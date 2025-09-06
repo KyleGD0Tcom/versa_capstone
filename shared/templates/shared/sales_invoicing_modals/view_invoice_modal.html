@@ -1,0 +1,278 @@
+<!-- Invoice Modal -->
+{% for invoice in invoices %}
+{% csrf_token %}
+<div class="modal fade" id="viewInvoiceModal{{ invoice.id }}" tabindex="-1" aria-labelledby="viewInvoiceModalLabel{{ invoice.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content rounded-3 p-5"
+            style="font-family: 'Rubik', sans-serif; max-height: 90vh; overflow: hidden;">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start p-4 border-bottom">
+                <div>
+                    <h5 class="fw-bold mb-1" style="color: #033b60;">{{ invoice.invoice_number }}</h5>
+                    <div class="text-muted small">Date of Issue: <span class="text-dark">{{ invoice.invoice_date|date:"F j, Y" }}</span></div>
+                    <div class="text-muted small">Due Date: <span class="text-dark">{{ invoice.due_date|date:"F j, Y" }}</span></div>
+                </div>
+                <div class="d-flex align-items-start">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="modal-body p-4 overflow-auto" style="max-height: calc(90vh - 130px);">
+
+                <!-- Client and Seller Information -->
+                <div class="row mb-5">
+                    <!-- Client Information -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold" style="color: #033b60;">CLIENT INFORMATION</h6>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Name:</strong></div>
+                            <div class="col-8">{{ invoice.order.client_name }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Address:</strong></div>
+                            <div class="col-8">{{ invoice.order.client_address }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Contact:</strong></div>
+                            <div class="col-8">{{ invoice.order.client_contact }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Email:</strong></div>
+                            <div class="col-8">
+                                <a href="mailto:{{ invoice.order.client_email }}" class="text-primary text-decoration-none">{{ invoice.order.client_email }}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seller Information -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold" style="color: #033b60;">SELLER INFORMATION</h6>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Company:</strong></div>
+                            <div class="col-8">{{ invoice.order.company_name }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Address:</strong></div>
+                            <div class="col-8">{{ invoice.order.company_address }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Contact:</strong></div>
+                            <div class="col-8">{{ invoice.order.company_contact }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Email:</strong></div>
+                            <div class="col-8">
+                                <a href="mailto:{{ invoice.order.company_email }}" class="text-primary text-decoration-none">{{ invoice.order.company_email }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Breakdown -->
+                <div class="mb-3" style="color: #033b60;">PRODUCT BREAKDOWN</div>
+                <div class="mb-3">
+                    <span class="badge bg-light text-dark border me-2">{{ invoice.department }}</span>
+                    <strong class="fs-6" style="color: #033b60;">Order Items</strong>
+                </div>
+                <div class="border p-3 rounded-3 mb-5">
+                    <div class="table-responsive mb-4">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="opacity: 0.3;">Item Description</th>
+                                    <th style="opacity: 0.3;">Item Code</th>
+                                    <th style="opacity: 0.3;">Serial Number</th>
+                                    <th style="opacity: 0.3;">Quantity</th>
+                                    <th style="opacity: 0.3;">Unit Price</th>
+                                    <th style="opacity: 0.3;">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in invoice.order.items.all %}
+                                <tr>
+                                    <td>{{ item.inventory_item.unit_item }}</td>
+                                    <td>{{ item.inventory_item.item_code }}</td>
+                                    <td>{{ item.inventory_item.serial_number }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₱ {{ item.unit_price|floatformat:2 }}</td>
+                                    <td>₱ {{ item.total_price|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <br>
+                <!-- Summary -->
+                <h6 class="" style="color: #033b60;">SUMMARY</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-center">₱ {{ invoice.amount|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="fw-bold">
+                                <td>Total</td>
+                                <td class="text-center">₱ {{ invoice.amount|floatformat:2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Payment Details -->
+                <h6 class="mb-4 mt-5" style="color: #033b60;">PAYMENT DETAILS</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">Payment Mode:</div>
+                            <div class="col-7">{{ invoice.order.payment_mode|title }}</div>
+                        </div>
+                        {% if invoice.order.payment_mode != 'cash' %}
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">Bank Account:</div>
+                            <div class="col-7">{{ invoice.order.bank_account|default:"N/A" }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">Account Number:</div>
+                            <div class="col-7">{{ invoice.order.account_number|default:"N/A" }}</div>
+                        </div>
+                        {% endif %}
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">Amount Paid:</div>
+                            <div class="col-7">₱ {{ invoice.order.amount_paid|floatformat:2 }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-5 text-muted">Outstanding Balance:</div>
+                            <div class="col-7">₱ {{ invoice.order.remaining_balance|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">Payment Status:</div>
+                            <div class="col-7">
+                                {% if invoice.status == 'Pending' %}
+                                <span class="badge bg-warning text-dark">{{ invoice.status }}</span>
+                                {% elif invoice.status == 'Paid' %}
+                                <span class="badge bg-success">{{ invoice.status }}</span>
+                                {% elif invoice.status == 'Overdue' %}
+                                <span class="badge bg-danger">{{ invoice.status }}</span>
+                                {% elif invoice.status == 'Cancelled' %}
+                                <span class="badge bg-secondary">{{ invoice.status }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">Due Date:</div>
+                            <div class="col-7">{{ invoice.due_date|date:"F j, Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-top pt-3">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Close</button>
+                {% if invoice.status != 'Cancelled' %}
+                    {% if invoice.order.remaining_balance > 0 and invoice.status == 'Pending' or invoice.status == 'Overdue' %}
+                        <button type="button" class="btn btn-success px-4" data-bs-toggle="modal"
+                            data-bs-target="#addPaymentModal{{ invoice.id }}">
+                            Add Payment
+                        </button>
+                    {% endif %}
+                    
+                    {% if request.path|slice:":10" == "/warehouse" %}
+                            <button type="button" class="btn btn-primary px-4" 
+                                    onclick="sendToDelivery(this)"
+                                    data-invoice-number="{{ invoice.invoice_number }}"
+                                data-invoice-id="{{ invoice.id }}"
+                                {% if invoice.has_delivery_request %}disabled{% endif %}>
+                            {% if invoice.has_delivery_request %}
+                                Sent to Delivery
+                            {% else %}
+                                Send To Delivery
+                            {% endif %}
+                            </button>
+                    {% else %}
+                        {% if not invoice.has_pdi_request %}
+                            <button type="button" class="btn btn-primary px-4" 
+                                    onclick="createPDIRequest(this)"
+                                    data-invoice-number="{{ invoice.invoice_number }}"
+                                    data-invoice-id="{{ invoice.id }}"
+                                    data-unit="{{ invoice.order.items.first.inventory_item.unit_item }}">
+                                Request for PDI
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+    function sendToDelivery(button) {
+        const invoiceId = button.dataset.invoiceId;
+        const invoiceNumber = button.dataset.invoiceNumber;
+        
+        if (confirm(`Are you sure you want to send invoice ${invoiceNumber} to delivery?`)) {
+            // Get the invoice data from the modal
+            const modal = button.closest('.modal');
+            const clientName = modal.querySelector('.col-8').textContent.trim();
+            const clientAddress = modal.querySelectorAll('.col-8')[1].textContent.trim();
+            const clientContact = modal.querySelectorAll('.col-8')[2].textContent.trim();
+            const clientEmail = modal.querySelectorAll('.col-8')[3].textContent.trim();
+            
+            // Get the first item's information
+            const firstItem = modal.querySelector('tbody tr');
+            const unitName = firstItem.querySelector('td:nth-child(1)').textContent.trim();
+            const serialNumber = firstItem.querySelector('td:nth-child(3)').textContent.trim();
+            const quantity = firstItem.querySelector('td:nth-child(4)').textContent.trim();
+            const unitPrice = firstItem.querySelector('td:nth-child(5)').textContent.replace('₱', '').replace(/,/g, '').trim();
+            const totalPrice = firstItem.querySelector('td:nth-child(6)').textContent.replace('₱', '').replace(/,/g, '').trim();
+
+            fetch('/warehouse/api/send-to-delivery/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                },
+                body: JSON.stringify({
+                    invoice_id: invoiceId,
+                    invoice_number: invoiceNumber,
+                    client_info: {
+                        client_name: clientName,
+                        client_address: clientAddress,
+                        client_contact: clientContact,
+                        client_email: clientEmail
+                    },
+                    unit_info: {
+                        unit_name: unitName,
+                        serial_number: serialNumber,
+                        quantity: quantity,
+                        unit_price: unitPrice,
+                        total_price: totalPrice
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Invoice sent to delivery successfully!');
+                    location.reload();
+                } else {
+                    alert('Error sending to delivery: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending to delivery. Please try again.');
+            });
+        }
+    }
+</script>

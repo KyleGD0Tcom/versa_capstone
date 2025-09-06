@@ -1,0 +1,181 @@
+{% extends 'motorpool/motorpool_base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-text {
+        color: #666;
+    }
+
+    /* Status colors */
+    .status-pending .status-dot {
+        background-color: #ffc107;
+    }
+    .status-pending .status-text {
+        color: #856404;
+    }
+
+    .status-in-progress .status-dot {
+        background-color: #0d6efd;
+    }
+    .status-in-progress .status-text {
+        color: #004085;
+    }
+
+    .status-passed .status-dot {
+        background-color: #198754;
+    }
+    .status-passed .status-text {
+        color: #155724;
+    }
+
+    .status-failed .status-dot {
+        background-color: #dc3545;
+    }
+    .status-failed .status-text {
+        color: #721c24;
+    }
+
+    .status-delivery .status-dot {
+        background-color: #20c997;
+    }
+    .status-delivery .status-text {
+        color: #0f5132;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i class="mb-4 d-block">Motorpool Department | Equipment Inspection</i>
+    <div class="mb-4">
+        <input type="search" placeholder="search" class="form-control" 
+             id="search1">  
+    </div>
+
+    <!-- Header and Add Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">Equipment Inspection Records</h5>
+        <!-- <button class="btn btn-success d-flex align-items-center gap-2 px-4" 
+                data-bs-toggle="modal" data-bs-target="#addEquipmentInspectionModal">
+            <i class="bi bi-plus-circle"></i>
+            Add New Inspection
+        </button> -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="card border rounded-4 shadow-sm">
+        <div class="card-body p-4">
+            <!-- Search and Filter -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <input type="text" class="form-control" placeholder="Search" style="width: 300px;">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted">Filter by:</span>
+                    <select class="form-select" style="width: 150px;">
+                        <option value="">Select</option>
+                    <option>Status</option>
+                        <option>Date</option>
+                        <option>Type</option>
+                </select>
+            </div>
+        </div>
+
+            <!-- Table -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="opacity: 0.3;">Inspection ID</th>
+                        <th style="opacity: 0.3;">Request Type</th>
+                        <th style="opacity: 0.3;">Unit</th>
+                        <th style="opacity: 0.3;">Date Received</th>
+                        <th style="opacity: 0.3;">Assigned Technician</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inspection in inspections %}
+                    <tr>
+                        <td class="fw-medium">{{ inspection.inspection_id }}</td>
+                        <td>{{ inspection.request_type }}</td>
+                        <td>{{ inspection.unit }}</td>
+                        <td>{{ inspection.date_received|date:"F j, Y" }}</td>
+                        <td>{{ inspection.assigned_technician }}</td>
+                        <td>
+                            <div id="statusBadge{{ inspection.id }}" 
+                                 class="status-indicator {% if inspection.status == 'Pending' %}status-pending{% elif inspection.status == 'In Progress' %}status-in-progress{% elif inspection.status == 'Passed' %}status-passed{% elif inspection.status == 'Failed' %}status-failed{% elif inspection.status == 'Delivery' %}status-delivery{% endif %}">
+                                <span class="status-dot"></span>
+                                <span class="status-text">{{ inspection.status }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-3">
+                                <a href="#" class="text-dark" data-bs-toggle="modal"
+                                    data-bs-target="#editEquipmentInspectionModal{{ inspection.id }}">
+                                    <i class="bi bi-pencil"></i>
+                            </a>
+                                <a href="#" class="text-dark" data-bs-toggle="modal"
+                                    data-bs-target="#viewEquipmentInspectionModal{{ inspection.id }}">
+                                    <i class="bi bi-chevron-right"></i>
+                            </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include Modals -->
+{% for inspection in inspections %}
+    {% include 'shared/motorpool_equipment_inspection_modals/edit_equipment_inspection.html' with inspection=inspection %}
+    {% include 'shared/motorpool_equipment_inspection_modals/view_equipment_inspection.html' with inspection=inspection %}
+{% endfor %}
+
+{% include 'shared/motorpool_equipment_inspection_modals/add_equipment_inspection.html' %}
+
+<style>
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.5rem;
+    }
+    .table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .table thead tr {
+        border-bottom: 1px solid #e0e0e0;
+    }
+</style>
+
+{% endblock %}

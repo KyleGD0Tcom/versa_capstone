@@ -1,0 +1,417 @@
+{% for schedule in delivery_schedules %}
+<div class="modal fade" id="viewDeliveryTrackerModal{{ schedule.schedule_id }}" tabindex="-1" aria-labelledby="viewDeliveryTrackerModalLabel{{ schedule.schedule_id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <!-- Add CSRF Token -->
+            {% csrf_token %}
+            
+            <style>
+                .status-badge {
+                    padding: 6px 12px;
+                    border-radius: 50px;
+                    font-size: 12px;
+                    font-weight: 500;
+                }
+
+                .status-scheduled {
+                    background-color: #cce5ff;
+                    color: #004085;
+                }
+
+                .status-intransit {
+                    background-color: #fff3cd;
+                    color: #856404;
+                }
+
+                .status-delivered {
+                    background-color: #d4edda;
+                    color: #155724;
+                }
+
+                .status-cancelled {
+                    background-color: #f8d7da;
+                    color: #721c24;
+                }
+            </style>
+            
+            <div class="modal-header border-0">
+                <div class="w-100">
+                    <!-- Name and Close Button -->
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;">{{ schedule.schedule_id }}</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Row 1: Company & Address -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Invoice Number:</div>
+                            <div class="fw-bold" id="invoice-number-{{ schedule.schedule_id }}"></div>
+                        </div>
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Date Ordered:</div>
+                            <div id="delivery-date-{{ schedule.schedule_id }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Contact Details & Status -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary mb-2" style="min-width: 150px;">Assigned Driver:</div>
+                            <div class="fw-bold" id="assigned-driver-{{ schedule.schedule_id }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Status -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary" style="min-width: 150px;">Status:</div>
+                            <div class="mt-1">
+                                <span id="status-badge-{{ schedule.schedule_id }}" class="status-badge"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">CLIENT INFORMATION</div>
+
+                <!-- Client Details -->
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Name:</div>
+                        <div class="fw-bold" id="client-name-{{ schedule.schedule_id }}"></div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Address:</div>
+                        <div class="fw-bold" id="client-address-{{ schedule.schedule_id }}"></div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Contact:</div>
+                        <div class="fw-bold" id="client-contact-{{ schedule.schedule_id }}"></div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Email:</div>
+                        <div><a href="" id="client-email-link-{{ schedule.schedule_id }}"><span id="client-email-{{ schedule.schedule_id }}"></span></a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Breakdown -->
+            <div class="mb-3 mt-4" style="color: #033b60;">PRODUCT BREAKDOWN</div>
+            <div class="mb-3">
+                <strong class="fs-6" style="color: #033b60;">Order Item</strong>
+            </div>
+            <div class="border p-3 rounded-3 mb-4">
+                <div class="table-responsive mb-4">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="opacity: 0.3;">Item Description</th>
+                                <th style="opacity: 0.3;">Serial Number</th>
+                                <th style="opacity: 0.3;">Quantity</th>
+                                <th style="opacity: 0.3;">Unit Price</th>
+                                <th style="opacity: 0.3;">Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="unit-name-{{ schedule.schedule_id }}"></td>
+                                <td class="fw-bold" id="serial-number-{{ schedule.schedule_id }}"></td>
+                                <td id="quantity-{{ schedule.schedule_id }}">
+                                    {% if schedule.delivery_request.invoice and schedule.delivery_request.invoice.order and schedule.delivery_request.invoice.order.items.first %}
+                                        {{ schedule.delivery_request.invoice.order.items.first.quantity }}
+                                    {% else %}
+                                        {{ schedule.delivery_request.unit_info.quantity|default:"1" }}
+                                    {% endif %}
+                                </td>
+                                <td id="unit-price-{{ schedule.schedule_id }}"></td>
+                                <td id="total-price-{{ schedule.schedule_id }}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="" style="color: #033b60;">SUMMARY</div>
+            <div class="table-responsive mb-4 mx-5">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <td id="subtotal-{{ schedule.schedule_id }}"></td>
+                        </tr>
+                        <tr class="fw-bold" style="border-top: solid rgb(197, 191, 191) 0.1px;">
+                            <td>Total</td>
+                            <td id="total-{{ schedule.schedule_id }}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Delivery Status -->
+            <div class="mb-5">
+                <div class="mb-4" style="color: #033b60;">DELIVERY STATUS</div>
+                <div class="d-flex align-items-center mx-5">
+                    <!-- Status Steps -->
+                    <div class="d-flex align-items-center w-100">
+                        <!-- Step 1: Scheduled -->
+                        <div class="text-center" style="min-width: 100px;">
+                            <i id="status-scheduled-icon-{{ schedule.schedule_id }}" class="bi bi-box-seam" style="font-size: 32px;"></i>
+                            <p id="status-scheduled-text-{{ schedule.schedule_id }}" class="mt-2 fw-bold">Scheduled</p>
+                        </div>
+                        <div id="line-1-{{ schedule.schedule_id }}" class="flex-grow-1 border-top" style="height: 3px; margin: 0 20px;"></div>
+
+                        <!-- Step 2: In Transit -->
+                        <div class="text-center" style="min-width: 100px;">
+                            <i id="status-transit-icon-{{ schedule.schedule_id }}" class="bi bi-truck" style="font-size: 32px;"></i>
+                            <p id="status-transit-text-{{ schedule.schedule_id }}" class="mt-2 fw-bold">In-Transit</p>
+                        </div>
+                        <div id="line-2-{{ schedule.schedule_id }}" class="flex-grow-1 border-top" style="height: 3px; margin: 0 20px;"></div>
+
+                        <!-- Step 3: Delivered -->
+                        <div class="text-center" style="min-width: 100px;">
+                            <i id="status-delivered-icon-{{ schedule.schedule_id }}" class="bi bi-box" style="font-size: 32px;"></i>
+                            <p id="status-delivered-text-{{ schedule.schedule_id }}" class="mt-2 fw-bold">Delivered</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-3">
+                <button type="button" id="inTransitBtn-{{ schedule.schedule_id }}" class="btn btn-warning" onclick="updateDeliveryStatus('{{ schedule.schedule_id }}', 'In-Transit', this, '{{ schedule.schedule_id }}')">Mark In-Transit</button>
+                <button type="button" id="deliveredBtn-{{ schedule.schedule_id }}" class="btn btn-success" onclick="updateDeliveryStatus('{{ schedule.schedule_id }}', 'Delivered', this, '{{ schedule.schedule_id }}')">Mark Delivered</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+function decodeUnicode(str) {
+    try {
+        return JSON.parse('"' + str.replace(/"/g, '\\"') + '"');
+    } catch {
+        return str;
+    }
+}
+
+function initializeDeliveryTracker(scheduleId, requestId, invoiceNumber, deliveryDate, assignedDriver, status, 
+    clientName, clientAddress, clientContact, clientEmail, unitName, serialNumber, unitPrice, totalPrice) {
+    // Decode all possibly escaped strings
+    scheduleId = decodeUnicode(scheduleId);
+    requestId = decodeUnicode(requestId);
+    invoiceNumber = decodeUnicode(invoiceNumber);
+    deliveryDate = decodeUnicode(deliveryDate);
+    assignedDriver = decodeUnicode(assignedDriver);
+    status = decodeUnicode(status);
+    clientName = decodeUnicode(clientName);
+    clientAddress = decodeUnicode(clientAddress);
+    clientContact = decodeUnicode(clientContact);
+    clientEmail = decodeUnicode(clientEmail);
+    unitName = decodeUnicode(unitName);
+    serialNumber = decodeUnicode(serialNumber);
+    // unitPrice and totalPrice are numbers, no need to decode
+
+    console.log('initializeDeliveryTracker called with:', scheduleId, requestId, invoiceNumber, deliveryDate, assignedDriver, status);
+    // Debug: check if key elements exist
+    const invoiceElem = document.getElementById('invoice-number-' + scheduleId);
+    if (!invoiceElem) {
+        alert('Could not find element: invoice-number-' + scheduleId);
+        return;
+    }
+    invoiceElem.textContent = invoiceNumber;
+    const dateElem = document.getElementById('delivery-date-' + scheduleId);
+    if (!dateElem) {
+        alert('Could not find element: delivery-date-' + scheduleId);
+        return;
+    }
+    dateElem.textContent = deliveryDate;
+    const driverElem = document.getElementById('assigned-driver-' + scheduleId);
+    if (!driverElem) {
+        alert('Could not find element: assigned-driver-' + scheduleId);
+        return;
+    }
+    driverElem.textContent = assignedDriver;
+    const statusBadge = document.getElementById('status-badge-' + scheduleId);
+    if (!statusBadge) {
+        alert('Could not find element: status-badge-' + scheduleId);
+        return;
+    }
+    statusBadge.textContent = status;
+    statusBadge.className = 'status-badge';
+    const statusClass = status.toLowerCase().replace('-', '').replace(' ', '');
+    statusBadge.classList.add(`status-${statusClass}`);
+    const inTransitBtn = document.getElementById('inTransitBtn-' + scheduleId);
+    const deliveredBtn = document.getElementById('deliveredBtn-' + scheduleId);
+    // Normalize status for comparison
+    const normalizedStatus = (status || '').toLowerCase().replace(/\s+/g, '').replace('-', '');
+    if (normalizedStatus === 'scheduled') {
+        inTransitBtn.disabled = false;
+        deliveredBtn.disabled = true;
+    } else if (normalizedStatus === 'intransit') {
+        inTransitBtn.disabled = true;
+        deliveredBtn.disabled = false;
+    } else if (normalizedStatus === 'delivered') {
+        inTransitBtn.disabled = true;
+        deliveredBtn.disabled = true;
+    } else {
+        inTransitBtn.disabled = true;
+        deliveredBtn.disabled = true;
+    }
+    document.getElementById('client-name-' + scheduleId).textContent = clientName;
+    document.getElementById('client-address-' + scheduleId).textContent = clientAddress;
+    document.getElementById('client-contact-' + scheduleId).textContent = clientContact;
+    document.getElementById('client-email-' + scheduleId).textContent = clientEmail;
+    document.getElementById('client-email-link-' + scheduleId).href = 'mailto:' + clientEmail;
+    try {
+        const formattedUnitPrice = parseFloat(unitPrice || 0).toLocaleString('en-PH', {
+            style: 'currency', currency: 'PHP', minimumFractionDigits: 2, maximumFractionDigits: 2
+        });
+        const formattedTotalPrice = parseFloat(totalPrice || 0).toLocaleString('en-PH', {
+            style: 'currency', currency: 'PHP', minimumFractionDigits: 2, maximumFractionDigits: 2
+        });
+        document.getElementById('unit-name-' + scheduleId).textContent = unitName;
+        document.getElementById('serial-number-' + scheduleId).textContent = serialNumber;
+        document.getElementById('unit-price-' + scheduleId).textContent = formattedUnitPrice;
+        document.getElementById('total-price-' + scheduleId).textContent = formattedTotalPrice;
+        document.getElementById('subtotal-' + scheduleId).textContent = formattedTotalPrice;
+        document.getElementById('total-' + scheduleId).textContent = formattedTotalPrice;
+    } catch (error) {
+        document.getElementById('unit-price-' + scheduleId).textContent = '₱ 0.00';
+        document.getElementById('total-price-' + scheduleId).textContent = '₱ 0.00';
+        document.getElementById('subtotal-' + scheduleId).textContent = '₱ 0.00';
+        document.getElementById('total-' + scheduleId).textContent = '₱ 0.00';
+    }
+    updateStatusProgress(status, scheduleId);
+}
+
+function updateStatusProgress(status, scheduleId) {
+    // Decode the status if it contains Unicode escape sequences
+    const decodedStatus = decodeURIComponent(JSON.parse('"' + status.replace(/\"/g, '\\"') + '"'));
+    
+    const steps = ['scheduled', 'transit', 'delivered'];
+    const normalizedStatus = decodedStatus.toLowerCase().replace('-', '').replace(' ', '');
+    
+    const currentStep = normalizedStatus === 'scheduled' ? 0 
+                     : normalizedStatus === 'intransit' ? 1 
+                     : normalizedStatus === 'delivered' ? 2 
+                     : -1;
+    
+    steps.forEach((step, index) => {
+        const icon = document.getElementById(`status-${step}-icon-` + scheduleId);
+        const text = document.getElementById(`status-${step}-text-` + scheduleId);
+        const line = index < 2 ? document.getElementById(`line-${index + 1}-` + scheduleId) : null;
+        
+        if (currentStep === -1) {
+            // Cancelled state
+            icon.className = 'bi bi-x-circle text-danger';
+            text.className = 'mt-2 fw-bold text-danger';
+            if (line) line.className = 'flex-grow-1 border-top';
+        } else if (index <= currentStep) {
+            // Completed steps
+            icon.className = 'bi bi-' + (step === 'scheduled' ? 'box-seam' : step === 'transit' ? 'truck' : 'box') + ' text-success';
+            text.className = 'mt-2 fw-bold text-success';
+            if (line) line.className = 'flex-grow-1 border-top border-success';
+        } else {
+            // Future steps
+            icon.className = 'bi bi-' + (step === 'scheduled' ? 'box-seam' : step === 'transit' ? 'truck' : 'box') + ' text-muted';
+            text.className = 'mt-2 fw-bold text-muted';
+            if (line) line.className = 'flex-grow-1 border-top';
+        }
+    });
+}
+
+function updateDeliveryStatus(scheduleId, newStatus, buttonElement, modalId) {
+    // Disable the clicked button immediately
+    buttonElement.disabled = true;
+    
+    // Disable both buttons to prevent double submission
+    const inTransitBtn = document.getElementById('inTransitBtn-' + modalId);
+    const deliveredBtn = document.getElementById('deliveredBtn-' + modalId);
+    inTransitBtn.disabled = true;
+    deliveredBtn.disabled = true;
+    
+    // Add loading state to the clicked button
+    const originalText = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
+
+    const modalElement = document.getElementById('viewDeliveryTrackerModal' + modalId);
+    const csrfToken = modalElement.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('/delivery/api/update-status/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            schedule_id: scheduleId,
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Decode the status if it contains Unicode escape sequences
+            const decodedStatus = decodeURIComponent(JSON.parse('"' + newStatus.replace(/\"/g, '\\"') + '"'));
+            
+            // Update the UI
+            const statusBadge = document.getElementById('status-badge-' + modalId);
+            statusBadge.textContent = decodedStatus;
+            statusBadge.className = 'status-badge';
+            
+            // Add the appropriate status class
+            const statusClass = decodedStatus.toLowerCase().replace('-', '').replace(' ', '');
+            statusBadge.classList.add(`status-${statusClass}`);
+            
+            // Update the progress indicators
+            updateStatusProgress(decodedStatus, modalId);
+            
+            // Keep buttons disabled and update their appearance
+            if (newStatus === 'In-Transit') {
+                inTransitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Marked as In-Transit';
+                inTransitBtn.classList.remove('btn-warning');
+                inTransitBtn.classList.add('btn-secondary');
+            } else if (newStatus === 'Delivered') {
+                deliveredBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Marked as Delivered';
+                deliveredBtn.classList.remove('btn-success');
+                deliveredBtn.classList.add('btn-secondary');
+                
+                // Refresh the current page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        } else {
+            // Re-enable buttons and restore original state if there's an error
+            buttonElement.disabled = false;
+            buttonElement.innerHTML = originalText;
+            if (newStatus === 'In-Transit') {
+                deliveredBtn.disabled = true;
+            }
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Re-enable buttons and restore original state
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = originalText;
+        if (newStatus === 'In-Transit') {
+            deliveredBtn.disabled = true;
+        }
+        alert('Error updating delivery status. Please try again.');
+    });
+}
+</script>

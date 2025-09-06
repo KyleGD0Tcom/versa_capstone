@@ -1,0 +1,278 @@
+<div class="modal fade" id="viewServiceRecordModal{{ record.service_id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content p-5 rounded-3">
+            <!-- Service ID Header -->
+            <div class="modal-header border-0">
+                <h5 class="modal-title ms-3 fw-bold" style="color: #033b60;">{{ record.service_id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Order Details Section -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Order ID:</div>
+                        <div class="ms-3">{{ record.sales_order.order_number|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Invoice ID:</div>
+                        <div class="ms-3">{{ record.invoice.invoice_number|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Date Received:</div>
+                        <div class="ms-3">{{ record.created_at|date:"F j, Y" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Status:</div>
+                        <div class="ms-3">
+                            <span style="background-color: rgb(202, 238, 204); border-radius: 5px;"
+                                class="p-1 text-success">{{ record.status }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Information Section -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #033b60;">CLIENT INFORMATION</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Name:</div>
+                                <div class="ms-5" data-field="client_name">{{ record.client_name }}</div>
+                            </div>
+                            {% if record.sales_order %}
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Company:</div>
+                                <div class="ms-5">{{ record.sales_order.company_name|default:"-" }}</div>
+                            </div>
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Contact:</div>
+                                <div class="ms-5">{{ record.sales_order.client_contact|default:"-" }}</div>
+                            </div>
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Email:</div>
+                                <div class="ms-5">{{ record.sales_order.client_email|default:"-" }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Breakdown Section -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #033b60;">PRODUCT BREAKDOWN</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item Description</th>
+                                    <th>Serial Number</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-field="unit_name">{{ record.unit_name }}</td>
+                                    <td data-field="serial_number"><b>{{ record.serial_number }}</b></td>
+                                    <td>
+                                        {% if record.sales_order and record.sales_order.items.first %}
+                                            {{ record.sales_order.items.first.quantity }}
+                                        {% else %}
+                                            1
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.sales_order and record.sales_order.items.first %}
+                                            ₱{{ record.sales_order.items.first.unit_price|floatformat:2 }}
+                                        {% else %}
+                                            ₱0.00
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.sales_order and record.sales_order.items.first %}
+                                            ₱{{ record.sales_order.items.first.total_price|floatformat:2 }}
+                                        {% else %}
+                                            ₱0.00
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Warranty Details Section -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #033b60;">WARRANTY DETAILS</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Start Date:</div>
+                                <div class="ms-5">{{ record.warranty_start|date:"F j, Y" }}</div>
+                            </div>
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">End Date:</div>
+                                <div class="ms-5">{{ record.warranty_end|date:"F j, Y" }}</div>
+                            </div>
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Remaining Days:</div>
+                                <div class="ms-5">
+                                    {% with days_left=record.warranty_end|timeuntil %}
+                                    {{ days_left }}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Send To Maintenance Button -->
+            <div class="modal-footer border-0 d-flex justify-content-end">
+                <button type="button" 
+                    class="btn btn-info me-2" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#maintenanceHistoryModal{{ record.service_id }}">
+                    <i class="bi bi-clock-history me-2"></i>Maintenance History
+                </button>
+                <button type="button" 
+                    class="btn {% if record.has_maintenance %}btn-secondary{% else %}btn-primary{% endif %}" 
+                    id="sendToMaintenanceBtn{{ record.service_id }}"
+                    onclick="sendToMaintenance('{{ record.service_id }}')"
+                    {% if record.has_maintenance %}disabled{% endif %}>
+                    <i class="bi bi-tools me-2"></i>
+                    {% if record.has_maintenance %}
+                        Already Sent to Maintenance
+                    {% else %}
+                        Send To Maintenance
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Maintenance History Modal -->
+<div class="modal fade" id="maintenanceHistoryModal{{ record.service_id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-5 rounded-3">
+            <!-- Header -->
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" style="color: #033b60;">MAINTENANCE HISTORY</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Maintenance ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for maintenance in record.completed_maintenance_records %}
+                            <tr>
+                                <td>
+                                    <a href="#" 
+                                       class="btn btn-outline-primary btn-sm fw-bold w-25 text-start mb-1"
+                                       onclick="openMaintenanceModal('{{ maintenance.maintenance_id }}')"
+                                       style="cursor: pointer;">
+                                        {{ maintenance.maintenance_id }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td class="text-center text-muted py-4">
+                                    No completed maintenance records found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openMaintenanceModal(maintenanceId) {
+    // Close the maintenance history modal
+    var historyModal = document.getElementById('maintenanceHistoryModal{{ record.service_id }}');
+    var bsHistoryModal = bootstrap.Modal.getInstance(historyModal);
+    if (bsHistoryModal) {
+        bsHistoryModal.hide();
+    }
+    
+    // Open the view schedule modal
+    var scheduleModal = document.getElementById('viewScheduleModal' + maintenanceId);
+    if (scheduleModal) {
+        var bsScheduleModal = new bootstrap.Modal(scheduleModal);
+        bsScheduleModal.show();
+    }
+}
+
+function sendToMaintenance(serviceId) {
+    // Immediately disable the button
+    const btn = document.getElementById('sendToMaintenanceBtn' + serviceId);
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-secondary');
+        btn.innerHTML = '<i class="bi bi-tools me-2"></i>Already Sent to Maintenance';
+    }
+
+    // Get the modal for this service
+    const modal = document.getElementById('viewServiceRecordModal' + serviceId);
+    if (!modal) return;
+
+    // Get values from modal fields
+    const unitName = modal.querySelector('[data-field="unit_name"]').textContent.trim();
+    const serialNumber = modal.querySelector('[data-field="serial_number"]').textContent.trim();
+    const clientName = modal.querySelector('[data-field="client_name"]').textContent.trim();
+
+    // Send AJAX request to create maintenance
+    fetch('/aftersales/create_maintenance/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            service_id: serviceId,
+            unit_name: unitName,
+            serial_number: serialNumber,
+            client_name: clientName
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Optionally reload or update UI
+            window.location.href = data.redirect_url || '/aftersales/maintenance_schedule/';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>

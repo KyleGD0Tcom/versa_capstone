@@ -1,0 +1,1 @@
+from adminpanel.forms import InventoryItemForm

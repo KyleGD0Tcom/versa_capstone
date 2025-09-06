@@ -1,0 +1,574 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+
+</head>
+<style>
+    th {
+        opacity: 0.3;
+    }
+
+    .labels {
+        opacity: 0.7;
+    }
+
+
+    .product-breakdown {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    .remove-btn {
+        color: rgb(255, 255, 255);
+        cursor: pointer;
+        border-radius: 5px;
+        border: none;
+        background-color: red;
+    }
+</style>
+
+
+
+<!-- Edit Sales Order Modal -->
+<div class="modal fade" id="requestOrdersModal" tabindex="-1" aria-labelledby="requestOrdersModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="requestOrdersModalLabel">
+                    <span style="color: #033b60;">New Order</span>
+                </h5>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="salesOrderForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-secondary">Order Date:</div>
+                        <div class="col-md-10">
+                            <input type="date" class="form-control" name="order_date" value="{{ today|date:'Y-m-d' }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-secondary">Delivery Date:</div>
+                        <div class="col-md-10">
+                            <input type="date" class="form-control" name="delivery_date" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-secondary">Delivery Instructions:</div>
+                        <div class="col-md-10">
+                            <textarea class="form-control" name="delivery_instructions" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Client & Seller Info -->
+                    <div class="row mb-5 mt-5">
+                        <div class="col-md-6">
+                            <div class="mb-4" style="color: #033b60;">CLIENT INFORMATION</div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Name:</label>
+                                <input type="text" class="form-control" name="client_name" required style="flex: 2;">
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Address:</label>
+                                <input type="text" class="form-control" name="client_address" required style="flex: 2;">
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Contact:</label>
+                                <input type="text" class="form-control" name="client_contact" required style="flex: 2;">
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Email:</label>
+                                <input type="email" class="form-control" name="client_email" required style="flex: 2;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-4" style="color: #033b60;">SELLER INFORMATION</div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Company:</label>
+                                <input type="text" class="form-control" name="company_name" required style="flex: 2;">
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Address:</label>
+                                <input type="text" class="form-control" name="company_address" required style="flex: 2;">
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Contact:</label>
+                                <input type="text" class="form-control" name="company_contact" required style="flex: 2;">
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <label class="form-label text-secondary" style="flex: 1;">Email:</label>
+                                <input type="email" class="form-control" name="company_email" required style="flex: 2;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Product Breakdown Section -->
+                    <div style="color: #033b60;">PRODUCT BREAKDOWN</div>
+                    <div id="product-container">
+                        <div class="row mb-2 mt-2 border p-3 rounded mx-1 product-row">
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3 mt-3">
+                                    <label class="form-label text-secondary" style="flex: 1;">Item Name:</label>
+                                    <select class="form-select item-select" style="flex: 2;" required>
+                                        <option value="">Select Item</option>
+                                        {% if inventory_items %}
+                                            {% for item in inventory_items %}
+                                            <option value="{{ item.id }}">{{ item.unit_item }}</option>
+                                            {% endfor %}
+                                        {% elif items %}
+                                            {% for item in items %}
+                                            <option value="{{ item.id }}">{{ item.unit_item }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+
+                                <div class="d-flex mb-3">
+                                    <label class="form-label text-secondary" style="flex: 1;">Item Code:</label>
+                                    <input type="text" class="form-control item-code" readonly style="flex: 2;">
+                                </div>
+
+                                <div class="d-flex mb-3">
+                                    <label class="form-label text-secondary" style="flex: 1;">Serial Number:</label>
+                                    <input type="text" class="form-control serial-number" readonly style="flex: 2;">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3 mt-3">
+                                    <label class="form-label text-secondary" style="flex: 1;">Quantity:</label>
+                                    <input type="number" class="form-control quantity" min="1" required style="flex: 2;">
+                                </div>
+
+                                <div class="d-flex mb-3">
+                                    <label class="form-label text-secondary" style="flex: 1;">Unit Price:</label>
+                                    <input type="text" class="form-control unit-price" readonly style="flex: 2;">
+                                </div>
+
+                                <div class="d-flex mb-3">
+                                    <label class="form-label text-secondary" style="flex: 1;">Total Price:</label>
+                                    <input type="text" class="form-control total-price" readonly style="flex: 2;">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="remove-btn" onclick="removeProduct(this)">X</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="button" style="background-color: #033b60; border-radius: 5px; border: none; min-width: 10%;" class="text-white p-1 shadow" onclick="addProduct()">+ Add More</button>
+                    </div>
+
+                    <hr>
+
+                    <!-- Payment Details -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div style="color: #033b60;">PAYMENT DETAILS</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="row mb-2">
+                                <div class="col-4 text-secondary">Payment Mode:</div>
+                                <div class="col-8">
+                                    <select class="form-select" id="paymentMode" name="payment_mode" onchange="togglePaymentFields()">
+                                        <option value="cash">Cash</option>
+                                        <option value="inhouse">In-house</option>
+                                        <option value="financing">Financing</option>
+                                        <option value="loan">Loan</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cash Payment Fields -->
+                    <div id="cashFields" class="payment-fields">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Due Date:</div>
+                                    <div class="col-8">
+                                        <input type="date" class="form-control" name="due_date" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Amount Paid:</div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" name="amount_paid" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other Payment Types Fields -->
+                    <div id="otherPaymentFields" class="payment-fields" style="display: none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Residence Location:</div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" name="residence_location">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Due Date:</div>
+                                    <div class="col-8">
+                                        <input type="date" class="form-control" name="due_date" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Statement Details -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div style="color: #033b60;">BANK STATEMENT</div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Bank Account:</div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" name="bank_account">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Account Number:</div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" name="account_number">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Amount Paid:</div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" name="amount_paid" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Attachments Section -->
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div style="color: #033b60;">ATTACHMENTS</div>
+                        </div>
+                    </div>
+
+                    <!-- Cash Payment Attachments -->
+                    <div id="cashAttachments" class="attachment-fields">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">ID:</div>
+                                    <div class="col-8">
+                                        <input type="file" class="form-control" name="id_attachment" accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other Payment Types Attachments -->
+                    <div id="otherAttachments" class="attachment-fields" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">Business Permit:</div>
+                                    <div class="col-8">
+                                        <input type="file" class="form-control" name="business_permit">
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-secondary">BIR:</div>
+                                    <div class="col-8">
+                                        <input type="file" class="form-control" name="bir_attachment">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <hr>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="submitOrder()">Submit Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to add new product row
+    function addProduct() {
+        const productContainer = document.getElementById('product-container');
+        const newProductRow = document.querySelector('.product-row').cloneNode(true);
+
+        // Clear input fields in the cloned row
+        newProductRow.querySelectorAll('input').forEach(input => input.value = '');
+        newProductRow.querySelector('select').value = '';
+
+        // Add event listeners to the new row
+        setupProductRowEventListeners(newProductRow);
+
+        // Append the new row to the container
+        productContainer.appendChild(newProductRow);
+    }
+
+    // Function to remove product row
+    function removeProduct(button) {
+        const productContainer = document.getElementById('product-container');
+        const productRows = productContainer.querySelectorAll('.product-row');
+
+        if (productRows.length > 1) {
+            button.closest('.product-row').remove();
+        }
+    }
+
+    // Function to toggle payment fields based on payment mode
+    function togglePaymentFields() {
+        const paymentMode = document.getElementById('paymentMode').value;
+        const cashFields = document.getElementById('cashFields');
+        const otherPaymentFields = document.getElementById('otherPaymentFields');
+        const cashAttachments = document.getElementById('cashAttachments');
+        const otherAttachments = document.getElementById('otherAttachments');
+
+        if (paymentMode === 'cash') {
+            cashFields.style.display = 'block';
+            otherPaymentFields.style.display = 'none';
+            cashAttachments.style.display = 'block';
+            otherAttachments.style.display = 'none';
+        } else {
+            cashFields.style.display = 'none';
+            otherPaymentFields.style.display = 'block';
+            cashAttachments.style.display = 'none';
+            otherAttachments.style.display = 'block';
+        }
+    }
+
+    // Function to setup event listeners for a product row
+    function setupProductRowEventListeners(row) {
+        const itemSelect = row.querySelector('.item-select');
+        const quantityInput = row.querySelector('.quantity');
+
+        itemSelect.addEventListener('change', function() {
+            if (this.value) {
+                // Determine if we're in sales or warehouse context
+                const isWarehouse = window.location.pathname.includes('/warehouse/');
+                const endpoint = isWarehouse ? 
+                    `/warehouse/get-item-details/${this.value}/` : 
+                    `/sales/get-item-details/${this.value}/`;
+
+                fetch(endpoint)
+                    .then(response => response.json())
+                    .then(data => {
+                        row.querySelector('.item-code').value = data.item_code;
+                        row.querySelector('.serial-number').value = data.serial_number;
+                        row.querySelector('.unit-price').value = data.unit_price;
+                        updateTotalPrice(row);
+                    });
+            } else {
+                row.querySelector('.item-code').value = '';
+                row.querySelector('.serial-number').value = '';
+                row.querySelector('.unit-price').value = '';
+                row.querySelector('.total-price').value = '';
+            }
+        });
+
+        quantityInput.addEventListener('input', function() {
+            updateTotalPrice(row);
+        });
+    }
+
+    // Function to update total price
+    function updateTotalPrice(row) {
+        const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+        const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+        row.querySelector('.total-price').value = (quantity * unitPrice).toFixed(2);
+    }
+
+    // Function to submit the order
+    function submitOrder() {
+        const form = document.getElementById('salesOrderForm');
+        const formData = new FormData();
+
+        // Get all form data
+        const orderData = {
+            client_name: form.querySelector('[name="client_name"]').value,
+            client_address: form.querySelector('[name="client_address"]').value,
+            client_contact: form.querySelector('[name="client_contact"]').value,
+            client_email: form.querySelector('[name="client_email"]').value,
+            company_name: form.querySelector('[name="company_name"]').value,
+            company_address: form.querySelector('[name="company_address"]').value,
+            company_contact: form.querySelector('[name="company_contact"]').value,
+            company_email: form.querySelector('[name="company_email"]').value,
+            delivery_date: form.querySelector('[name="delivery_date"]').value,
+            delivery_instructions: form.querySelector('[name="delivery_instructions"]').value,
+            payment_mode: form.querySelector('[name="payment_mode"]').value,
+            items: []
+        };
+
+        // Get payment mode specific fields
+        const paymentMode = orderData.payment_mode;
+        if (paymentMode === 'cash') {
+            // For cash payments
+            const cashDueDate = form.querySelector('#cashFields [name="due_date"]').value;
+            const cashAmountPaid = form.querySelector('#cashFields [name="amount_paid"]').value;
+            orderData.due_date = cashDueDate;
+            orderData.amount_paid = cashAmountPaid || 0;
+        } else {
+            // For other payment types (in-house, financing, loan)
+            const otherDueDate = form.querySelector('#otherPaymentFields [name="due_date"]').value;
+            const otherAmountPaid = form.querySelector('#otherPaymentFields [name="amount_paid"]').value;
+            orderData.residence_location = form.querySelector('[name="residence_location"]').value;
+            orderData.bank_account = form.querySelector('[name="bank_account"]').value;
+            orderData.account_number = form.querySelector('[name="account_number"]').value;
+            orderData.due_date = otherDueDate;
+            orderData.amount_paid = otherAmountPaid || 0;
+        }
+
+        // Validate required dates
+        if (!orderData.delivery_date || !orderData.due_date) {
+            alert('Please fill in all required dates');
+            return;
+        }
+
+        // Get items data
+        const productRows = document.querySelectorAll('.product-row');
+        let hasItems = false;
+        productRows.forEach(row => {
+            const itemSelect = row.querySelector('.item-select');
+            if (itemSelect.value) {
+                hasItems = true;
+                orderData.items.push({
+                    item_id: itemSelect.value,
+                    quantity: row.querySelector('.quantity').value,
+                    unit_price: row.querySelector('.unit-price').value,
+                    item_code: row.querySelector('.item-code').value,
+                    serial_number: row.querySelector('.serial-number').value
+                });
+            }
+        });
+
+        if (!hasItems) {
+            alert('Please add at least one item');
+            return;
+        }
+
+        // Add the order data to formData
+        formData.append('order_data', JSON.stringify(orderData));
+
+        // Add file attachments
+        if (paymentMode === 'cash') {
+            const idAttachment = form.querySelector('#cashAttachments [name="id_attachment"]').files[0];
+            if (idAttachment) formData.append('id_attachment', idAttachment);
+        } else {
+            const businessPermit = form.querySelector('#otherAttachments [name="business_permit"]').files[0];
+            const birAttachment = form.querySelector('#otherAttachments [name="bir_attachment"]').files[0];
+            if (businessPermit) formData.append('business_permit', businessPermit);
+            if (birAttachment) formData.append('bir_attachment', birAttachment);
+        }
+
+        // Determine if we're in sales or warehouse context
+        const isWarehouse = window.location.pathname.includes('/warehouse/');
+        const endpoint = isWarehouse ? '/warehouse/api/create-order/' : '/sales/api/create-order/';
+
+        // Send the request
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Order created successfully!');
+                location.reload();
+            } else {
+                alert('Error creating order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error creating order: ' + error);
+        });
+    }
+
+    // Initialize the modal when it's shown
+    document.getElementById('requestOrdersModal').addEventListener('show.bs.modal', function () {
+        // Reset form
+        document.getElementById('salesOrderForm').reset();
+        
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelector('[name="order_date"]').value = today;
+        
+        // Reset product rows to initial state
+        const productContainer = document.getElementById('product-container');
+        while (productContainer.children.length > 1) {
+            productContainer.removeChild(productContainer.lastChild);
+        }
+        
+        // Reset the first product row
+        const firstRow = productContainer.querySelector('.product-row');
+        firstRow.querySelectorAll('input').forEach(input => input.value = '');
+        firstRow.querySelector('select').value = '';
+        
+        // Initialize payment fields
+        togglePaymentFields();
+        
+        // Setup event listeners
+        document.querySelectorAll('.product-row').forEach(row => {
+            setupProductRowEventListeners(row);
+        });
+    });
+</script>

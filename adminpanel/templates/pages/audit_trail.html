@@ -1,0 +1,195 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .custom-dropdown {
+        background-color: rgb(224, 224, 224);
+        color: #000;
+        /* Optional: ensures text is visible */
+        border: 0.1px solid #ccc;
+        /* Optional: define border style */
+    }
+
+    .custom-dropdown:focus {
+        box-shadow: none;
+        /* Optional: remove blue focus ring */
+        border-color: #999;
+        /* Optional: focus border color */
+    }
+</style>
+
+<div class="container-fluid px-5">
+
+    <i>Audit Trail</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search" placeholder="search"></div>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">Filter by:</span>
+            <select class="form-select form-select-sm custom-dropdown" style="width: auto;">
+                <option selected>Data Range</option>
+                <option>Role</option>
+                <option>Status</option>
+                <option>Department</option>
+            </select>
+        </div>
+        <select class="form-select form-select-sm custom-dropdown" style="width: auto;">
+            <option selected>User</option>
+            <option>Role</option>
+            <option>Status</option>
+            <option>Department</option>
+        </select>
+        <select class="form-select form-select-sm custom-dropdown" style="width: auto;">
+            <option selected>Department</option>
+            <option>Role</option>
+            <option>Status</option>
+            <option>Department</option>
+        </select>
+        <select class="form-select form-select-sm custom-dropdown" style="width: auto;">
+            <option selected>Action Type</option>
+            <option>Role</option>
+            <option>Status</option>
+            <option>Department</option>
+        </select>
+    </div>
+
+    <div class="container-fluid my-4 mt-5">
+        <h5 class="fs-4 fw-bold mb-3" style="color: #033b60;">Audit Logs</h5>
+
+        <div class="border rounded-3 p-4 bg-white">
+            <!-- Pagination (Top Right) -->
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <button disabled style="border: none; background-color: transparent;"><i
+                        class="bi bi-chevron-left"></i></button>
+                <span>Page 1 of 1</span>
+                <button disabled style="border: none; background-color: transparent;"><i
+                        class="bi bi-chevron-right"></i></button>
+            </div>
+
+            <!-- Search bar -->
+            <div class="input-group mb-4 w-25">
+                <input type="text" class="form-control" placeholder="Search" id="search"/>
+                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search"></i></span>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-secondary small">
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Department</th>
+                            <th>Action</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _ in "12345678" %}
+                        <tr>
+                            <td>
+                                <div>14:00:03</div>
+                                <div class="small text-muted">05/01/25</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                   
+                                    <span>Hubert Eleazar</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border border-secondary-subtle">Sales</span></td>
+                            <td>Created</td>
+                            <td class="text-muted small">User "Hubert Eleazar Debalucos" has been deleted from Warehouse
+                                Department.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

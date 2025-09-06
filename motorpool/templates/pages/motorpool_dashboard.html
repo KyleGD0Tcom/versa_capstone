@@ -1,0 +1,167 @@
+{% extends 'motorpool/motorpool_base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 5px;
+    }
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-progress {
+        background-color: #cfe2ff;
+        color: #0c5460;
+    }
+    .status-completed {
+        background-color: #d1e7dd;
+        color: #155724;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Motorpool Department | Dashboard</div>
+    <div class="d-flex gap-5">
+        <div class="mt-2" style="color: #033b60;">
+            <h4>Good Afternoon!</h4>
+        </div>
+        <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+    </div>
+
+
+    <div class="container-fluid mb-5">
+        <div class="row g-3">
+            <!-- Card 1 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-clock fa-lg me-2 text-primary"></i>
+                            <div class="small text-muted mt-3">Pending PDI Requests</div>
+                            <div class="fw-bold fs-3">{{ pending_pdi_requests|default:"0" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-tools fa-lg text-success me-2"></i>
+                            <div class="small text-muted mt-3">Repairs in Progress</div>
+                            <div class="fw-bold fs-3">{{ repairs_in_progress|default:"0" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-check-circle fa-lg text-purple me-2"></i>
+                            <div class="small text-muted mt-3">Completed Inspections this Month</div>
+                            <div class="fw-bold fs-3">{{ completed_inspections|default:"0" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Header-->
+    <div class="d-flex align-items-center mb-2">
+        <h5 class="fs-4 fw-bold mb-0" style="color: #033b60;">Received Requests</h5>
+        <a href="{% url 'motorpool_received_requests' %}" class="btn btn-link p-0 ms-2" title="Go to Received Requests">
+            <i class="bi bi-chevron-right fs-3 text-dark"></i>
+        </a>
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;" class="mx-4">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Request ID</th>
+                        <th style="opacity: 0.3;">Request Type</th>
+                        <th style="opacity: 0.3;">Unit</th>
+                        <th style="opacity: 0.3;">Linked Invoice</th>
+                        <th style="opacity: 0.3;">Assigned By</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in sales_requests %}
+                    <tr>
+                        <td>{{ request.request_id }}</td>
+                        <td>{{ request.request_type }}</td>
+                        <td>{{ request.unit }}</td>
+                        <td>{{ request.invoice_number }}</td>
+                        <td>
+                            {{ request.requested_by_name }}
+                        </td>
+                        <td>
+                            <span class="status-badge {% if request.status == 'Pending' %}status-pending{% elif request.status == 'In Progress' %}status-progress{% elif request.status == 'Completed' %}status-completed{% endif %}">
+                                {{ request.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

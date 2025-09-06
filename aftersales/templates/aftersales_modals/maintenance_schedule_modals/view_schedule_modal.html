@@ -1,0 +1,315 @@
+{% load static %}
+
+<div class="modal fade" id="viewScheduleModal{{ maintenance.maintenance_id }}" tabindex="-1" aria-labelledby="viewScheduleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <!-- Header -->
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="viewScheduleModalLabel" style="color: #033b60;">
+                    {{ maintenance.maintenance_id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <!-- Order Details Section -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Order ID:</div>
+                        <div class="ms-3">
+                            {% if maintenance.service %}
+                                {% if maintenance.service.sales_order %}
+                                    {{ maintenance.service.sales_order.order_number }}
+                                {% else %}
+                                    No Sales Order
+                                {% endif %}
+                            {% else %}
+                                No Service Record
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Service ID:</div>
+                        <div class="ms-3">{{ maintenance.service_id }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Date Received:</div>
+                        <div class="ms-3">{{ maintenance.created_at|date:"F j, Y" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex">
+                        <div class="text-secondary" style="width: 150px;">Status:</div>
+                        <div class="ms-3">
+                            {% if maintenance.status == 'Completed' %}
+                                <span style="background-color: rgb(222, 243, 219); border-radius: 5px;" class="p-1 text-success">{{ maintenance.status }}</span>
+                            {% elif maintenance.status == 'In Progress' %}
+                                <span style="background-color: #cfe2ff; color: #084298; border-radius: 5px;" class="p-1">{{ maintenance.status }}</span>
+                            {% elif maintenance.status == 'Pending' %}
+                                <span style="background-color: rgb(241, 238, 211); border-radius: 5px;" class="p-1 text-warning">{{ maintenance.status }}</span>
+                            {% else %}
+                                <span style="background-color: #e2e3e5; border-radius: 5px;" class="p-1">{{ maintenance.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Information Section -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #033b60;">CLIENT INFORMATION</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="text-secondary" style="width: 120px;">Name:</div>
+                                <div class="ms-5">{{ maintenance.client_name }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="text-secondary" style="width: 120px;">Company:</div>
+                                <div class="ms-5">{% if maintenance.service and maintenance.service.sales_order %}{{ maintenance.service.sales_order.company_name }}{% else %}N/A{% endif %}</div>
+                    </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="text-secondary" style="width: 120px;">Contact:</div>
+                                <div class="ms-5">{% if maintenance.service and maintenance.service.sales_order %}{{ maintenance.service.sales_order.client_contact }}{% else %}N/A{% endif %}</div>
+                </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="text-secondary" style="width: 120px;">Email:</div>
+                                <div class="ms-5">{% if maintenance.service and maintenance.service.sales_order %}{{ maintenance.service.sales_order.client_email }}{% else %}N/A{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Breakdown Section -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #033b60;">PRODUCT BREAKDOWN</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item Description</th>
+                                    <th>Serial Number</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{% if maintenance.service %}{{ maintenance.service.unit_name }}{% else %}{{ maintenance.unit_name }}{% endif %}</td>
+                                    <td><b>{% if maintenance.service %}{{ maintenance.service.serial_number }}{% else %}{{ maintenance.serial_number }}{% endif %}</b></td>
+                                    <td>{% if maintenance.service and maintenance.service.sales_order and maintenance.service.sales_order.items.first %}{{ maintenance.service.sales_order.items.first.quantity }}{% else %}1{% endif %}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Warranty Details Section -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #033b60;">WARRANTY DETAILS</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Start Date:</div>
+                                <div class="ms-5">
+                                    {% if service %}
+                                        {{ service.warranty_start|date:"F j, Y" }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">End Date:</div>
+                                <div class="ms-5">
+                                    {% if service %}
+                                        {{ service.warranty_end|date:"F j, Y" }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3 d-flex">
+                                <div class="text-secondary" style="width: 120px;">Remaining Days:</div>
+                                <div class="ms-5">
+                                    {% if service %}
+                                        {% with days_left=service.warranty_end|timeuntil %}
+                                            {{ days_left }}
+                                        {% endwith %}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if maintenance.maintenance_id %}
+                <form id="maintenance-update-form-{{ maintenance.maintenance_id }}" method="post" action="{% url 'update_maintenance' maintenance.maintenance_id %}">
+                    {% csrf_token %}
+                    <!-- Issue Details Section -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: #033b60;">ISSUE DETAILS</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                                    <div class="text-secondary" style="width: 150px;">Request Type:</div>
+                                    <div class="ms-3">Repair</div>
+                        </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <div class="d-flex">
+                                    <div class="text-secondary" style="width: 150px;">Reported Problem:</div>
+                                    <textarea name="reported_problem" class="form-control ms-3" rows="3">{{ maintenance.reported_problem }}</textarea>
+                    </div>
+                </div>
+                        </div>
+                    </div>
+
+                    <!-- Technician Details Section -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: #033b60;">TECHNICIAN DETAILS</h6>
+                        <div class="row">
+                            <label class="col-auto col-form-label text-secondary text-end pt-2 align-self-start" style="min-width: 120px;">Technicians:</label>
+                            <div class="col ms-3">
+                                <div class="assistants-container" id="assistants-container-{{ maintenance.maintenance_id }}">
+                                    {% if maintenance.technicians.all %}
+                                        {% for technician in maintenance.technicians.all %}
+                                            <div class="d-flex gap-2 mb-2">
+                                                <input type="text" class="form-control assistant-input w-50" name="technicians" value="{{ technician.name }}" placeholder="Enter name">
+                                                <button type="button" class="btn btn-sm btn-outline-danger remove-assistant" onclick="removeAssistantField(this, '{{ maintenance.maintenance_id }}')" {% if forloop.first and forloop.last %}style="display: none;"{% endif %}>
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="d-flex gap-3 mb-2">
+                                            <input type="text" class="form-control assistant-input w-50 ms-2" name="technicians" placeholder="Enter name">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-assistant" onclick="removeAssistantField(this, '{{ maintenance.maintenance_id }}')" style="display: none;">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 mb-2 ms-2" onclick="addAssistantField('{{ maintenance.maintenance_id }}')">
+                                        <i class="bi bi-plus"></i> Add More
+                                    </button>
+                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="mb-3 mt-3" style="color: #033b60;">RESULTS &amp; FINDINGS</h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="d-flex">
+                                    <div class="text-secondary" style="width: 150px;">Diagnosis:</div>
+                                    <textarea name="diagnosis" class="form-control ms-3" rows="3">{{ maintenance.diagnosis|default_if_none:"" }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <div class="d-flex">
+                                    <div class="text-secondary" style="width: 150px;">Findings/Note:</div>
+                                    <textarea name="findings_note" class="form-control ms-3" rows="3">{{ maintenance.findings_note|default_if_none:"" }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- ACTIONS TAKEN Section -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: #033b60;">ACTIONS TAKEN</h6>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="d-flex">
+                                    <div class="text-secondary" style="width: 150px;">Work Performed:</div>
+                                    <textarea name="work_performed" class="form-control ms-3" rows="3">{{ maintenance.work_performed|default_if_none:"" }}</textarea>
+                    </div>
+                </div>
+                    </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" onclick="submitMaintenanceForm('{{ maintenance.maintenance_id }}')">Update</button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-danger">Maintenance ID is missing. Cannot update this record.</div>
+                {% endif %}
+            </div>
+
+            <div style="display:none">
+                <script id="technician-select-template-{{ maintenance.maintenance_id }}" type="text/template">
+                    <select class="form-control assistant-input w-50 ms-2" name="technicians">
+                        <option value="" disabled selected>Select technician</option>
+                        {% for tech in all_technicians %}
+                            <option value="{{ tech.id }}">{{ tech.name }}</option>
+                        {% endfor %}
+                    </select>
+                </script>
+            </div>
+
+            <script>
+            function addAssistantField(maintenanceId) {
+                const container = document.getElementById('assistants-container-' + maintenanceId);
+                const newField = document.createElement('div');
+                newField.className = 'd-flex gap-3 mb-2';
+                newField.innerHTML = `
+                    <input type="text" class="form-control assistant-input w-50 ms-2" name="technicians" placeholder="Enter name">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-assistant" onclick="removeAssistantField(this, '${maintenanceId}')">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                `;
+                container.insertBefore(newField, container.lastElementChild);
+                const allAssistants = container.querySelectorAll('.d-flex');
+                if (allAssistants.length > 1) {
+                    allAssistants[0].querySelector('.remove-assistant').style.display = 'block';
+                }
+            }
+            function removeAssistantField(button, maintenanceId) {
+                const container = document.getElementById('assistants-container-' + maintenanceId);
+                button.parentElement.remove();
+                const allAssistants = container.querySelectorAll('.d-flex');
+                if (allAssistants.length === 1) {
+                    allAssistants[0].querySelector('.remove-assistant').style.display = 'none';
+                }
+            }
+            window.submitMaintenanceForm = function(maintenanceId) {
+                var form = document.getElementById('maintenance-update-form-' + maintenanceId);
+                // Remove any existing hidden fields for technicians
+                Array.from(form.querySelectorAll('input[type=hidden][name=technicians]')).forEach(e => e.remove());
+                // Collect all technician select values
+                var techInputs = form.querySelectorAll('select[name=technicians]');
+                var techIds = Array.from(techInputs).map(input => input.value).filter(v => v.trim() !== '');
+                techIds.forEach(id => {
+                    var hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'technicians';
+                    hidden.value = id;
+                    form.appendChild(hidden);
+                });
+                // Now submit as before
+                var formData = new FormData(form);
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') },
+                    body: formData
+                }).then(response => response.json())
+                  .then(data => {
+                    if (data.success) {
+                        alert('Saved!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + JSON.stringify(data.errors));
+                    }
+                  });
+            }
+            </script>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,110 @@
+{% extends 'sales/sales_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/client_records_modals/view_client_records_modal.html' %}
+{% include 'shared/orders_modals/view_orders_modal.html' %}
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Sales Department | Client Records</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search1" placeholder="search"></div>
+
+
+    <!-- Header-->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">Client Records</h5>
+
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 650px; overflow-y: auto;" class="mx-4">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Client Name</th>
+                        <th style="opacity: 0.3;">Company</th>
+                        <th style="opacity: 0.3;">Contact Info</th>
+                        <th style="opacity: 0.3;">Total Number of Orders</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for client in client_records %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>
+                            {{ client.client_name }}
+                        </td>
+                        <td>{{ client.company_name|default:"N/A" }}</td>
+                        <td>{{ client.contact_info }}</td>
+                        <td>{{ client.total_orders }}</td>
+                        <td><span style="background-color: rgb(216, 241, 213); border-radius: 5px;"
+                                class="p-1 text-success">{{ client.status }}</span></td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewClientRecordsModal"
+                                onclick="initializeClientRecord('{{ client.id }}','{{ client.client_name|escapejs }}','{{ client.company_name|default:''|escapejs }}','{{ client.contact_info|escapejs }}','{{ client.email|default:''|escapejs }}','{{ client.address|escapejs }}','{{ client.total_orders }}','{{ client.status|escapejs }}','{{ client.last_order_date|date:'F j, Y'|escapejs }}','{{ client.latest_order.payment_mode|default_if_none:''|escapejs }}','{{ client.latest_order.residence_location|default_if_none:''|escapejs }}','{{ client.latest_order.due_date|date:'F j, Y'|default_if_none:''|escapejs }}','{{ client.latest_order.amount_paid|default_if_none:''|escapejs }}','{{ client.latest_order.bank_account|default_if_none:''|escapejs }}','{{ client.latest_order.account_number|default_if_none:''|escapejs }}','{% if client.latest_order.id_attachment %}{{ client.latest_order.id_attachment.url|escapejs }}{% else %}{% endif %}','{% if client.latest_order.business_permit %}{{ client.latest_order.business_permit.url|escapejs }}{% else %}{% endif %}','{% if client.latest_order.e_signature %}{{ client.latest_order.e_signature.url|escapejs }}{% else %}{% endif %}','{% if client.latest_order.bir_attachment %}{{ client.latest_order.bir_attachment.url|escapejs }}{% else %}{% endif %}')">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No client records found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends 'warehouse/warehouse_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/client_records_modals/view_client_records_modal.html' %}
+{% include 'shared/orders_modals/view_orders_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Warehouse Department | Client Records</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search1" placeholder="search"></div>
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">Client Records</h5>
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Status</option>
+                    <option>Total Orders</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 650px; overflow-y: auto;" class="mx-4">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Client Name</th>
+                        <th style="opacity: 0.3;">Company</th>
+                        <th style="opacity: 0.3;">Contact Info</th>
+                        <th style="opacity: 0.3;">Total Number of Orders</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for client in clients %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>{{ client.client_name }}</td>
+                        <td>{{ client.company_name }}</td>
+                        <td>{{ client.contact_info }}</td>
+                        <td>{{ client.total_orders }}</td>
+                        <td><span style="background-color: rgb(202, 238, 211); border-radius: 5px;"
+                                class="p-1 text-success">{{ client.status }}</span></td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewClientRecordsModal" 
+                                onclick="viewWarehouseClient('{{ client.id }}', '{{ client.client_name }}', '{{ client.company_name }}', '{{ client.contact_info }}', '{{ client.email }}', '{{ client.address }}', '{{ client.total_orders }}', '{{ client.status }}')">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No client records found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewWarehouseClient(clientId, clientName, companyName, contactInfo, email, address, totalOrders, status) {
+    // Fetch payment details for the client (simulate or fetch from API if needed)
+    // For now, fetch from the first order/invoice for demo; in production, fetch from backend as needed
+    fetch(`/warehouse/api/client-orders/${clientId}/`)
+        .then(response => response.json())
+        .then(orderData => {
+            let paymentMode = '';
+            let dueDate = '';
+            let amountPaid = '';
+            let idAttachment = '';
+            if (orderData.orders && orderData.orders.length > 0) {
+                // Use the first order's id_attachment if available
+                idAttachment = orderData.orders[0].id_attachment || '';
+                // You may want to fetch more details from the order if needed
+                // For now, just use the first order as a reference
+                const orderId = orderData.orders[0].id;
+                fetch(`/warehouse/api/get-item-details/${orderId}/`)
+                    .then(response => response.json())
+                    .then(itemDetails => {
+                        // You can extract more details if needed
+                    });
+            }
+            // Fetch the first invoice for payment details
+            fetch(`/warehouse/api/client-invoices/${clientId}/`)
+                .then(response => response.json())
+                .then(invoiceData => {
+                    if (invoiceData.invoices && invoiceData.invoices.length > 0) {
+                        // For now, just use the first invoice as a reference
+                        // In production, you may want to aggregate or pick the latest
+                        const invoice = invoiceData.invoices[0];
+                        paymentMode = invoice.payment_mode || 'cash'; // fallback to cash
+                        // Format due date as 'Month DD, YYYY'
+                        if (invoice.due_date) {
+                            const dateObj = new Date(invoice.due_date);
+                            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                            dueDate = dateObj.toLocaleDateString('en-US', options);
+                        } else {
+                            dueDate = '';
+                        }
+                        amountPaid = invoice.amount || '';
+                    }
+                    // Initialize the client record modal with warehouse client data
+                    initializeClientRecord(
+                        clientId,
+                        clientName,
+                        companyName,
+                        contactInfo,
+                        email,
+                        address,
+                        totalOrders,
+                        status,
+                        null, // lastOrderDate
+                        paymentMode, // paymentMode
+                        null, // residenceLocation
+                        dueDate, // dueDate
+                        amountPaid, // amountPaid
+                        null, // bankAccount
+                        null, // accountNumber
+                        idAttachment, // idAttachment
+                        null, // businessPermit
+                        null, // eSignature
+                        null  // birAttachment
+                    );
+                });
+
+            // Fetch warehouse client orders (existing logic)
+            fetch(`/warehouse/api/client-orders/${clientId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const orderHistory = document.getElementById('modal-order-history');
+                    if (orderHistory) {
+                        if (data.orders.length === 0) {
+                            orderHistory.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No order history found</td></tr>';
+                        } else {
+                            orderHistory.innerHTML = data.orders.map(order => `
+                                <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                                    <td>${order.order_number}</td>
+                                    <td>${order.item_description}</td>
+                                    <td>₱ ${parseFloat(order.total_amount).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
+                                    <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                                    <td>${new Date(order.delivery_date).toLocaleDateString()}</td>
+                                    <td><span style="background-color: ${getStatusColor(order.status)}; border-radius: 5px;"
+                                            class="p-1 ${getStatusTextColor(order.status)}">${order.status}</span></td>
+                                </tr>
+                            `).join('');
+                        }
+                    }
+                });
+
+            // Fetch warehouse client invoices (existing logic)
+            fetch(`/warehouse/api/client-invoices/${clientId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const invoiceHistory = document.getElementById('modal-invoice-history');
+                    if (invoiceHistory) {
+                        if (data.invoices.length === 0) {
+                            invoiceHistory.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No invoice history found</td></tr>';
+                        } else {
+                            invoiceHistory.innerHTML = data.invoices.map(invoice => `
+                                <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                                    <td>${invoice.invoice_number}</td>
+                                    <td>₱ ${parseFloat(invoice.amount).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
+                                    <td>${new Date(invoice.invoice_date).toLocaleDateString()}</td>
+                                    <td>${new Date(invoice.due_date).toLocaleDateString()}</td>
+                                    <td><span style="background-color: ${getStatusColor(invoice.status)}; border-radius: 5px;"
+                                            class="p-1 ${getStatusTextColor(invoice.status)}">${invoice.status}</span></td>
+                                </tr>
+                            `).join('');
+                        }
+                    }
+                });
+        });
+}
+</script>
+
+{% endblock %}

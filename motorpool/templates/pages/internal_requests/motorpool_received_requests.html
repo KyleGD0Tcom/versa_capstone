@@ -1,0 +1,167 @@
+{% extends 'motorpool/motorpool_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/received_requests_modals/view_sales_req.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 5px;
+    }
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-progress {
+        background-color: #cfe2ff;
+        color: #0c5460;
+    }
+    .status-completed {
+        background-color: #d1e7dd;
+        color: #155724;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Motorpool Department | Internal Requests > Received   Requests</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search1" placeholder="search"></div>
+
+
+    <div class="d-flex gap-5 mb-5">
+        <a href="{% url 'motorpool_received_requests' %}">
+            <button class="p-2 rounded text-white fw-bold fs-5 border-0"
+                style="width: 130%; background-color: #033b60">
+                Received Requests
+            </button>
+        </a>
+
+        <a href="{% url 'motorpool_sent_requests' %}">
+            <button class="p-2 rounded fw-bold text-secondary fs-5 border-0"
+                style="width: 155%; background-color: #d6d6d6;">
+                Sent Requests
+            </button>
+        </a>
+    </div>
+    
+<!-- Only Sales Table -->
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+        <div id="salesTable" class="table-responsive p-2">
+            <div class="scrollable-table">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th style="opacity: 0.3;">Request ID</th>
+                            <th style="opacity: 0.3;">Request Type</th>
+                            <th style="opacity: 0.3;">Unit</th>
+                            <th style="opacity: 0.3;">Linked Invoice</th>
+                            <th style="opacity: 0.3;">Assigned By</th>
+                            <th style="opacity: 0.3;">Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in sales_requests %}
+                        <tr>
+                            <td>{{ request.request_id }}</td>
+                            <td>{{ request.request_type }}</td>
+                            <td>{{ request.unit }}</td>
+                            <td>{{ request.invoice_number }}</td>
+                            <td>
+                               
+                                {{ request.requested_by_name }}
+                            </td>
+                            <td>
+                                <span class="status-badge {% if request.status == 'Pending' %}status-pending{% elif request.status == 'In Progress' %}status-progress{% elif request.status == 'Completed' %}status-completed{% endif %}">
+                                    {{ request.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="" data-bs-toggle="modal" data-bs-target="#SalesRequestModal{{ request.id }}"
+                                    class="text-dark me-2">
+                                    <i class="bi bi-chevron-right fs-5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.querySelector('#salesTable tbody');
+
+    function statusClass(status) {
+        if (status === 'Pending') return 'status-pending';
+        if (status === 'In Progress') return 'status-progress';
+        if (status === 'Completed') return 'status-completed';
+        return '';
+    }
+
+    function renderRows(requests) {
+        if (!tbody) return;
+        let html = '';
+        requests.forEach(function(req) {
+            html += '<tr>' +
+                '<td>' + req.request_id + '</td>' +
+                '<td>' + req.request_type + '</td>' +
+                '<td>' + req.unit + '</td>' +
+                '<td>' + req.invoice_number + '</td>' +
+                '<td>' + (req.requested_by_name || '') + '</td>' +
+                '<td><span class="status-badge ' + statusClass(req.status) + '">' + req.status + '</span></td>' +
+                '<td><a href="" data-bs-toggle="modal" data-bs-target="#SalesRequestModal' + req.id + '" class="text-dark me-2"><i class="bi bi-chevron-right fs-5"></i></a></td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function fetchUpdates() {
+        fetch('{% url "motorpool_received_requests_feed" %}', { credentials: 'same-origin' })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                renderRows(data.requests || []);
+                // Also refresh notifications so the bell updates promptly
+                if (typeof fetchNotifications === 'function') {
+                    fetchNotifications();
+                }
+            })
+            .catch(function(err) { console.error('Feed error:', err); });
+    }
+
+    // Initial fetch and interval polling
+    fetchUpdates();
+    setInterval(fetchUpdates, 5000);
+});
+</script>
+{% endblock %}

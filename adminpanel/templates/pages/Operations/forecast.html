@@ -1,0 +1,273 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+{% include 'admin_modals/operations_modal/InventoryForecasting_modals/view_forecast_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #wan {
+        color: #025ca8;
+    }
+
+    #viewButton {
+        background-color: #033b60;
+        color: white;
+        border-radius: 7px;
+        width: 18%;
+    }
+
+    #search {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Operation > Inventory and Forecasting > Forecasting</i>
+    <div class="row mb-4 mt-3 px-3"><input class="p-3" type="search" id="search" placeholder="search"></div>
+
+    <div class="d-flex gap-5 mb-5">
+        <a href="{% url 'operations_inventory' %}">
+            <button class="p-2 rounded text-secondary fw-bold fs-5 border-0"
+                style="width: 150%; background-color: #dddcdc;">
+                Inventory
+            </button>
+        </a>
+
+        <a href="">
+            <button class="p-2 rounded fw-bold text-white fs-5 border-0"
+                style="width: 150%; background-color: #033b60;">
+                Forecast
+            </button>
+        </a>
+    </div>
+
+
+    <!-- Stats Cards -->
+    <!-- Stats Cards and Side Container -->
+
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">List of Predicted Demand Spikes</h5>
+    </div>
+    <div class="table-responsive border rounded-3 p-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle">
+                <thead class="table">
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Serial Number</th>
+                        <th>Unit/item<br>Description</th>
+                        <th>Category</th>
+                        <th>Current<br>Stock</th>
+                        <th>Predicted Demand<br> (Next 30 Days)</th>
+                        <th>Suggested <br>
+                            Restock Qty</th>
+                        <th>Suggested<br>
+                            Order Date</th>
+                        <th>Trend</th>
+                        <th>Note</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in "12345" %}
+                    <tr>
+                        <td>HVY-00001</td>
+                        <td>
+                            EX-12345
+                        </td>
+                        <td>Excavator EC750</td>
+                        <td>Heavy Equipment</a></td>
+                        <td>10</td>
+                        <td>120 units</td>
+                        <td><span>10</span></td>
+                        <td><span>May 25</span></td>
+                        <td><span style="background-color: rgb(184, 199, 238); border-radius: 5px;"
+                                class="p-1 text-primary">Stable</span></td>
+                        <td>Long lead<br> time, stock...</td>
+                        <td> <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewForecastModal">
+                                <i class="fa bi-chevron-right"></i>
+                            </a></i>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm p-4 mb-5" style="border-radius: 15px;">
+        <!-- Header Tabs -->
+        <div class="d-flex mb-4">
+            <button class="department-btn border-0 bg-transparent fw-semibold pb-1 me-4" style="color: #033b60;"
+                data-filter="warehouse">
+                Warehouse Department
+            </button>
+            <button class="department-btn border-0 bg-transparent fw-semibold pb-1" style="color: #b3b3b3;"
+                data-filter="sales">
+                Sales Department
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center mb-3 w-100">
+            <span class="badge rounded-pill bg-secondary px-3 py-2 me-3">Top 10</span>
+            <h5 class="fw-bold mb-0 text-center">Predicted Demand for Spare Parts <span
+                    class="fw-normal text-muted" id="timeframeText">(Next 30 days)</span></h5>
+        </div>
+
+
+
+        <!-- Chart + Table -->
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <canvas id="barChart" height="500"></canvas>
+            </div>
+            <div class="col-lg-4 ps-lg-5">
+                <!-- Suggested Restock Quantity -->
+                <!-- Container for Suggested Restock Quantity and Trend titles side by side -->
+                <!-- Container for Suggested Restock Quantity and Trend titles side by side -->
+                <!-- Container for Suggested Restock Quantity and Trend titles side by side -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="fw-semibold text-muted">Suggested Restock Quantity</div>
+                    <div class="fw-semibold text-muted">Trend</div>
+                </div>
+
+                <!-- Trend Items -->
+                <div class="d-flex flex-column gap-3">
+                    {% for i in "0123456789" %}
+                    <div class="d-flex justify-content-between">
+                        <span class="d-flex justify-content-center flex-grow-1">10 items</span>
+                        <span
+                            class="badge text-bg-{% if i < 2 %}success{% elif i < 7 %}primary{% else %}danger{% endif %} bg-opacity-25 text-{% if i < 2 %}success{% elif i < 7 %}primary{% else %}danger{% endif %}">
+                            {% if i < 2 %}Rising{% elif i < 7 %}Stable{% else %}Falling{% endif %} </span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const departmentButtons = document.querySelectorAll(".department-btn");
+        const barChartCanvas = document.getElementById("barChart");
+        const trendContainer = document.getElementById("trendItems"); // 👈 Add an ID to your container
+
+        const chartData = {
+            warehouse: {
+                labels: ["Brake Pads", "Hydraulic Pump", "Filter Elements", "Oil Filter", "Alternator", "Brake Pads", "Hydraulic Pump", "Filter Elements", "Oil Filter", "Alternator"],
+                data: [400, 350, 300, 250, 210, 180, 170, 160, 150, 140],
+            },
+            sales: {
+                labels: ["Tires", "Batteries", "Spark Plugs", "Brake Discs", "Clutch Kits", "Tires", "Batteries", "Spark Plugs", "Brake Discs", "Clutch Kits"],
+                data: [300, 280, 260, 240, 220, 200, 190, 180, 170, 160],
+            },
+        };
+
+        // Initialize chart
+        let currentChart = new Chart(barChartCanvas.getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: chartData.warehouse.labels,
+                datasets: [{
+                    label: "Predicted demand",
+                    data: chartData.warehouse.data,
+                    backgroundColor: "#40dff1",
+                    borderRadius: 5,
+                    barThickness: 35,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: "y",
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: { display: true, text: "Predicted demand" },
+                    },
+                    y: {
+                        title: { display: true, text: "Item names" },
+                    },
+                },
+                plugins: {
+                    legend: { display: false },
+                },
+            },
+        });
+
+        departmentButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const filter = this.getAttribute("data-filter");
+
+                // Button styling
+                departmentButtons.forEach((btn) => btn.style.color = "#b3b3b3");
+                this.style.color = "#033b60";
+
+                // Update timeframe text
+                const timeframeText = document.getElementById("timeframeText");
+                if (filter === "warehouse") {
+                    timeframeText.textContent = "(Next 30 days)";
+                } else if (filter === "sales") {
+                    timeframeText.textContent = "(Next 12 Months)";
+                }
+
+                // Update chart
+                currentChart.data.labels = chartData[filter].labels;
+                currentChart.data.datasets[0].data = chartData[filter].data;
+                currentChart.update();
+
+                // Update trend section
+                trendContainer.innerHTML = "";
+                chartData[filter].data.forEach((value, index) => {
+                    const trend = index < 2 ? "Rising" : index < 7 ? "Stable" : "Falling";
+                    const trendClass = index < 2 ? "success" : index < 7 ? "primary" : "danger";
+
+                    trendContainer.innerHTML += `
+                        <div class="d-flex justify-content-between">
+                            <span class="d-flex justify-content-center flex-grow-1">${value} items</span>
+                            <span class="badge text-bg-${trendClass} bg-opacity-25 text-${trendClass}">${trend}</span>
+                        </div>
+                    `;
+                });
+            });
+        });
+    });
+</script>
+
+{% endblock %}

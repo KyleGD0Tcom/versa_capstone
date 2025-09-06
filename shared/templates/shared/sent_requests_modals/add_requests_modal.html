@@ -1,0 +1,171 @@
+{% load static %}
+
+<!-- add_requests_modal.html -->
+<div class="modal fade" id="addRequestModal" tabindex="-1" aria-labelledby="addRequestModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content rounded-4 p-4">
+      <div class="modal-header border-0 ms-4">
+        <h5 class="modal-title fw-bold" id="addRequestModalLabel" style="color: #033b60;">RQ-00002</h5>
+        <div class="ms-2 d-flex align-items-center gap-2">
+          <small class="text-muted ms-5">filed by</small>
+          <img src="https://i.pravatar.cc/32" alt="profile" class="rounded-5 ms-2"> <strong>Hubert Eleazar</strong>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <div class="row mb-3 align-items-center mx-4">
+            <div class="col-md-6 d-flex align-items-center">
+              <label class="form-label me-2 mb-0" style="min-width: 110px">Request Type:</label>
+              <select class="form-select w-auto flex-grow-1 ms-5">
+                <option selected disabled>Select Type</option>
+                <option value="purchase">Purchase</option>
+                <option value="repair">Repair</option>
+                <option value="inspection">Inspection</option>
+              </select>
+            </div>
+            <div class="col-md-6 d-flex align-items-center gap-2">
+              <label class="form-label me-2 mb-0" style="min-width: 50px">Date:</label>
+              <input type="date" class="form-control w-auto flex-grow-1 ms-5">
+            </div>
+          </div>
+
+          <div class="row mb-5 align-items-center mx-4">
+            <div class="col-md-6 d-flex align-items-center">
+              <label class="form-label me-2 mb-0" style="min-width: 110px">Department:</label>
+              <select class="form-select w-auto flex-grow-1 ms-5">
+                <option selected disabled>Select Department</option>
+                <option value="sales">Sales</option>
+                <option value="hr">HR</option>
+                <option value="logistics">Logistics</option>
+                <option value="engineering">Engineering</option>
+              </select>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+              <label class="form-label me-2 mb-0" style="min-width: 60px">Priority:</label>
+              <select class="form-select w-auto flex-grow-1 ms-5">
+                <option selected disabled>Select Priority</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="text-uppercase mb-3" style="color: #033b60;">Item Details</div>
+          <div class="row mx-4">
+            <div class="col-md-6">
+              <div class="d-flex align-items-start mb-2 gap-4">
+                <label class="form-label mb-0" style="min-width: 100px;">Unit Code:</label>
+                <input type="text" class="form-control w-50 ms-5">
+              </div>
+              <div class="mb-2 d-flex align-items-center gap-4">
+                <label class="form-label mb-0" style="min-width: 100px;">Unit Name:</label>
+                <p class="form-control-plaintext mb-0 ms-5">Hydraulic Filters</p>
+              </div>
+              <!-- <div class="mb-2 d-flex align-items-center gap-2">
+                <label class="form-label mb-0" style="min-width: 100px; white-space: nowrap;">Linked Order ID:</label>
+                <p class="form-control-plaintext mb-0 ms-5">ORD-00-0001</p>
+              </div>
+              <div class="mb-2 d-flex align-items-center gap-2">
+                <label class="form-label mb-0" style="min-width: 100px; white-space: nowrap;">Delivery Date:</label>
+                <p class="form-control-plaintext mb-0 ms-5">June 1, 2025</p>
+              </div> -->
+            </div>
+            <div class="col-md-6">
+              <div class="mb-2 d-flex align-items-center gap-2">
+                <label class="form-label mb-0" style="min-width: 70px;">Category:</label>
+                <p class="form-control-plaintext mb-0 ms-5">Filtration System</p>
+              </div>
+              <div class="d-flex align-items-start">
+                <label class="form-label mb-0 me-3" style="width: 90px;">Unit Photo:</label>
+                <img src="{% static 'images/excavator2.png' %}" alt="Item Photo"
+                  style="height: 140px; width: auto; margin-left: -44px;" class="img-fluid rounded">
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="row mt-0 d-block mx-4">
+            <h6 class="fst-italic mb-3" style="color: #033b60;">(Optional)</h6>
+            <div class="d-flex align-items-start mb-2">
+              <label class="form-label mb-0" style="min-width: 17.5%; white-space: nowrap;">Linked Order ID:</label>
+              <input type="text" class="form-control w-25">
+            </div>
+            <div class="d-flex align-items-start mb-2">
+              <label class="form-label mb-0" style="min-width: 17.5%; white-space: nowrap;">Delivery Date:</label>
+              <input type="date" class="form-control w-25">
+            </div>
+          </div>
+
+          <div class="row mt-4 d-block mx-4">
+            <h6 class="fst-italic mb-3" style="color: #033b60;">(If PDI)</h6>
+            <div class="d-flex align-items-start mb-2">
+              <label class="form-label mb-0" style="min-width: 17.5%; white-space: nowrap;">Delivery Date:</label>
+              <input type="date" class="form-control w-25">
+            </div>
+            <div class="d-flex align-items-start mb-2">
+              <label class="form-label mb-0" style="min-width: 17.5%; white-space: nowrap;">Reason for
+                Inspection:</label>
+              <textarea class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="row mt-4 mx-4">
+            <h6 class="fst-italic mb-3" style="color: #033b60;">(If Repair)</h6>
+            <div class="d-flex align-items-center mb-2 gap-5">
+              <label class="form-label mb-0 me-2" style="white-space: nowrap;">Return Source:</label>
+              <select class="form-select w-25 ms-1">
+                <option selected disabled>Select Source</option>
+                <option value="customer">Customer</option>
+                <option value="internal">Internal</option>
+                <option value="vendor">Vendor</option>
+              </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-center mt-2">
+              <label class="form-label mb-0">Description:</label>
+            </div>
+            <div class="col-md-10 d-flex">
+              <textarea class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+
+
+          <div class="text-uppercase mb-3 mt-5" style="color: #033b60;">Request Details</div>
+
+          <div class="row mt-2 mx-4">
+            <!-- Assigned to -->
+            <div class="d-flex align-items-center mb-2 gap-5">
+              <label class="form-label mb-0 me-2" style="white-space: nowrap;">Assigned to:</label>
+              <select class="form-select w-25 ms-4">
+                <option selected disabled>Select Person</option>
+                <option value="user1">John Doe</option>
+                <option value="user2">Jane Smith</option>
+                <option value="user3">Michael Reyes</option>
+              </select>
+            </div>
+
+            <!-- Notes -->
+            <div class="d-flex align-items-start mb-2">
+              <label class="form-label mb-0" style="min-width: 17.5%; white-space: nowrap;">Notes:</label>
+              <textarea class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <hr>
+      <div class="modal-footer border-0 mx-4">
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success px-4">Send Request</button>
+      </div>
+    </div>
+  </div>
+</div>

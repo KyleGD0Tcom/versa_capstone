@@ -1,0 +1,7 @@
+based on my system, the flow is that on this page i create a order @sales_orders.html then after create it will automatically generate a invoice to this page @sales_invoicing.html on the invoice page on the records there is view button to open modal, after open that modal there is a button to request for PDI after clicking that it will automatically generate a record on the @motorpool_received_requests.html inside that there is table for sale and on records and each record has its own view, if i click the view button it open the and there is button to Start Inspection, if i click that it will automatically generate a record on @equipment_inspection.html on that there is record also which also have view button inside that view modal there is button to Sent To Delivery after executing that it will automatic generate record on this @delivery_requests.html there is also view modal on that record and there is button inside it which is create schedule if it is already executed. 
+it will auto generate a record on the @delivery_tracker.html which  on that record there is modal also to view, inside that modal there is button Mark Delivered if it is Mark Delivered it will automatically create a record on @delivery_logs.html and also on client records on sales app, @sales_client_records.html .
+
+
+now after delivered also it must be autogenerate a record on the aftersales app on this page@aftersales_logs.html .
+make sure it is still connected to its related data, like its order record invoice record, and etc.
+

@@ -1,0 +1,390 @@
+{% load static %}
+
+<!-- Add CSRF Token -->
+{% csrf_token %}
+
+<div class="modal fade" id="viewEquipmentInspectionModal{{ inspection.id }}" tabindex="-1"
+    aria-labelledby="viewEquipmentInspectionModalLabel{{ inspection.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <div class="w-100">
+                    <!-- Name and Close Button -->
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;">{{ inspection.inspection_id }}</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Row 1: Company & Address -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex mb-0 gap-5">
+                            <div class="text-secondary" style="min-width: 150px;">Technician:</div>
+                            <div class="d-flex align-items-center">
+                                {{ inspection.assigned_technician|default:"Not assigned" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex mb-2 gap-5">
+                            <div class="text-secondary" style="min-width: 150px;">Inspection Date:</div>
+                            <div>{{ inspection.date_received|date:"F j, Y" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Request Type -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex gap-5">
+                            <div class="text-secondary mb-2" style="min-width: 150px;">Request Type:</div>
+                            <div>{{ inspection.request_type }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Invoice ID -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex gap-5">
+                            <div class="text-secondary" style="min-width: 150px;">Invoice ID:</div>
+                            <div>{{ inspection.invoice_number }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="mb-3 mt-4">
+                <div style="color: #033b60;" class="mb-3">PRODUCT BREAKDOWN</div>
+                {% if inspection.invoice and inspection.invoice.order %}
+                <div class="table-responsive mb-4">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="opacity: 0.3;">Item Description</th>
+                                <th style="opacity: 0.3;">Item Code</th>
+                                <th style="opacity: 0.3;">Serial Number</th>
+                                <th style="opacity: 0.3;">Quantity</th>
+                                <th style="opacity: 0.3;">Unit Price</th>
+                                <th style="opacity: 0.3;">Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inspection.invoice.order.items.all %}
+                            <tr>
+                                <td>{{ item.inventory_item.unit_item }}</td>
+                                <td>{{ item.inventory_item.item_code }}</td>
+                                <td>{{ item.inventory_item.serial_number }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₱ {{ item.unit_price|floatformat:2 }}</td>
+                                <td>₱ {{ item.total_price|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No invoice data available for this inspection.
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="modal-body mt-5">
+                <div class="mb-3" style="color: #033b60;">INSPECTION INFO</div>
+
+                <!-- Checklist Reference -->
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex gap-5">
+                        <div class="text-secondary" style="min-width: 150px;">Checklist Reference:</div>
+                        <div>
+                            {% if inspection.checklist_reference %}
+                            <a href="{{ inspection.checklist_reference.url }}" class="text-decoration-none" target="_blank">
+                                <i class="bi bi-file-earmark-text"></i> {{ inspection.checklist_reference.name|slice:"20:" }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">No checklist attached</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Assisted by -->
+                    <div class="col-md-6 d-flex gap-5">
+                        <div class="text-secondary" style="min-width: 150px;">Assisted by:</div>
+                        <div>
+                            {% if inspection.assisted_by %}
+                                {% for assistant in inspection.assisted_by %}
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    {{ assistant }}
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">No assistants assigned</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results & Findings Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="mb-3" style="color: #033b60; font-weight: normal;">RESULTS & FINDINGS</h6>
+                </div>
+                
+                <!-- Inspection Result -->
+                <div class="col-md-6 d-flex gap-5 mb-3">
+                    <div class="text-secondary" style="min-width: 150px;">Inspection Result:</div>
+                    <div>
+                        {% if inspection.inspection_result %}
+                            <span class="badge {% if inspection.inspection_result == 'Passed' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ inspection.inspection_result }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Issues Found -->
+                <div class="col-12 mb-3">
+                    <div class="text-secondary mb-2">Issues Found:</div>
+                    <div class="border rounded p-3 bg-light">
+                        {% if inspection.issues_found %}
+                            {{ inspection.issues_found|linebreaks }}
+                        {% else %}
+                            <span class="text-muted">No issues recorded</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Corrective Actions -->
+                <div class="col-12 mb-3">
+                    <div class="text-secondary mb-2">Corrective Actions:</div>
+                    <div class="border rounded p-3 bg-light">
+                        {% if inspection.corrective_actions %}
+                            {{ inspection.corrective_actions|linebreaks }}
+                        {% else %}
+                            <span class="text-muted">No corrective actions recorded</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Spare Parts Used -->
+                <div class="col-12 mb-3">
+                    <div class="text-secondary mb-2">Spare Parts Used:</div>
+                    <div class="border rounded p-3 bg-light">
+                        {% if inspection.spare_parts_used %}
+                            {{ inspection.spare_parts_used|linebreaks }}
+                        {% else %}
+                            <span class="text-muted">No spare parts recorded</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Additional Notes -->
+                <div class="col-12 mb-3">
+                    <div class="text-secondary mb-2">Additional Notes:</div>
+                    <div class="border rounded p-3 bg-light">
+                        {% if inspection.notes %}
+                            {{ inspection.notes|linebreaks }}
+                        {% else %}
+                            <span class="text-muted">No additional notes</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mt-4 mb-5">
+                <div class="mb-3" style="color: #033b60;">ATTACHMENTS</div>
+                <div class="row">
+                    <!-- Left Column: Inspection Photos -->
+                    <div class="col-md-6">
+                        <div class="mb-2 text-secondary">Inspection photos:</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% if inspection.inspection_photos %}
+                                {% for photo in inspection.inspection_photos %}
+                                <div class="preview-wrapper">
+                                    <a href="{{ MEDIA_URL }}{{ photo }}" target="_blank" class="text-decoration-none">
+                                        <img src="{{ MEDIA_URL }}{{ photo }}" alt="Inspection Photo {{ forloop.counter }}" 
+                                             class="image-preview">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-muted">No inspection photos uploaded</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Signed Form -->
+                    <div class="col-md-6">
+                        <div class="mb-2 text-secondary">Signed form:</div>
+                        <div>
+                            {% if inspection.signed_form %}
+                            <a href="{{ inspection.signed_form.url }}" class="text-decoration-none" target="_blank">
+                                <i class="bi bi-file-earmark-text"></i> {{ inspection.signed_form.name|slice:"20:" }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">No signed form attached</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" 
+                        class="btn btn-success" 
+                        id="sendToDeliveryBtn{{ inspection.id }}"
+                        {% if inspection.status != 'Delivery' or inspection.has_delivery_request %}disabled{% endif %}
+                        data-sent="{% if inspection.has_delivery_request %}true{% else %}false{% endif %}"
+                        onclick="sendToDelivery('{{ inspection.id }}')">
+                    <i class="bi bi-truck me-2"></i>
+                    {% if inspection.has_delivery_request %}
+                        Already Sent to Delivery
+                    {% elif inspection.status != 'Delivery' %}
+                        Not Ready for Delivery
+                    {% else %}
+                        Send To Delivery
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.image-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.preview-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.badge {
+    padding: 8px 12px;
+    font-weight: normal;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.border {
+    border-color: #dee2e6 !important;
+}
+
+/* Disabled button styling */
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn[data-sent="true"] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+</style>
+
+<script>
+function disableButton(button) {
+    button.disabled = true;
+    button.setAttribute('data-sent', 'true');
+    button.innerHTML = '<i class="bi bi-truck me-2"></i>Already Sent to Delivery';
+    button.classList.add('btn-secondary');
+    button.classList.remove('btn-success');
+}
+
+function sendToDelivery(inspectionId) {
+    const button = document.getElementById(`sendToDeliveryBtn${inspectionId}`);
+    
+    // If button is disabled or already sent, prevent execution
+    if (button.disabled || button.getAttribute('data-sent') === 'true') {
+        alert('This inspection has already been sent to delivery.');
+        disableButton(button);
+        return;
+    }
+
+    if (!confirm('Are you sure you want to send this inspection to delivery?')) {
+        return;
+    }
+
+    // Disable the button immediately to prevent double-clicks
+    button.disabled = true;
+    
+    // Get unit info from the invoice items
+    const unitInfo = {
+        unit_name: '{{ inspection.unit }}',
+        serial_number: '{{ inspection.pdi_request.request_id }}'
+    };
+    
+    // Get client info from the invoice order
+    const clientInfo = {
+        client_name: '{{ inspection.invoice.order.client_name }}',
+        client_address: '{{ inspection.invoice.order.client_address }}',
+        client_contact: '{{ inspection.invoice.order.client_contact }}',
+        client_email: '{{ inspection.invoice.order.client_email }}',
+        company_name: '{{ inspection.invoice.order.company_name }}',
+        company_address: '{{ inspection.invoice.order.company_address }}',
+        company_contact: '{{ inspection.invoice.order.company_contact }}',
+        company_email: '{{ inspection.invoice.order.company_email }}'
+    };
+
+    // Get CSRF token from the form
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('/motorpool/send-to-delivery/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            inspection_id: inspectionId,
+            pdi_request_id: '{{ inspection.pdi_request.request_id }}',
+            invoice_number: '{{ inspection.invoice_number }}',
+            unit_info: unitInfo,
+            client_info: clientInfo
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.status === 'success' || data.exists) {
+            // Permanently disable the button
+            disableButton(button);
+            
+            if (data.status === 'success') {
+                // Show success message
+                alert('Successfully sent to delivery and created delivery request');
+                // Reload the page to refresh the status
+                window.location.reload();
+            } else {
+                alert('This inspection has already been sent to delivery.');
+            }
+        } else {
+            // Re-enable the button if there was an error
+            button.disabled = false;
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error details:', error);
+        // Re-enable the button on error
+        button.disabled = false;
+        alert('An error occurred while processing your request. Please try again.');
+    });
+}
+</script>

@@ -1,0 +1,338 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+
+{% include 'admin_modals/operations_modal/InventoryForecasting_modals/view_inventory_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #wan {
+        color: #025ca8;
+    }
+
+    #viewButton {
+        background-color: #033b60;
+        color: white;
+        border-radius: 7px;
+        width: 18%;
+    }
+
+    #search {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Operation > Inventory and Forecasting > Inventory</i>
+    <div class="row mb-4 mt-3 px-3"><input class="p-3" type="search" id="search" placeholder="search"></div>
+
+    <div class="d-flex gap-5 mb-5">
+        <a href="">
+            <button class="p-2 rounded text-white fw-bold fs-5 border-0"
+                style="width: 150%; background-color: #033b60;">
+                Inventory
+            </button>
+        </a>
+
+        <a href="{% url 'operations_forecast' %}">
+            <button class="p-2 rounded fw-bold text-secondary fs-5 border-0"
+                style="width: 150%; background-color: #dfdfdf;">
+                Forecast
+            </button>
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <!-- Stats Cards and Side Container -->
+    <div class="row mb-5">
+        <!-- Left Column: 3 Cards -->
+        <div class="col-lg-4">
+            <div class="row g-3">
+                <!-- Card 1 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 163px;">
+                        <div class="d-flex align-items-center h-100">
+                            <i class="fas fa-boxes fa-lg me-3" style="color: #005ca8;"></i>
+                            <div class="d-flex justify-content-between w-100">
+                                <div>
+                                    <div class="small text-muted mt-2">Total Items in Stock</div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-bold fs-4 me-3">{{ warehouse_total }}</div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-bold fs-4 me-3">{{ sales_total }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-block mt-3">
+                                    <div class="text-muted mt-3">Warehouse</div>
+                                    <div class="text-muted mt-3">Sales</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 163px;">
+                        <div class="d-flex align-items-center h-100">
+                            <i class="fas fa-exclamation-triangle fa-lg me-3" style="color: #ef6f28;"></i>
+                            <div class="d-flex justify-content-between w-100">
+                                <div>
+                                    <div class="small text-muted mt-2">Low Stocks Items</div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-bold fs-4 me-3">{{ warehouse_low_stock }}</div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-bold fs-4 me-3">{{ sales_low_stock }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-block mt-3">
+                                    <div class="text-muted mt-3">Warehouse</div>
+                                    <div class="text-muted mt-3">Sales</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 163px;">
+                        <div class="d-flex align-items-center h-100">
+                            <i class="fas fa-plus-circle fa-lg me-3" style="color: #28a745;"></i>
+                            <div class="d-flex justify-content-between w-100">
+                                <div>
+                                    <div class="small text-muted mt-2">New Items Added this Week</div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-bold fs-4 me-3">{{ warehouse_new_items }}</div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="fw-bold fs-4 me-3">{{ sales_new_items }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-block mt-3">
+                                    <div class="text-muted mt-3">Warehouse</div>
+                                    <div class="text-muted mt-3">Sales</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Single Container (Moved Title Outside) -->
+        <div class="col-lg-8">
+            <!-- Title outside the container -->
+            <div class="mb-3">
+                <h5 class="fw-bold mb-0" style="color: #033b60;">Inventory Forecast</h5>
+            </div>
+
+            <!-- The actual content container -->
+            <div class="card p-4 shadow-sm w-100" style="border-radius: 10px; min-height: 480px;">
+                <!-- Filter Buttons -->
+                <div class="mb-3 d-flex gap-4">
+                    <button class="filter-btn border-0 bg-transparent fw-semibold pb-1" style="color: #033b60;"
+                        data-filter="all">
+                        All
+                    </button>
+                    <button class="filter-btn border-0 bg-transparent fw-semibold pb-1" style="color: #b3b3b3;"
+                        data-filter="warehouse">
+                        Warehouse
+                    </button>
+                    <button class="filter-btn border-0 bg-transparent fw-semibold pb-1" style="color: #b3b3b3;"
+                        data-filter="sales">
+                        Sales
+                    </button>
+                </div>
+
+                <!-- Scrollable inner content -->
+                <div id="forecast-content" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Warehouse Items -->
+                    <div class="forecast-item" data-category="warehouse">
+                        <div class="mb-3 d-flex justify-content-between align-items-start">
+                            <div style="flex: 1;">
+                                <div class="badge rounded-4 p-2 text-center mb-2"
+                                    style="background-color: #e6c99f; color: #ab5d1e; font-weight: normal;">
+                                    Preventive Maintenance Warning
+                                </div>
+                                <h6 class="fw-bold mb-1">Excavator EC750</h6>
+                                <div class="text-muted">Hydraulic Pump down to <span class="fw-bold">12% life.</span>
+                                </div>
+                            </div>
+                            <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                                <div>Department: <strong class="text-dark">Warehouse</strong></div><br>
+                                <div>Failure projected: <strong class="text-dark">May 8</strong></div>
+                                <div><strong class="text-dark">Schedule replacement</strong></div>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+
+                    <!-- Sales Items -->
+                    <div class="forecast-item" data-category="sales">
+                        <div class="mb-3 d-flex justify-content-between align-items-start">
+                            <div style="flex: 1;">
+                                <div class="badge rounded-4 p-2 text-center mb-2"
+                                    style="background-color: #e6c99f; color: #ab5d1e; font-weight: normal;">
+                                    Preventive Maintenance Warning
+                                </div>
+                                <h6 class="fw-bold mb-1">Bulldozer D8T</h6>
+                                <div class="text-muted">Projected sales increase by <span class="fw-bold">15%</span>.
+                                </div>
+                            </div>
+                            <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                                <div>Department: <strong class="text-dark">Sales</strong></div><br>
+                                <div>Forecast date: <strong class="text-dark">May 15</strong></div>
+                                <div><strong class="text-dark">Prepare inventory</strong></div>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+
+                    <!-- Additional Items for All -->
+                    <div class="forecast-item" data-category="warehouse">
+                        <div class="mb-3 d-flex justify-content-between align-items-start">
+                            <div style="flex: 1;">
+                                <div class="badge rounded-4 p-2 text-center mb-2"
+                                    style="background-color: #e6c99f; color: #ab5d1e; font-weight: normal;">
+                                    Preventive Maintenance Warning
+                                </div>
+                                <h6 class="fw-bold mb-1">Forklift FLX200</h6>
+                                <div class="text-muted">Routine maintenance scheduled for <span class="fw-bold">June
+                                        1</span>.</div>
+                            </div>
+                            <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                                <div>Department: <strong class="text-dark">Warehouse</strong></div><br>
+                                <div>Maintenance date: <strong class="text-dark">June 1</strong></div>
+                                <div><strong class="text-dark">Ensure availability</strong></div>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">Inventory</h5>
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle" style="border-spacing: 0 20px; border-collapse: separate;">
+                <!-- Adjust vertical gap here -->
+                <thead class="table">
+                    <tr>
+                        <th class="fw-normal text-secondary">Unit/Item Code</th>
+                        <th class="fw-normal text-secondary">Serial Number</th>
+                        <th class="fw-normal text-secondary">Unit/item<br>Name</th>
+                        <th class="fw-normal text-secondary">Category</th>
+                        <th class="fw-normal text-secondary">Current Stock</th>
+                        <th class="fw-normal text-secondary">Last Restocked</th>
+                        <th class="fw-normal text-secondary">Status</th>
+                        <th class="fw-normal text-secondary">Supplier</th>
+                        <th class="fw-normal text-secondary">Department</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventory_items %}
+                    <tr>
+                        <td>{{ item.item_code }}</td>
+                        <td>
+                            {{ item.serial_number }}
+                        </td>
+                        <td>{{ item.unit_item }}</td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.date_received }}</td>
+                        <td>
+                            <!-- Status logic based on quantity -->
+                            {% if item.quantity < 20 %} <span style="background-color: #e6c5b0; color: #ef6f28;"
+                                class="rounded p-1">Low Stock</span>
+                                {% else %}
+                                <span style="background-color: #92b0dd; color: #0d2f5a;" class="rounded p-1">In
+                                    Stock</span>
+                                {% endif %}
+                        </td>
+                        <td>
+                            <span>{{ item.supplier }}</span>
+                        </td>
+                        <td><span>{{ item.department }}</span></td>
+
+
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewInventoryModal{{ item.id }}">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        const forecastItems = document.querySelectorAll("#forecast-content .forecast-item");
+
+        filterButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const filter = this.getAttribute("data-filter");
+
+                // Update button styles
+                filterButtons.forEach(btn => {
+                    btn.style.color = "#b3b3b3"; // Inactive color
+                });
+                this.style.color = "#033b60"; // Active color
+
+                // Filter forecast items
+                forecastItems.forEach(item => {
+                    const category = item.getAttribute("data-category");
+                    if (filter === "all" || category === filter) {
+                        item.style.display = ""; // Show item
+                    } else {
+                        item.style.display = "none"; // Hide item
+                    }
+                });
+            });
+        });
+    });
+</script>{% endblock %}

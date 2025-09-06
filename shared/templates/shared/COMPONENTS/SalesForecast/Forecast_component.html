@@ -1,0 +1,129 @@
+  <!-- Inventory Forecast and Predicted Demand Spike -->
+  <div class="row mt-4">
+    <!-- Inventory Forecast -->
+    <div class="col-lg-6">
+      <div class="d-flex align-items-center mb-3 gap-3">
+        <h5 class="fw-bold mb-0" style="color: #033b60;">Inventory Forecast</h5>
+        <a href="{% url 'operations_inventory' %}">
+          <i class="fas fa-lg fa-chevron-right text-muted"></i>
+        </a>
+      </div>
+      <div class="card p-5 shadow-sm" style="border-radius: 10px;">
+        <!-- Item 1 -->
+        <div class="d-flex justify-content-between align-items-start">
+          <!-- LEFT side -->
+          <div style="flex: 1;">
+            <div class="badge rounded-4 p-2 text-center mb-2" style="background-color: #e79b97; color: #f71105;">
+              Critical Low Stock Alert</div>
+            <div class="fs-5 fw-semibold">Hydraulic Filters</div>
+            <div class="text-muted">Projected to run out in <span class="fw-bold">13 days.</span></div>
+          </div>
+
+          <!-- RIGHT side -->
+          <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+            <div>Department: <strong class="text-dark">Warehouse</strong></div><br>
+            <div>Current Stock: <strong class="text-dark">12 units</strong></div>
+            <div>Avg. Use: <strong class="text-dark">20/month</strong></div>
+          </div>
+        </div>
+
+        <hr>
+        <!-- Item 2 -->
+        <div class="mb-3 d-flex justify-content-between align-items-start">
+          <!-- LEFT side -->
+          <div style="flex: 1;">
+            <div class="badge rounded-4 p-2 text-center mb-2" style="background-color: #e6c99f; color: #ab5d1e;">
+              Preventive Maintenance Warning
+            </div>
+            <h6 class="fw-bold mb-1">Excavator EC750</h6>
+            <div class="text-muted">
+              Hydraulic Pump down to <span class="fw-bold">12% life.</span>
+            </div>
+          </div>
+
+          <!-- RIGHT side -->
+          <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+            <div>Department: <strong class="text-dark">Sales</strong></div><br>
+            <div>Failure projected: <strong class="text-dark">May 8</strong></div>
+            <div><strong class="text-dark">Schedule replacement</strong></div>
+          </div>
+        </div>
+
+        <hr>
+        <!-- Item 3 -->
+        <div class="mb-3 d-flex justify-content-between align-items-start">
+          <!-- LEFT side -->
+          <div style="flex: 1;">
+            <div class="badge rounded-4 p-2 text-center mb-2" style="background-color: #f7d1bd; color: #ef6f28;">
+              Forecast Depletion
+            </div>
+            <h6 class="fw-bold mb-1">Track Rollers (CAT320)</h6>
+            <div class="text-muted">
+              Stock may hit by <span class="fw-bold">May 2.</span>
+            </div>
+          </div>
+
+          <!-- RIGHT side -->
+          <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+            <div>Department: <strong class="text-dark">Sales</strong></div><br>
+            <div>Lead time: <strong class="text-dark">18 days</strong></div>
+            <div>Reorder now to avoid downtime</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Predicted Demand Spike -->
+    <div class="col-lg-6 mb-4">
+      <div class="d-flex align-items-center mb-3 gap-3">
+        <h5 class="fw-bold mb-0" style="color: #033b60;">Predicted Demand Spike</h5>
+        <a href="{% url 'operations_forecast' %}">
+          <i class="fas fa-lg fa-chevron-right text-muted"></i>
+        </a>
+      </div>
+
+      <div class="card p-5 shadow-sm" style="border-radius: 10px; height: 95%;">
+        <!-- Alert 1 -->
+        <div class="mb-4">
+          <div class="badge mb-2 rounded-4 p-2 text-center" style="background-color: #f7d1bd; color: #ef6f28;">
+            Upcoming Demand Surge Alert
+          </div>
+
+          <!-- Flex row with title and peak window -->
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-1 mb-lg-0">Track Rollers (CAT320)</h6>
+            <p class="small text-muted mb-0">Peak Window:<span class="text-dark"><strong><br>April 29 – May
+                  5</strong></span></p>
+          </div>
+
+          <p class="small mb-3 text-muted">Usage projected to increase by <strong>+45% next week</strong>.</p>
+          <p class="small text-muted mb-0"><strong>Recommendation:</strong><br> Adjust reorder volume & check stock
+            buffer</p>
+        </div>
+
+        <hr>
+
+        <!-- Alert 2 (same style) -->
+        <div>
+          <div class="badge mb-2 rounded-4 p-2 text-center" style="background-color: #f7d1bd; color: #ef6f28;">
+            Upcoming Demand Surge Alert
+          </div>
+
+          <!-- Flex row again -->
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-1 mb-lg-0">Track Rollers (CAT320)</h6>
+            <p class="small text-muted mb-0">Peak Window:<span class="text-dark"><strong><br>April 29 – May
+                  5</strong></span></p>
+          </div>
+
+          <p class="small mb-3 text-muted">Usage projected to increase by <strong>+45% next week</strong>.</p>
+          <p class="small text-muted mb-0"><strong>Recommendation:</strong><br> Adjust reorder volume & check stock
+            buffer</p>
+        </div>
+      </div>
+    </div>
+
+
+  </div>

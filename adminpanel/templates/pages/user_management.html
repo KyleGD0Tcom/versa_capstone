@@ -1,0 +1,297 @@
+{% extends 'adminpanel/base.html' %}
+{% load static %}
+{% block content %}
+{% include 'admin_modals/user_management_modals/add_user_modal.html' %}
+{% include 'admin_modals/user_management_modals/view_user_modal.html' %}
+{% include 'admin_modals/user_management_modals/update_user_modal.html' %}
+{% include 'admin_modals/user_management_modals/delete_user_modal.html' %}
+
+<!-- Success Modals -->
+<div class="modal fade" id="successAddModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <i class="bi bi-check-circle text-success fs-1 mb-3"></i>
+                <h5>Success!</h5>
+                <p class="mb-0">User has been successfully added.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successUpdateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <i class="bi bi-check-circle text-success fs-1 mb-3"></i>
+                <h5>Success!</h5>
+                <p class="mb-0">User has been successfully updated.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">User Management</div>
+    <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+    <!-- Top Info Section in One Container -->
+    <div class="row g-3 mb-4 border rounded shadow-sm">
+        <div class="col-12">
+            <div class="d-flex gap-3 justify-content-between bg-white p-3 rounded">
+                <!-- Total Users -->
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-people fs-4 text-primary"></i>
+                    <div>
+                        <div class="text-secondary small">Total Users</div>
+                        <div class="fs-3 fw-bold">{{ total_users }}</div>
+                    </div>
+                </div>
+                <!-- Sales Dept -->
+                <div>
+                    <div class="text-secondary small">Sales Dept.</div>
+                    <div class="fs-3 fw-bold text-center">{{ sales_users }}</div>
+                </div>
+                <!-- Warehouse Dept -->
+                <div>
+                    <div class="text-secondary small">Warehouse Dept.</div>
+                    <div class="fs-3 fw-bold text-center">{{ warehouse_users }}</div>
+                </div>
+                <!-- Motorpool Dept -->
+                <div>
+                    <div class="text-secondary small">Motorpool Dept.</div>
+                    <div class="fs-3 fw-bold text-center">{{ motorpool_users }}</div>
+                </div>
+                <!-- Aftersales Dept -->
+                <div>
+                    <div class="text-secondary small">Aftersales Dept.</div>
+                    <div class="fs-3 fw-bold text-center">{{ aftersales_users }}</div>
+                </div>
+                <!-- Delivery Dept -->
+                <div>
+                    <div class="text-secondary small">Delivery Dept.</div>
+                    <div class="fs-3 fw-bold text-center">{{ delivery_users }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">User List</h5>
+        <a href="#" class="btn text-white d-flex align-items-center gap-2" data-bs-toggle="modal"
+            data-bs-target="#addUserModal" style="background-color: #53893c;">
+            <i class="bi bi-plus-circle"></i> Add new user
+        </a>
+    </div>
+
+    <!-- User Table -->
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle">
+                <thead class="table">
+                    <tr>
+                        <th>Name</th>
+                        <th>ID Number</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="d-flex align-items-center gap-2">
+                            {% if user.userprofile.profile_picture %}
+                                <img src="{{ user.userprofile.profile_picture.url }}" class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                            {% else %}
+                                <img src="https://i.pravatar.cc/32" class="rounded-circle" width="36" height="36">
+                            {% endif %}
+                            {{ user.first_name }} {{ user.last_name }}
+                        </td>
+                        <td>{{ user.id }}</td>
+                        <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                        <td>{{ user.userprofile.department }}</td>
+                        <td>{{ user.userprofile.role }}</td>
+                        <td><span class="text-success">{{ user.userprofile.status }}</span></td>
+                        <td><span class="text-success">
+                                {% if forloop.counter == 2 %}
+                                5 minutes ago
+                                {% else %}
+                                Active Now
+                                {% endif %}
+                            </span></td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#updateUserModal"
+                                data-user-id="{{ user.id }}" data-user-first-name="{{ user.first_name }} "
+                                data-user-last-name="{{ user.last_name }}" data-user-email="{{ user.email }} "
+                                data-user-department="{{ user.userprofile.department }} "
+                                data-user-role="{{ user.userprofile.role }} "
+                                data-user-status="{{ user.userprofile.status }} "
+                                data-user-mobile_number="{{ user.userprofile.mobile_number }}"
+                                data-user-work_shift="{{ user.userprofile.work_shift }}"
+                                data-user-employee_type="{{ user.userprofile.employee_type }}"
+                                data-user-plain_password="{{ user.userprofile.plain_password }}"
+                                data-user-dob="{{ user.userprofile.dob|date:'Y-m-d' }}"
+                                data-user-username="{{ user.username }}"
+                                data-user-gender="{{ user.userprofile.gender }}"
+                                data-user-profile-picture="{% if user.userprofile.profile_picture %}{{ user.userprofile.profile_picture.url }}{% endif %}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" class="text-danger me-2" data-bs-toggle="modal"
+                                data-bs-target="#deleteUserModal" data-user-id="{{ user.id }}">
+                                <i class="bi bi-trash"></i>
+                            </a>
+
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewUserModal{{ user.id }}"><i class="bi bi-chevron-right"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #search {
+        width: 20%;
+        border: none;
+        background-color: #eaedf7;
+        border-radius: 5px;
+        padding: 5px;
+    }
+</style>
+
+<script>
+    // Existing scripts
+    //FOR UPDATE
+    document.addEventListener('DOMContentLoaded', function () {
+        const updateButtons = document.querySelectorAll('[data-bs-target="#updateUserModal"]');
+        
+        // Check if there's a success message in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'added') {
+            const successModal = new bootstrap.Modal(document.getElementById('successAddModal'));
+            successModal.show();
+            // Remove the success parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (urlParams.get('success') === 'updated') {
+            const successModal = new bootstrap.Modal(document.getElementById('successUpdateModal'));
+            successModal.show();
+            // Remove the success parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        updateButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Extract the data attributes from the clicked button
+                const userId = this.getAttribute('data-user-id');
+                const username = this.getAttribute('data-user-username');
+                const gender = this.getAttribute('data-user-gender');
+                const firstName = this.getAttribute('data-user-first-name');
+                const lastName = this.getAttribute('data-user-last-name');
+                const email = this.getAttribute('data-user-email');
+                const department = this.getAttribute('data-user-department');
+                const role = this.getAttribute('data-user-role');
+                const status = this.getAttribute('data-user-status');
+                const mobile_number = this.getAttribute('data-user-mobile_number');
+                const work_shift = this.getAttribute('data-user-work_shift');
+                const employee_type = this.getAttribute('data-user-employee_type');
+                const plain_password = this.getAttribute('data-user-plain_password');
+                const dob = this.getAttribute('data-user-dob');
+                const profile_picture = this.getAttribute('data-user-profile-picture');
+
+                // Populate the modal's input fields
+                document.getElementById('updateUserId').value = userId;
+                document.getElementById('updateFirstName').value = firstName.trim();
+                document.getElementById('updateLastName').value = lastName.trim();
+                document.getElementById('updateEmail').value = email.trim();
+                document.getElementById('updateDepartment').value = department.trim();
+                document.getElementById('updateRole').value = role.trim();
+                document.getElementById('updateStatus').value = status.trim();
+                document.getElementById('updateMobileNumber').value = mobile_number.trim();
+                document.getElementById('updateWorkShift').value = work_shift.trim();
+                document.getElementById('updateEmployeeType').value = employee_type.trim();
+                document.getElementById('updatePassword').value = plain_password.trim();
+                document.getElementById('updateDob').value = dob.trim();
+                document.getElementById('updateUsername').value = username.trim();
+                document.getElementById('updateGender').value = gender.trim();
+                
+                // Update profile picture preview
+                const updateProfilePreview = document.getElementById('updateProfilePreview');
+                const updateAddProfileBtn = document.getElementById('updateAddProfileBtn');
+                if (profile_picture) {
+                    updateProfilePreview.src = profile_picture;
+                    updateAddProfileBtn.textContent = 'Change profile picture';
+                } else {
+                    updateProfilePreview.src = '{% static "images/user.png" %}';
+                    updateAddProfileBtn.textContent = '+ Add profile picture';
+                }
+            });
+        });
+    });
+
+    //FOR DELETE
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('[data-bs-target="#deleteUserModal"]');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.getAttribute('data-user-id');
+                document.getElementById('deleteUserId').value = userId;
+            });
+        });
+    });
+</script>
+
+{% endblock %}

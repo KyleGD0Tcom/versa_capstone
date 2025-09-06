@@ -1,0 +1,417 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    {% csrf_token %}
+</head>
+<style>
+    th {
+        opacity: 0.3;
+    }
+
+    .labels {
+        opacity: 0.7;
+    }
+</style>
+
+{% for order in orders %}
+<!-- Sales Order View Modal -->
+<div class="modal fade" id="viewSalesOrderModal{{ order.id }}" tabindex="-1" aria-labelledby="viewSalesOrderModalLabel{{ order.id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <div class="modal-header border-0 gap-4">
+                <h5 class="modal-title fw-bold" id="viewSalesOrderModalLabel{{ order.id }}">
+                    <span style="color: #033b60;">{{ order.order_number }}</span>
+                </h5>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-3 text-secondary">Order Date:</div>
+                    <div class="col-md-9">{{ order.order_date|date:"F j, Y" }}</div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-3 text-secondary">Delivery Date:</div>
+                    <div class="col-md-9">{{ order.delivery_date|date:"F j, Y" }}</div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-3 text-secondary">Delivery Instructions:</div>
+                    <div class="col-md-9">{{ order.delivery_instructions }}</div>
+                </div>
+                <br>
+
+                <hr>
+
+                <!-- Client & Seller Info -->
+                <div class="row mb-5 mt-5">
+                    <div class="col-md-6">
+                        <h6 class="mb-4" style="color: #033b60;">CLIENT INFORMATION</h6>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Name:</div>
+                            <div class="col-8">{{ order.client_name }}</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Address:</div>
+                            <div class="col-8">{{ order.client_address }}</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Contact:</div>
+                            <div class="col-8">{{ order.client_contact }}</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Email:</div>
+                            <div class="col-8"><a href="mailto:{{ order.client_email }}">{{ order.client_email }}</a></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="mb-4" style="color: #033b60;">SELLER INFORMATION</h6>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Company:</div>
+                            <div class="col-8">
+                                {% if order.company_name %}
+                                    {{ order.company_name }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Address:</div>
+                            <div class="col-8">
+                                {% if order.company_address %}
+                                    {{ order.company_address }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Contact:</div>
+                            <div class="col-8">
+                                {% if order.company_contact %}
+                                    {{ order.company_contact }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4 text-secondary">Email:</div>
+                            <div class="col-8">
+                                {% if order.company_email %}
+                                    {{ order.company_email }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Details (Full Row) -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 style="color: #033b60;">PAYMENT DETAILS</h6>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Payment Mode:</div>
+                            <div class="col-8">{{ order.payment_mode }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if order.payment_mode == 'cash' %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Due Date:</div>
+                            <div class="col-8">{{ order.due_date|date:"F j, Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Amount Paid:</div>
+                            <div class="col-8">₱ {{ order.amount_paid|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Residence Location:</div>
+                            <div class="col-8">{{ order.residence_location|default:"N/A" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Due Date:</div>
+                            <div class="col-8">{{ order.due_date|date:"F j, Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Statement Details -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div style="color: #033b60;">BANK STATEMENT</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Bank Account:</div>
+                            <div class="col-8">{{ order.bank_account|default:"N/A" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Account Number:</div>
+                            <div class="col-8">{{ order.account_number|default:"N/A" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">Amount Paid:</div>
+                            <div class="col-8">₱ {{ order.amount_paid|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <br>
+
+                <!-- Attachments Heading -->
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <h6 style="color: #033b60;">ATTACHMENTS</h6>
+                    </div>
+                </div>
+
+                <!-- Attachments List in 2 Columns with Labels -->
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-4 text-secondary">ID:</div>
+                            <div class="col-8">
+                                {% if order.id_attachment %}
+                                <a href="{{ order.id_attachment.url }}" target="_blank">View ID</a>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        {% if order.payment_mode != 'cash' %}
+                        <div class="row mb-2">
+                            <div class="col-5 text-secondary">Business Permit:</div>
+                            <div class="col-7">
+                                {% if order.business_permit %}
+                                <a href="{{ order.business_permit.url }}" target="_blank">View Permit</a>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-secondary">BIR:</div>
+                            <div class="col-7">
+                                {% if order.bir_attachment %}
+                                <a href="{{ order.bir_attachment.url }}" target="_blank">View BIR</a>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Breakdown -->
+                <h6 class="mb-3" style="color: #033b60;">PRODUCT BREAKDOWN</h6>
+
+                <!-- Products Table -->
+                <div class="border p-3 rounded-3 mb-5 mt-3">
+                    <div class="table-responsive mt-2">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Item Description</th>
+                                    <th>Item Code</th>
+                                    <th>Serial Number</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.inventory_item.unit_item }}</td>
+                                    <td>
+                                        {% if item.item_code %}
+                                            {{ item.item_code }}
+                                        {% elif item.inventory_item.item_code %}
+                                            {{ item.inventory_item.item_code }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.serial_number %}
+                                            {{ item.serial_number }}
+                                        {% elif item.inventory_item.serial_number %}
+                                            {{ item.inventory_item.serial_number }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₱ {{ item.unit_price|floatformat:2 }}</td>
+                                    <td>₱ {{ item.total_price|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Summary Section Header -->
+                <div class="row mb-2">
+                    <div class="col-md-12">
+                        <h6 style="color: #033b60;">SUMMARY</h6>
+                    </div>
+                </div>
+
+                <!-- Summary Table -->
+                <div class="row mb-5">
+                    <div class="col-md-12">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td style="padding-left: 100px;">Subtotal</td>
+                                <td class="text-start">₱ {{ order.total_amount|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 100px;">Amount Paid</td>
+                                <td class="text-start">₱ {{ order.amount_paid|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="fw-bold border-top">
+                                <td style="padding-left: 100px;">Balance</td>
+                                <td class="text-start">₱ {{ order.remaining_balance|floatformat:2 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Order Status -->
+                <h6 class="fw-bold mb-3" style="color: #033b60;">ORDER STATUS</h6>
+                <div class="d-flex align-items-center justify-content-between text-center">
+                    {% with status=order.status %}
+                    <div class="{% if status != 'Cancelled' %}text-success{% else %}text-muted{% endif %}">
+                        <i class="bi bi-check-circle-fill fs-4"></i>
+                        <div>Checking<br>Availability</div>
+                    </div>
+
+                    <hr class="flex-grow-1 mx-2 border border-1 opacity-50 {% if status != 'Cancelled' %}border-success{% endif %}">
+
+                    <div class="{% if status == 'Processing' or status == 'Completed' %}text-success{% else %}text-muted{% endif %}">
+                        <i class="bi bi-box-seam fs-4"></i>
+                        <div>Preparing</div>
+                    </div>
+
+                    <hr class="flex-grow-1 mx-2 border border-1 opacity-50 {% if status == 'Processing' or status == 'Completed' %}border-success{% endif %}">
+
+                    <div class="{% if status == 'Processing' or status == 'Completed' %}text-success{% else %}text-muted{% endif %}">
+                        <i class="bi bi-gear fs-4"></i>
+                        <div>Processing</div>
+                    </div>
+
+                    <hr class="flex-grow-1 mx-2 border border-1 opacity-50 {% if status == 'Completed' %}border-success{% endif %}">
+
+                    <div class="{% if status == 'Completed' %}text-success{% else %}text-muted{% endif %}">
+                        <i class="bi bi-truck fs-4"></i>
+                        <div>In Delivery</div>
+                    </div>
+
+                    <hr class="flex-grow-1 mx-2 border border-1 opacity-50 {% if status == 'Completed' %}border-success{% endif %}">
+
+                    <div class="{% if status == 'Completed' %}text-success{% else %}text-muted{% endif %}">
+                        <i class="bi bi-house-door fs-4"></i>
+                        <div>Delivered</div>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+
+            <hr>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                {% if order.status != 'Cancelled' and order.status != 'Completed' and order.remaining_balance > 0 %}
+                    <button type="button" class="btn btn-danger cancel-order-btn" data-order-id="{{ order.id }}">Cancel Order</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for cancel order buttons
+        document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orderId = this.dataset.orderId;
+                cancelOrder(orderId);
+            });
+        });
+    });
+
+    function cancelOrder(orderId) {
+        if (confirm('Are you sure you want to cancel this order?')) {
+            // Detect warehouse or sales context
+            const isWarehouse = window.location.pathname.includes('/warehouse/');
+            const endpoint = isWarehouse ? `/warehouse/cancel-order/${orderId}/` : `/sales/cancel-order/${orderId}/`;
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Order cancelled successfully!');
+                    location.reload();
+                } else {
+                    alert('Error cancelling order: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error cancelling order. Please try again.');
+            });
+        }
+    }
+</script>
+{% endfor %}

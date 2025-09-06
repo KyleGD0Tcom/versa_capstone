@@ -1,0 +1,365 @@
+{% load static %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    .section-title {
+        color: #033b60;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .status-scheduled {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-intransit {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-delivered {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    th {
+        opacity: 0.3;
+    }
+</style>
+
+{% for schedule in delivery_schedules %}
+<div class="modal fade" id="viewDeliveryModal{{ schedule.schedule_id }}" tabindex="-1" aria-labelledby="viewDeliveryModalLabel{{ schedule.schedule_id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <!-- Add CSRF Token -->
+            {% csrf_token %}
+            
+            <div class="modal-header border-0">
+                <div class="w-100">
+                    <!-- Name and Close Button -->
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;">{{ schedule.schedule_id }}</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Row 1: Company & Address -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Invoice Number:</div>
+                            <div class="fw-bold">{{ schedule.delivery_request.invoice_number }}</div>
+                        </div>
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Delivery Date:</div>
+                            <div>{{ schedule.delivery_date|date:"F j, Y" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Contact Details & Status -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary mb-2" style="min-width: 150px;">Assigned Driver:</div>
+                            <div class="fw-bold">{{ schedule.assigned_driver }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Status -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary" style="min-width: 150px;">Status:</div>
+                            <div class="mt-1">
+                                <span class="status-badge status-{{ schedule.status|lower|cut:' -' }}">{{ schedule.status }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">CLIENT INFORMATION</div>
+
+                <!-- Client Details -->
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Name:</div>
+                        <div class="fw-bold">{{ schedule.delivery_request.client_info.client_name }}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Address:</div>
+                        <div class="fw-bold">{{ schedule.delivery_request.client_info.client_address }}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Contact:</div>
+                        <div class="fw-bold">{{ schedule.delivery_request.client_info.client_contact }}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Email:</div>
+                        <div><a href="mailto:{{ schedule.delivery_request.client_info.client_email }}">{{ schedule.delivery_request.client_info.client_email }}</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Breakdown -->
+            <div class="mb-3 mt-4" style="color: #033b60;">PRODUCT BREAKDOWN</div>
+            <div class="mb-3">
+                <strong class="fs-6" style="color: #033b60;">Order Item</strong>
+            </div>
+            <div class="border p-3 rounded-3 mb-4">
+                <div class="table-responsive mb-4">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item Description</th>
+                                <th>Serial Number</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {% if schedule.delivery_request.invoice and schedule.delivery_request.invoice.order and schedule.delivery_request.invoice.order.items.first %}
+                                        {{ schedule.delivery_request.invoice.order.items.first.inventory_item.unit_item }}
+                                    {% else %}
+                                        {{ schedule.delivery_request.unit_info.unit_name }}
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold">
+                                    {% if schedule.delivery_request.invoice and schedule.delivery_request.invoice.order and schedule.delivery_request.invoice.order.items.first %}
+                                        {{ schedule.delivery_request.invoice.order.items.first.inventory_item.serial_number }}
+                                    {% else %}
+                                        {{ schedule.delivery_request.unit_info.serial_number }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if schedule.delivery_request.invoice_number|slice:':6' == 'INVWH-' %}
+                                        {{ schedule.delivery_request.unit_info.quantity|default:"1" }}
+                                    {% elif schedule.first_item %}
+                                        {{ schedule.first_item.quantity }}
+                                    {% else %}
+                                        1
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if schedule.delivery_request.invoice_number|slice:':6' == 'INVWH-' %}
+                                        ₱ {{ schedule.delivery_request.unit_info.unit_price|default:"0.00"|floatformat:2 }}
+                                    {% elif schedule.first_item %}
+                                        ₱ {{ schedule.first_item.unit_price|default:"0.00"|floatformat:2 }}
+                                    {% else %}
+                                        ₱ 0.00
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if schedule.delivery_request.invoice_number|slice:':6' == 'INVWH-' %}
+                                        ₱ {{ schedule.delivery_request.unit_info.total_price|default:"0.00"|floatformat:2 }}
+                                    {% elif schedule.first_item %}
+                                        ₱ {{ schedule.first_item.total_price|default:"0.00"|floatformat:2 }}
+                                    {% else %}
+                                        ₱ 0.00
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="" style="color: #033b60;">SUMMARY</div>
+            <div class="table-responsive mb-4 mx-5">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <td>
+                                {% if schedule.delivery_request.invoice and schedule.delivery_request.invoice.order and schedule.delivery_request.invoice.order.items.first %}
+                                    ₱ {{ schedule.delivery_request.invoice.order.items.first.total_price|floatformat:2 }}
+                                {% else %}
+                                    ₱ {{ schedule.delivery_request.unit_info.total_price|floatformat:2 }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr class="fw-bold" style="border-top: solid rgb(197, 191, 191) 0.1px;">
+                            <td>Total</td>
+                            <td>
+                                {% if schedule.delivery_request.invoice and schedule.delivery_request.invoice.order and schedule.delivery_request.invoice.order.items.first %}
+                                    ₱ {{ schedule.delivery_request.invoice.order.items.first.total_price|floatformat:2 }}
+                                {% else %}
+                                    ₱ {{ schedule.delivery_request.unit_info.total_price|floatformat:2 }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Delivery Status -->
+            <div class="mb-5">
+                <div class="mb-4" style="color: #033b60;">DELIVERY STATUS</div>
+                <div class="d-flex align-items-center mx-5">
+                    <!-- Status Steps -->
+                    <div class="d-flex align-items-center w-100">
+                        <!-- Step 1: Scheduled -->
+                        <div class="text-center" style="min-width: 100px;">
+                            <i class="bi bi-box-seam {% if schedule.status == 'Scheduled' or schedule.status == 'In-Transit' or schedule.status == 'Delivered' %}text-success{% else %}text-muted{% endif %}" style="font-size: 32px;"></i>
+                            <p class="mt-2 fw-bold {% if schedule.status == 'Scheduled' or schedule.status == 'In-Transit' or schedule.status == 'Delivered' %}text-success{% else %}text-muted{% endif %}">Scheduled</p>
+                        </div>
+                        <div class="flex-grow-1 border-top {% if schedule.status == 'In-Transit' or schedule.status == 'Delivered' %}border-success{% endif %}" style="height: 3px; margin: 0 20px;"></div>
+
+                        <!-- Step 2: In Transit -->
+                        <div class="text-center" style="min-width: 100px;">
+                            <i class="bi bi-truck {% if schedule.status == 'In-Transit' or schedule.status == 'Delivered' %}text-success{% else %}text-muted{% endif %}" style="font-size: 32px;"></i>
+                            <p class="mt-2 fw-bold {% if schedule.status == 'In-Transit' or schedule.status == 'Delivered' %}text-success{% else %}text-muted{% endif %}">In-Transit</p>
+                        </div>
+                        <div class="flex-grow-1 border-top {% if schedule.status == 'Delivered' %}border-success{% endif %}" style="height: 3px; margin: 0 20px;"></div>
+
+                        <!-- Step 3: Delivered -->
+                        <div class="text-center" style="min-width: 100px;">
+                            <i class="bi bi-box {% if schedule.status == 'Delivered' %}text-success{% else %}text-muted{% endif %}" style="font-size: 32px;"></i>
+                            <p class="mt-2 fw-bold {% if schedule.status == 'Delivered' %}text-success{% else %}text-muted{% endif %}">Delivered</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <!-- Removed Mark In-Transit and Mark Delivered buttons for adminpanel view only -->
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+function updateDeliveryStatus(scheduleId, newStatus, buttonElement, modalId) {
+    // Disable the clicked button immediately
+    buttonElement.disabled = true;
+    
+    // Disable both buttons to prevent double submission
+    const inTransitBtn = document.getElementById('inTransitBtn-' + modalId);
+    const deliveredBtn = document.getElementById('deliveredBtn-' + modalId);
+    inTransitBtn.disabled = true;
+    deliveredBtn.disabled = true;
+    
+    // Add loading state to the clicked button
+    const originalText = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
+
+    const modalElement = document.getElementById('viewDeliveryModal' + modalId);
+    const csrfToken = modalElement.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('/adminpanel/api/update-delivery-status/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            schedule_id: scheduleId,
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update the UI
+            const statusBadge = document.querySelector(`#viewDeliveryModal${modalId} .status-badge`);
+            statusBadge.textContent = newStatus;
+            statusBadge.className = 'status-badge';
+            statusBadge.classList.add(`status-${newStatus.toLowerCase().replace('-', '').replace(' ', '')}`);
+            
+            // Update the progress indicators
+            updateStatusProgress(newStatus, modalId);
+            
+            // Keep buttons disabled and update their appearance
+            if (newStatus === 'In-Transit') {
+                buttonElement.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Marked as In-Transit';
+                buttonElement.classList.remove('btn-warning');
+                buttonElement.classList.add('btn-secondary');
+            } else if (newStatus === 'Delivered') {
+                buttonElement.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Marked as Delivered';
+                buttonElement.classList.remove('btn-success');
+                buttonElement.classList.add('btn-secondary');
+                
+                // Refresh the current page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        } else {
+            // Re-enable buttons and restore original state if there's an error
+            buttonElement.disabled = false;
+            buttonElement.innerHTML = originalText;
+            if (newStatus === 'In-Transit') {
+                deliveredBtn.disabled = true;
+            }
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Re-enable buttons and restore original state
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = originalText;
+        if (newStatus === 'In-Transit') {
+            deliveredBtn.disabled = true;
+        }
+        alert('Error updating delivery status. Please try again.');
+    });
+}
+
+function updateStatusProgress(status, modalId) {
+    const steps = ['scheduled', 'transit', 'delivered'];
+    const normalizedStatus = status.toLowerCase().replace('-', '').replace(' ', '');
+    
+    const currentStep = normalizedStatus === 'scheduled' ? 0 
+                     : normalizedStatus === 'intransit' ? 1 
+                     : normalizedStatus === 'delivered' ? 2 
+                     : -1;
+    
+    steps.forEach((step, index) => {
+        const icon = document.querySelector(`#viewDeliveryModal${modalId} .bi-${step === 'scheduled' ? 'box-seam' : step === 'transit' ? 'truck' : 'box'}`);
+        const text = document.querySelector(`#viewDeliveryModal${modalId} p:contains('${step === 'scheduled' ? 'Scheduled' : step === 'transit' ? 'In-Transit' : 'Delivered'}')`);
+        const line = index < 2 ? document.querySelector(`#viewDeliveryModal${modalId} .border-top:nth-of-type(${index + 1})`) : null;
+        
+        if (currentStep === -1) {
+            // Cancelled state
+            icon.className = `bi bi-${step === 'scheduled' ? 'box-seam' : step === 'transit' ? 'truck' : 'box'} text-danger`;
+            text.className = 'mt-2 fw-bold text-danger';
+            if (line) line.className = 'flex-grow-1 border-top';
+        } else if (index <= currentStep) {
+            // Completed steps
+            icon.className = `bi bi-${step === 'scheduled' ? 'box-seam' : step === 'transit' ? 'truck' : 'box'} text-success`;
+            text.className = 'mt-2 fw-bold text-success';
+            if (line) line.className = 'flex-grow-1 border-top border-success';
+        } else {
+            // Future steps
+            icon.className = `bi bi-${step === 'scheduled' ? 'box-seam' : step === 'transit' ? 'truck' : 'box'} text-muted`;
+            text.className = 'mt-2 fw-bold text-muted';
+            if (line) line.className = 'flex-grow-1 border-top';
+        }
+    });
+}
+</script>

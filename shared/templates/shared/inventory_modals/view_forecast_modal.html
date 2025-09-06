@@ -1,0 +1,235 @@
+{% load static %}
+
+<!-- View Inventory Modal -->
+<div class="modal fade" id="viewForecastModal1" tabindex="-1" aria-labelledby="viewForecastModalLabel1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5 rounded-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <span class="badge bg-light border text-dark fw-bold px-2 py-1">HVY-00001</span>
+                    <h4 class="fw-bold d-inline ms-2" style="color: #033b60;">Excavator EC750</h4>
+                </div>
+                <div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Supplier and Date -->
+            <div class="mb-3">
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Serial Number:</div>
+                    <div class="col-sm-10 text-uppercase">EX-12345</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Supplier:</div>
+                    <div class="col-sm-10 text-uppercase fw-semibold">XCMG</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Date Received:</div>
+                    <div class="col-sm-10">June 3, 2020</div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Image + Info Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 text-center">
+                    <img src="{% static 'images/Excavator2.png' %}" class="img-fluid rounded-3 h-100" style="min-width: 500px; margin-left: -100px;"
+                        alt="Equipment Photo" />
+                </div>
+                <div class="col-md-8">
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Department:</div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-light text-dark">Sales</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Category:</div>
+                        <div class="col-sm-8">Heavy Equipment</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Current Stock:</div>
+                        <div class="col-sm-8">10</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Predicted Demand<br>(Next 30 Days):</div>
+                        <div class="col-sm-8 mt-4">5 units</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Suggested <br>
+                            Restock Qty:</div>
+                        <div class="col-sm-8 mt-4">130 units</div>
+                    </div>
+
+                    <!-- Status and Last Restocked -->
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Trend:</div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-primary text-white">Stable</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-secondary">Last Restocked:</div>
+                        <div class="col-sm-8">May 1, 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="mb-4">
+                <h5 class="mb-3" style="color: #033b60;">Notes</h5>
+
+                <div class="mb-3">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi assumenda amet vel totam ipsam,
+                    voluptatum reprehenderit ipsum commodi, voluptatibus numquam culpa. Dolor excepturi enim, deserunt
+                    earum quo itaque harum commodi.
+                </div>
+
+                <!-- Right aligned -->
+                <div class="text-end mx-3">
+                    <div class="text-end mx-5">
+                        <img src="https://i.pravatar.cc/32" class="rounded-circle me-2" width="36" height="36">
+                        <span class="me-2">Hubert Eleazar</span>
+                        <span class="me-2">|</span>
+                        <span class="me-4">April 30, 2025</span>
+                        <span>17:23:25</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Dynamic Input Field Section -->
+            <div class="mb-4">
+
+                <div id="inputFieldsContainer" class="d-flex flex-column gap-2">
+                    <!-- Default Input Field -->
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="text" class="form-control" placeholder="Enter note">
+                        <button type="button" class="btn btn-danger btn-sm remove-btn">×</button>
+                    </div>
+                </div>
+
+                <button type="button" id="addFieldBtn" style="background-color: #033b60; width: 8%;"
+                    class="text-white mt-2 rounded p-1">
+                    Add
+                </button>
+            </div>
+
+
+            <hr>
+
+
+            <!-- Predicted Demand Spike Section -->
+            <div class="mb-4">
+                <h5 class="mb-3" style="color: #033b60;">Predicted Demand Spike</h5>
+                <div class="p-3 rounded-3 mx-5" style="background-color: #f9fbfe; border: 1px solid #e3e9f3;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Left Section -->
+                        <div>
+                            <span class="badge"
+                                style="background-color: #fde8df; color: #ef6f28; font-size: 0.9rem;">Upcoming Demand
+                                Surge Alert</span>
+                            <h6 class="fw-bold mt-2" style="color: #033b60;">Track Rollers (CAT320)</h6>
+                            <p class="mb-1" style="color: #495057; font-size: 0.9rem;">Usage projected to increase by
+                                <span class="fw-bold">+45% next week.</span>
+                            </p>
+                            <p class="mb-0" style="color: #6c757d; font-size: 0.85rem;">Recommendation: <br> Adjust reorder
+                                volume & check stock buffer</p>
+                        </div>
+
+                        <!-- Right Section -->
+                        <div class="text-end">
+                            <p class="mb-1 text-secondary" style="font-size: 0.9rem;">Peak Window:</p>
+                            <p class="mb-0 fw-semibold" style="font-size: 0.85rem;">April 29 – May 5</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('inputFieldsContainer');
+        const addBtn = document.getElementById('addFieldBtn');
+
+        // Event delegation for removing input fields
+        container.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-btn')) {
+                const allFields = container.querySelectorAll('.form-control');
+                if (allFields.length > 1) {
+                    e.target.closest('.d-flex').remove();
+                }
+            }
+        });
+
+        // Add new input field
+        addBtn.addEventListener('click', function () {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex align-items-center gap-2';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'form-control';
+            input.placeholder = 'Enter note';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm remove-btn';
+            removeBtn.textContent = '×';
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(removeBtn);
+            container.appendChild(wrapper);
+        });
+    });
+</script>

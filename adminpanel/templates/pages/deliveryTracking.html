@@ -1,0 +1,162 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+{% include 'admin_modals/delivery_tracking_modals/view_delivery_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #wan {
+        color: #025ca8;
+    }
+
+    #viewButton {
+        background-color: #033b60;
+        color: white;
+        border-radius: 7px;
+        width: 18%;
+    }
+
+    #search {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .table > tbody > tr > td {
+        padding-top: 18px;
+        padding-bottom: 18px;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Delivery Tracking</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search" placeholder="search"></div>
+
+    <div class="row g-3 mb-5" style="height: 20%;">
+        <!-- Card 1 -->
+        <div class="col-4">
+            <div class="card p-3 shadow-sm w-100" style="border-radius: 10px;">
+                <div class="d-flex align-items-center h-100">
+                    <div class="m-3">
+                        <i class="fas fa-calendar-day fa-lg me-3" style="color: #005ca8;"></i>
+                        <div class="small text-muted mt-3">Deliveries Today</div>
+                        <div class="fw-bold fs-3">{{ deliveries_today }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col-4">
+            <div class="card p-3 shadow-sm w-100" style="border-radius: 10px;">
+                <div class="d-flex align-items-center h-100">
+                    <div class="m-3">
+                        <i class="fas fa-truck fa-lg text-success me-3"></i>
+                        <div class="small text-muted mt-3">In Transit</div>
+                        <div class="fw-bold fs-3">{{ in_transit }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col-4">
+            <div class="card p-3 shadow-sm w-100" style="border-radius: 10px;">
+                <div class="d-flex align-items-center h-100">
+                    <div class="m-3">
+                        <i class="fas fa-box fa-lg text-purple me-3"></i>
+                        <div class="small text-muted mt-3">Delivered</div>
+                        <div class="fw-bold text-purple fs-3">{{ delivered }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">Deliveries</h5>
+
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Schedule ID</th>
+                        <th style="opacity: 0.3;">Request ID</th>
+                        <th style="opacity: 0.3;">Assigned Driver</th>
+                        <th style="opacity: 0.3;">Delivery Date</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for schedule in delivery_schedules %}
+                    <tr>
+                        <td>{{ schedule.schedule_id }}</td>
+                        <td>{{ schedule.delivery_request.request_id }}</td>
+                        <td>{{ schedule.assigned_driver }}</td>
+                        <td><span class="">{{ schedule.delivery_date|date:"M d, Y" }}</span></td>
+                        <td>
+                            {% if schedule.status == 'Scheduled' %}
+                                <span style="background-color: #cce5ff; border-radius: 5px;" class="p-1 text-primary">{{ schedule.status }}</span>
+                            {% elif schedule.status == 'In-Transit' %}
+                                <span style="background-color: #fff3cd; border-radius: 5px;" class="p-1 text-warning">{{ schedule.status }}</span>
+                            {% elif schedule.status == 'Delivered' %}
+                                <span style="background-color: #d4edda; border-radius: 5px;" class="p-1 text-success">{{ schedule.status }}</span>
+                            {% elif schedule.status == 'Cancelled' %}
+                                <span style="background-color: #f8d7da; border-radius: 5px;" class="p-1 text-danger">{{ schedule.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewDeliveryModal{{ schedule.schedule_id }}">
+                                <i class="fas fa-lg text-muted fa-chevron-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">No deliveries found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+</div>
+
+<!-- Place all modals here, outside the table -->
+{% for schedule in delivery_schedules %}
+    {% include 'admin_modals/delivery_tracking_modals/view_delivery_modal.html' with schedule=schedule modal_id="viewDeliveryModal"|add:schedule.schedule_id %}
+{% endfor %}
+
+{% endblock %}

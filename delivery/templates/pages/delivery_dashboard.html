@@ -1,0 +1,258 @@
+{% extends 'delivery/delivery_base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+<!-- Debug output -->
+<div style="display: none;">
+    Debug values:
+    Scheduled: {{ scheduled_deliveries }}
+    Completed: {{ completed_deliveries }}
+    Cancelled: {{ returned_deliveries }}
+</div>
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Delivery Department | Dashboard</div>
+    <div class="d-flex gap-5">
+        <div class="mt-2" style="color: #033b60;">
+            <h4>Good Afternoon!</h4>
+        </div>
+        <div class="row mb-5">
+            <input class="p-2" type="search" id="search1" placeholder="search"
+                style="height: 40px; border: none; background-color: rgb(224, 224, 224); border-radius: 10px; padding: 20px; width: 300px;">
+        </div>
+    </div>
+
+    <div class="container-fluid mb-5">
+        <div class="row g-3">
+            <!-- Card 1 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-truck fa-lg me-2 text-primary"></i>
+                            <div class="small text-muted mt-3">Deliveries In Transit</div>
+                            <div class="fw-bold fs-3" id="inTransitCount">{{ in_transit_deliveries|default:"0" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-check-circle fa-lg text-success me-2"></i>
+                            <div class="small text-muted mt-3">Completed This Month</div>
+                            <div class="fw-bold fs-3" id="completedCount">{{ completed_deliveries|default:"0" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <!-- <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-times-circle fa-lg text-purple me-2"></i>
+                            <div class="small text-muted mt-3">Cancelled This Month</div>
+                            <div class="fw-bold fs-3" id="cancelledCount">{{ returned_deliveries|default:"0" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <!-- Left: Sales Forecast -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-7 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-2" style="color: #033b60;">Deliveries per Department</h5>
+                </div>
+                <div class="d-flex border-bottom mb-3">
+                    <button id="warehouseTab" class="btn fs-5 me-3"
+                        style="background: none; border: none; color: #033b60; font-weight: bold; border-bottom: 2px solid #033b60;">Warehouse</button>
+                    <button id="salesTab" class="btn fs-5 text-muted"
+                        style="background: none; border: none;">Sales</button>
+                </div>
+                <div class="card p-4" style="border-radius: 10px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">April 2025</h5>
+                        <button class="btn btn-sm btn-light">Last 7 Days</button>
+                    </div>
+                    <div style="height: 312px;">
+                        <canvas id="DeliveriesPerDepartmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById("DeliveriesPerDepartmentChart").getContext("2d");
+
+        // Initial data for Warehouse
+        const warehouseData = {
+            labels: ["21", "22", "23", "24", "25", "26", "27", "28"],
+            datasets: [
+                {
+                    label: "Successful",
+                    data: [20, 30, 25, 50, 40, 35, 30, 25],
+                    backgroundColor: "#28a745",
+                    barPercentage: 1,
+                    categoryPercentage: 0.8,
+                },
+                {
+                    label: "Failed",
+                    data: [10, 15, 10, 15, 10, 15, 10, 15],
+                    backgroundColor: "#dc3545",
+                    barPercentage: 1,
+                    categoryPercentage: 0.8,
+                },
+            ],
+        };
+
+        // Data for Sales
+        const salesData = {
+            labels: ["21", "22", "23", "24", "25", "26", "27", "28"],
+            datasets: [
+                {
+                    label: "Successful",
+                    data: [15, 25, 20, 45, 35, 30, 25, 20],
+                    backgroundColor: "#28a745",
+                    barPercentage: 1,
+                    categoryPercentage: 0.8,
+                },
+                {
+                    label: "Failed",
+                    data: [5, 10, 5, 10, 5, 10, 5, 10],
+                    backgroundColor: "#dc3545",
+                    barPercentage: 1,
+                    categoryPercentage: 0.8,
+                },
+            ],
+        };
+
+        // Initialize the chart
+        const deliveriesChart = new Chart(ctx, {
+            type: "bar",
+            data: warehouseData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "top",
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            font: {
+                                size: 12,
+                            },
+                            color: "#333",
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Days",
+                            color: "#999",
+                            font: { style: "italic" },
+                        },
+                        ticks: {
+                            color: "#333",
+                        },
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Number of Deliveries",
+                            color: "#999",
+                            font: { style: "italic" },
+                        },
+                        ticks: {
+                            stepSize: 10,
+                            max: 50,
+                            color: "#333",
+                        },
+                        grid: {
+                            color: "#ddd",
+                            borderDash: [4, 4],
+                        },
+                    },
+                },
+            },
+        });
+
+        // Event listeners for buttons
+        document.getElementById("warehouseTab").addEventListener("click", function () {
+            deliveriesChart.data = warehouseData;
+            deliveriesChart.update();
+
+            // Set active styles
+            this.style.color = "#033b60";
+            this.style.fontWeight = "bold";
+            this.style.borderBottom = "2px solid #033b60"; // Add bottom border
+            this.classList.remove("text-muted");
+
+            // Reset inactive styles
+            const salesTab = document.getElementById("salesTab");
+            salesTab.style.color = "#6c757d";
+            salesTab.style.fontWeight = "normal";
+            salesTab.style.borderBottom = "none"; // Remove bottom border
+            salesTab.classList.add("text-muted");
+        });
+
+        document.getElementById("salesTab").addEventListener("click", function () {
+            deliveriesChart.data = salesData;
+            deliveriesChart.update();
+
+            // Set active styles
+            this.style.color = "#033b60";
+            this.style.fontWeight = "bold";
+            this.style.borderBottom = "2px solid #033b60"; // Add bottom border
+            this.classList.remove("text-muted");
+
+            // Reset inactive styles
+            const warehouseTab = document.getElementById("warehouseTab");
+            warehouseTab.style.color = "#6c757d";
+            warehouseTab.style.fontWeight = "normal";
+            warehouseTab.style.borderBottom = "none"; // Remove bottom border
+            warehouseTab.classList.add("text-muted");
+        });
+    });
+</script>
+
+{% endblock %}

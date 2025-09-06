@@ -1,0 +1,212 @@
+{% include 'delivery_modals/delivery_requests_modals/create_delivery_sched_modal.html' %}
+
+{% for request in delivery_requests %}
+<div class="modal fade" id="viewDeliveryModal{{ request.id }}" tabindex="-1" aria-labelledby="viewDeliveryModalLabel{{ request.id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <div class="w-100">
+                    <!-- Name and Close Button -->
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;">{{ request.request_id }}</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Row 1: Company & Address -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Invoice Number:</div>
+                            <div class="fw-bold ms-1">{{ request.invoice_number }}</div>
+                        </div>
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Request Date:</div>
+                            <div>{{ request.created_at|date:"F j, Y" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Status -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary" style="min-width: 150px;">Status:</div>
+                            <div class="btn btn-light badge text-dark">{{ request.status }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">CLIENT INFORMATION</div>
+
+                <!-- Client Details -->
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Name:</div>
+                        <div class="fw-bold">{{ request.client_info.client_name }}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Address:</div>
+                        <div class="fw-bold">{{ request.client_info.client_address }}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Contact:</div>
+                        <div class="fw-bold">{{ request.client_info.client_contact }}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Email:</div>
+                        <div><a href="mailto:{{ request.client_info.client_email }}">{{ request.client_info.client_email }}</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Breakdown -->
+            <div class="mb-3 mt-4" style="color: #033b60;">PRODUCT BREAKDOWN</div>
+            <div class="mb-3">
+                {% if request.invoice_number|slice:':6' == 'INVWH-' %}
+                    <span class="badge bg-light text-dark border me-2">Warehouse</span>
+                    <strong class="fs-6" style="color: #033b60;">Spareparts</strong>
+                {% else %}
+                <span class="badge bg-light text-dark border me-2">Sales</span>
+                <strong class="fs-6" style="color: #033b60;">Heavy Equipment</strong>
+                {% endif %}
+            </div>
+            <div class="border p-3 rounded-3 mb-4">
+                <div class="table-responsive mb-4">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="opacity: 0.3;">Item Description</th>
+                                <th style="opacity: 0.3;">Serial Number</th>
+                                <th style="opacity: 0.3;">Quantity</th>
+                                <th style="opacity: 0.3;">Unit Price</th>
+                                <th style="opacity: 0.3;">Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {% if request.invoice and request.invoice.order and request.invoice.order.items.first %}
+                                        {{ request.invoice.order.items.first.inventory_item.unit_item }}
+                                    {% else %}
+                                        {{ request.unit_info.unit_name }}
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold">
+                                    {% if request.invoice and request.invoice.order and request.invoice.order.items.first %}
+                                        {{ request.invoice.order.items.first.inventory_item.serial_number }}
+                                    {% else %}
+                                        {{ request.unit_info.serial_number }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if request.invoice and request.invoice.order and request.invoice.order.items.first %}
+                                        {{ request.invoice.order.items.first.quantity }}
+                                    {% else %}
+                                        {{ request.unit_info.quantity|default:"1" }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if request.invoice and request.invoice.order and request.invoice.order.items.first %}
+                                        ₱ {{ request.invoice.order.items.first.unit_price|floatformat:2 }}
+                                    {% else %}
+                                        ₱ {{ request.unit_info.unit_price|floatformat:2 }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if request.invoice and request.invoice.order and request.invoice.order.items.first %}
+                                        ₱ {{ request.invoice.order.items.first.total_price|floatformat:2 }}
+                                    {% else %}
+                                        ₱ {{ request.unit_info.total_price|floatformat:2 }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <h6 class="" style="color: #033b60;">SUMMARY</h6>
+            <div class="table-responsive mb-4 mx-5">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Subtotal (Equipment)</td>
+                            <td>
+                                {% if request.invoice and request.invoice.order and request.invoice.order.items.first %}
+                                    ₱ {{ request.invoice.order.items.first.total_price|floatformat:2 }}
+                                {% else %}
+                                    ₱ {{ request.unit_info.total_price|floatformat:2 }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Amount Paid</td>
+                            <td>
+                                {% if request.invoice and request.invoice.order %}
+                                    ₱ {{ request.invoice.order.amount_paid|floatformat:2 }}
+                                {% else %}
+                                    ₱ {{ request.unit_info.amount_paid|floatformat:2 }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr class="fw-bold text-danger" style="border-top: solid rgb(197, 191, 191) 0.1px;">
+                            <td>Outstanding Balance</td>
+                            <td>
+                                {% if request.invoice and request.invoice.order %}
+                                    ₱ {{ request.invoice.order.remaining_balance|floatformat:2 }}
+                                {% else %}
+                                    ₱ {{ request.unit_info.outstanding_balance|floatformat:2 }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-end mt-4">
+                {% if request.schedules.exists %}
+                    <button type="button" 
+                        class="btn btn-success" 
+                        disabled
+                        title="Delivery schedule already exists">
+                        Create Schedule
+                    </button>
+                {% else %}
+                    <button type="button" 
+                        class="btn btn-success" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#createDeliveryModal{{ request.id }}"
+                        data-bs-dismiss="modal"
+                        onclick="initializeDeliverySchedule(
+                            '{{ request.request_id }}',
+                            '{{ request.invoice_number }}',
+                            '{{ request.created_at|date:'Y-m-d' }}',
+                            '{{ request.client_info.client_name }}',
+                            '{{ request.client_info.client_address }}',
+                            '{{ request.client_info.client_contact }}',
+                            '{{ request.client_info.client_email }}',
+                            '{% if request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.inventory_item.unit_item }}{% else %}{{ request.unit_info.unit_name }}{% endif %}',
+                            '{% if request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.inventory_item.serial_number }}{% else %}{{ request.unit_info.serial_number }}{% endif %}',
+                            '{% if request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.unit_price }}{% else %}{{ request.unit_info.unit_price }}{% endif %}',
+                            '{% if request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.total_price }}{% else %}{{ request.unit_info.total_price }}{% endif %}',
+                            '{{ request.delivery_date_value }}',
+                            '{{ request.delivery_instructions_value }}'
+                        )">
+                        Create Schedule
+                    </button>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}

@@ -1,0 +1,117 @@
+{% for dept in departments %}
+<div class="modal fade" id="viewDepartmentModal{{ dept.name }}" tabindex="-1" aria-labelledby="viewDepartmentLabel{{ dept.name }}" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content p-5">
+
+            <!-- Header with Department Title and Edit Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4" style="margin-left: 15px;">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-secondary"></span>
+                    <h5 class="fs-4 fw-bold" style="color: #033b60;">{{ dept.name }}</h5>
+                </div>
+                <button class="btn btn-lg" data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Department Info Row -->
+            <!-- Info block -->
+            <!-- Department Info Row -->
+            <div class="row mb-4">
+                <!-- Labels Column -->
+                <div class="col-md-3 text-muted">
+                    <div class="mb-3">Department Manager:</div>
+                    <div class="mb-3">Total Users:</div>
+                </div>
+            
+                <!-- Values Column -->
+                <div class="col-md-9">
+                    <div class="mb-3 d-flex align-items-center">
+                        
+                        <span class="fw-medium">Hubert Eleazar</span>
+                    </div>
+                    <div class="mb-3 fw-medium">{{ dept.user_count }}</div>
+                </div>
+            </div>
+            
+
+
+
+            <hr>
+
+            <!-- User List -->
+            <h6 class="fs-4 fw-bold" style="color: #033b60;">User List</h6>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <!-- Search input -->
+                <div class="input-group w-25 mt-2">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                </div>
+
+                <!-- Filter and page info aligned to right -->
+                <!-- Filter and pagination aligned to right -->
+                <div class="d-flex align-items-center gap-4">
+                    <!-- Filter -->
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label mb-0">Filter by:</label>
+                        <select class="form-select form-select-sm w-auto">
+                            <option selected>Select</option>
+                            <option>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-sm px-2 py-0">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <span class="text-muted small">Page 1 of 10</span>
+                        <button class="btn btn-sm px-2 py-0">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-muted" style="opacity: 0.2; font-size: 14px;">
+                            <th>Name</th>
+                            <th>ID Number</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in dept.users %}
+
+                        <tr>
+                            <td>
+                                
+                                {{ user.user.first_name }}&nbsp;{{ user.user.last_name }}
+                            </td>
+                            <td>{{ user.user.id }}</td>
+                            <td><a href="mailto:example@gmail.com">{{ user.user.email }}</a></td>
+                            <td><span class="badge bg-light text-dark">{{ user.department }}</span></td>
+                            <td>{{ user.role }}</td>
+                            <td>{{ user.status }}</td>
+                        </tr>
+                    </tbody>
+                    {% endfor %}
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endfor %}

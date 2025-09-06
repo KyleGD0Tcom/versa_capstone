@@ -1,0 +1,122 @@
+{% extends 'warehouse/warehouse_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/sales_invoicing_modals/view_invoice_modal.html' %}
+{% include 'shared/sales_invoicing_modals/add_invoice_modal.html' %}
+{% include 'shared/sales_invoicing_modals/edit_invoice_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Sales Department | Invoicing</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search1" placeholder="search"></div>
+
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">List of Invoices</h5>
+
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3 ms-4" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;" class="mx-4">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr >
+                        <th style="opacity: 0.3;">Invoice Number</th>
+                        <th style="opacity: 0.3;">Client Name</th>
+                        <th style="opacity: 0.3;">Department</th>
+                        <th style="opacity: 0.3;">Amount</th>
+                        <th style="opacity: 0.3;">Invoice Date</th>
+                        <th style="opacity: 0.3;">Due Date</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>{{ invoice.invoice_number }}</td>
+                        <td>{{ invoice.order.client_name }}</td>
+                        <td>Warehouse</td>
+                        <td>₱ {{ invoice.amount|floatformat:2 }}</td>
+                        <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
+                        <td>{{ invoice.due_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if invoice.status == 'Paid' %}
+                                <span style="background-color: #d4edda; color: #155724; border-radius: 5px;" class="p-1">{{ invoice.status }}</span>
+                            {% elif invoice.status == 'Pending' %}
+                                <span style="background-color: #fff3cd; color: #856404; border-radius: 5px;" class="p-1">{{ invoice.status }}</span>
+                            {% elif invoice.status == 'Overdue' %}
+                                <span style="background-color: rgb(238, 202, 202); color: #721c24; border-radius: 5px;" class="p-1">{{ invoice.status }}</span>
+                            {% elif invoice.status == 'Cancelled' %}
+                                <span style="background-color: #f8d7da; color: #721c24; border-radius: 5px;" class="p-1">{{ invoice.status }}</span>
+                            {% else %}
+                                <span style="background-color: #e2e3e5; color: #6c757d; border-radius: 5px;" class="p-1">{{ invoice.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewInvoiceModal{{ invoice.id }}">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">No invoices found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Header and Add User -->
+
+
+
+
+
+
+</div>
+
+
+
+
+
+{% endblock %}

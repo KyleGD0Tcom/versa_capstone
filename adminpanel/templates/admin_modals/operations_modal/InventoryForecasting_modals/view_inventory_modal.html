@@ -1,0 +1,161 @@
+{% load static %}
+{% for item in inventory_items %}
+
+<!-- View Inventory Modal -->
+<div class="modal fade" id="viewInventoryModal{{ item.id }}" tabindex="-1" aria-labelledby="viewInventoryModalLabel{{ item.id }}"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content p-5 rounded-3">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <span class="badge bg-light border text-dark fw-bold px-2 py-1">{{ item.item_code }}</span>
+          <h4 class="fw-bold d-inline ms-2" style="color: #033b60;">{{ item.unit_item }}</h4>
+        </div>
+        <div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Supplier and Date -->
+      <div class="mb-3">
+        <div class="row mb-2">
+          <div class="col-sm-2 text-secondary">Serial Number:</div>
+          <div class="col-sm-10 text-uppercase">{{ item.serial_number }}</div>
+        </div>
+
+        <div class="row mb-2">
+          <div class="col-sm-2 text-secondary">Supplier:</div>
+          <div class="col-sm-10 text-uppercase fw-semibold">{{ item.supplier }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-sm-2 text-secondary">Date Received:</div>
+          <div class="col-sm-10">{{ item.date_received }}</div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Image + Info Row -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-4 text-center">
+          {% if item.photo %}
+            <img src="{{ item.photo.url }}" alt="Item Photo" class="img-fluid rounded h-100"/>
+          {% else %}
+            <div class="bg-light rounded h-100 d-flex align-items-center justify-content-center">
+              <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+            </div>
+          {% endif %}
+        </div>
+        <div class="col-md-8">
+          <div class="row mb-3">
+            <div class="col-sm-4 text-secondary">Department:</div>
+            <div class="col-sm-8">
+              <span class="badge bg-light text-dark">{{ item.department }}</span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-4 text-secondary">Category:</div>
+            <div class="col-sm-8">{{ item.category }}</div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-sm-4 text-secondary">Quantity:</div>
+            <div class="col-sm-8">{{ item.quantity }}</div>
+          </div>
+
+          <!-- Description Below Label -->
+          <div class="row mb-5 d-block">
+            <div class="col-sm-3 mb-2 text-secondary">Description:</div>
+            <div class="col-sm-12">
+              <p class="small mb-0">
+                {{ item.details }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Status and Last Restocked -->
+          <div class="row mb-2">
+            <div class="col-sm-4 text-secondary">Status:</div>
+            <div class="col-sm-8">
+              <span class="bg-warning text-dark">
+                {% if item.quantity < 20 %} <span style="background-color: #e6c5b0; color: #ef6f28;" class="rounded p-1">Low Stock</span>
+                {% else %}
+                <span style="background-color: #92b0dd; color: #0d2f5a;" class="rounded p-1">In Stock</span>
+                {% endif %}
+
+              </span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-4 text-secondary">Last Restocked:</div>
+            <div class="col-sm-8">{{ item.date_received }}</div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Forecast Section -->
+      <div class="mb-4">
+        <h5 class="mb-3" style="color: #033b60;">Forecast</h5>
+        <div class="bg-light p-3 rounded-3 border mx-5">
+          <span class="mb-3 rounded small" style="background-color: #fadeb3; color: #5f4723;">Preventive Maintenance
+            Warning</span>
+
+          <div class="row text-muted small align-items-start">
+            <!-- Left column: Equipment Name + Status -->
+            <div class="col-md-8 mb-2">
+              <p class="mb-1 fw-bold">Excavator EC750</p>
+              <p class="mb-0">Hydraulic Pump down to <strong>12% life</strong>.</p>
+            </div>
+
+            <!-- Right column: Failure Projected -->
+            <div class="col-md-4 mb-2">
+              <p class="mb-1 text-secondary">Failure projected:</p>
+              <p class="mb-0">
+                <span class="fw-semibold">May 8</span> – Schedule replacement.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="container my-4">
+        <h5 class="" style="color: #033b60;">Inventory Audit</h5>
+
+        <!-- Audit Entry Start -->
+      {% for i in "123" %}
+        <div class="d-flex align-items-start py-3 mx-5">
+          <div class="me-3">
+            <div class="text-muted small">
+              <span>May 25, 2025</span>
+              <span class="mx-2">|</span>
+              <span>09:30:14</span>
+            </div>
+            <div class="mt-1">
+              <span>HYD-12345</span>
+              <span class="fw-bold">Hydraulic Filters</span>
+              <span>(SP-00001)</span>
+              <em class="text-muted"> restocked</em> —
+              <span>20 new units added by</span>
+            </div>
+          </div>
+
+          <div class="d-block align-items-center" style="margin-top: 2.2%;">
+            <img src="https://i.pravatar.cc/32" alt="User" class="rounded-circle me-2" width="32" height="32" />
+            <span class="text-muted">Kyle James</span>
+          </div>
+        </div>
+       {% endfor %} 
+        <!-- Audit Entry End -->
+
+        <!-- Duplicate the block above for more entries -->
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+{% endfor %}

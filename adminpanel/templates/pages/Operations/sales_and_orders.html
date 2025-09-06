@@ -1,0 +1,308 @@
+{% extends 'adminpanel/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+{% include 'admin_modals/operations_modal/salesOrders_modals/view_salesOrders_modal.html' %}
+
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+  body {
+    font-family: 'Rubik', sans-serif !important;
+  }
+
+  #search {
+    height: 40px;
+    border: none;
+    background-color: rgb(224, 224, 224);
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+  }
+</style>
+
+
+<div class="container-fluid px-5">
+  <!-- Greeting and Search -->
+  <i>Operation > Sales & Orders</i>
+  <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search" placeholder="search"></div>
+
+  <div class="row g-3 mb-5" style="height: 10%;">
+    <!-- Card 1 -->
+    <div class="col-3">
+      <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+        <div class="d-flex align-items-center h-100">
+          <div class="m-3">
+            <i class="fas fa-chart-line fa-lg me-3" style="color: #005ca8;"></i>
+            <div class="small text-muted mt-3">Total Monthly Sales</div>
+            <div class="fw-bold fs-3">{{ total_monthly_sales }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 2 -->
+    <div class="col-3">
+      <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+        <div class="d-flex align-items-center h-100">
+          <div class="m-3">
+            <i class="fas fa-clock fa-lg text-success me-3"></i>
+            <div class="small text-muted mt-3">Pending Orders</div>
+            <div class="fw-bold fs-3">{{ pending_orders }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 3 -->
+    <div class="col-3">
+      <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+        <div class="d-flex align-items-center h-100">
+          <div class="m-3">
+            <i class="fas fa-shopping-cart fa-lg text-purple me-3"></i>
+            <div class="small text-muted mt-3">Total Orders</div>
+            <div class="fw-bold text-purple fs-3">{{ total_orders }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 4 -->
+    <div class="col-3">
+      <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+        <div class="d-flex align-items-center h-100">
+          <div class="m-3">
+            <i class="fas fa-ban fa-lg text-warning me-3"></i>
+            <div class="small mt-3">Cancelled Orders</div>
+            <div class="fw-bold fs-3">{{ cancelled_orders }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Header and Add User -->
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="fs-4 fw-bold" style="color: #033b60;">List of Orders</h5>
+
+  </div>
+  <div class="table-responsive border rounded-3 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="text-secondary small">Filter by:</span>
+        <select class="form-select form-select-sm" style="width: auto;">
+          <option selected>Select</option>
+          <option>Role</option>
+          <option>Status</option>
+          <option>Department</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Scrollable Table Container -->
+    <div style="max-height: 400px; overflow-y: auto;">
+      <table class="table align-middle" style="border-collapse: separate; border-spacing: 0 10px;">
+        <thead class="table">
+          <tr>
+            <th style="opacity: 0.3;">Order Number</th>
+            <th style="opacity: 0.3;">Client Name</th>
+            <th style="opacity: 0.3;">Item Description </th>
+            <th style="opacity: 0.3;">Total Amount</th>
+            <th style="opacity: 0.3;">Order Date</th>
+            <th style="opacity: 0.3;">Delivery Date</th>
+            <th style="opacity: 0.3;">Status</th>
+            <th style="opacity: 0.3;"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for order in orders %}
+          <tr class="bg-white">
+            <td class="d-flex align-items-center gap-2">
+              {{ order.order_number }}
+            </td>
+            <td>{{ order.client_name }}</td>
+            <td>
+              {% if order|class_name == 'SalesOrder' %}
+                {{ order.item_description }}
+              {% elif order|class_name == 'WarehouseOrder' %}
+                {% if order.items.all %}
+                  {% for item in order.items.all %}
+                    {{ item.quantity }}x {{ item.inventory_item.unit_item }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                {% else %}-{% endif %}
+              {% else %}-{% endif %}
+            </td>
+            <td>₱ {{ order.total_amount|floatformat:2 }}</td>
+            <td>{{ order.order_date|date:"M d" }}</td>
+            <td><span>{{ order.delivery_date|date:"M d" }}</span></td>
+            <td>
+              {% if order.status == 'Pending' %}
+              <span style="background-color: #fff3cd; border-radius: 5px;" class="p-1 text-warning">{{ order.status }}</span>
+              {% elif order.status == 'Processing' %}
+              <span style="background-color: #cfe2ff; border-radius: 5px;" class="p-1 text-primary">{{ order.status }}</span>
+              {% elif order.status == 'Completed' %}
+              <span style="background-color: #d1e7dd; border-radius: 5px;" class="p-1 text-success">{{ order.status }}</span>
+              {% elif order.status == 'Cancelled' %}
+              <span style="background-color: #f8d7da; border-radius: 5px;" class="p-1 text-danger">{{ order.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if order|class_name == 'SalesOrder' %}
+              <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewSalesOrderModal{{ order.id }}">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+              {% else %}
+              <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewSalesOrderModal{{ order.id }}">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center py-4">No orders found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="container-fluid px-9 my-5">
+    <div class="row">
+      <!-- Left: Sales Forecast -->
+      <div class="col-12 col-lg-7 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0" style="color: #033b60;">Sales Forecast</h5>
+        </div>
+        <div class="card p-4" style="border-radius: 10px;">
+          <div class="d-flex flex-column">
+            <div class="d-flex justify-content-start align-items-center mb-3 w-100">
+              <h5 class="fw-bold mb-0 me-3">April 2025</h5>
+              <button class="btn btn-sm btn-light">Next 30 days</button>
+            </div>
+            <div style="height: 312px;">
+              <canvas id="saleForecastChartAdminDashboard"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Invoice Monitoring -->
+      <div class="col-12 col-lg-5 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0" style="color: #033b60;">Sales by Department</h5>
+        </div>
+        <div class="card shadow-sm p-4" style="border-radius: 16px;">
+          <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+              <div class="chart-container d-flex justify-content-center align-items-center"
+                style="position: relative; width: 100%; height: 320px;">
+                <canvas id="doughnutChart"></canvas>
+              </div>
+            </div>
+            <div class="col-12 d-flex justify-content-center mt-3">
+              <ul class="list-unstyled mb-0 d-flex flex-wrap justify-content-center gap-4">
+                <li><span class="badge me-2" style="background-color: #2d8bba;">&nbsp;</span> Sales</li>
+                <li><span class="badge me-2" style="background-color: #6ce5e8;">&nbsp;</span> Warehouse</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container-fluid">
+    <h5 class="fw-bold mb-3" style="color: #033b60;">Top 5 Best-Selling Products</h5>
+    <div class="card shadow-sm p-4" style="border-radius: 16px;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle text-center mt-3">
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+              <th style="opacity: 0.3;">Number of Orders</th>
+              <th style="opacity: 0.3;">Serial Number</th>
+              <th style="opacity: 0.3;">Revenue</th>
+              <th style="opacity: 0.3;">Department</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in "12345" %}
+            <tr>
+              <td class="fw-bold" style="opacity: 0.3;">{{ forloop.counter }}</td>
+              <td class="text-start d-flex align-items-center">
+                <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded" alt="Product Image"
+                  style="width: 60px; height: 60px; object-fit: cover;">
+                <div class="ms-3">
+                  <div class="fw-semibold text-muted">Crawler Excavator</div>
+                  <div class="text-muted small">Lorem Ipsum</div>
+                </div>
+              </td>
+              <td class="fw-bold">10</td>
+              <td>HP-9876</td>
+              <td>₱ 500,000</td>
+              <td>
+                <span class="badge bg-light text-dark border">Sales</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script src="{% static 'js/js.js' %}"></script>
+
+<script>
+  const ctx = document.getElementById('doughnutChart').getContext('2d');
+  const doughnutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Sales', 'Warehouse',],
+      datasets: [{
+        data: [36, 63], // You will dynamically insert this later with Django
+        backgroundColor: ['#6ce5e8', '#41b8d5',],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+</script>
+
+{# Render a modal for each order #}
+{% for order in orders %}
+  {% include 'admin_modals/operations_modal/salesOrders_modals/view_salesOrders_modal.html' with order=order %}
+{% endfor %}
+
+
+
+
+
+
+{% endblock %}

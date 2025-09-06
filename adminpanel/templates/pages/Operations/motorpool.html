@@ -1,0 +1,191 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+
+{% include 'admin_modals/operations_modal/motorpool_modals/view_motorpool_modal.html' %}
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif !important;
+    }
+
+    #wan {
+        color: #025ca8;
+    }
+
+    #viewButton {
+        background-color: #033b60;
+        color: white;
+        border-radius: 7px;
+        width: 18%;
+    }
+
+    #search {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    /* Status badge styles for table */
+    .status-badge {
+        border-radius: 5px;
+        padding: 4px 10px;
+        font-weight: 500;
+        display: inline-block;
+    }
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-progress {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+    .status-completed {
+        background-color: #d1e7dd;
+        color: #155724;
+    }
+    .status-overdue, .status-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <i>Operations > Motorpool</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search" placeholder="search"></div>
+
+    <div class="container-fluid mb-5">
+        <div class="row g-3">
+            <!-- Card 1 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-clipboard-list fa-lg me-2 text-primary"></i>
+                            <div class="small text-muted mt-3">Pending PDI Requests</div>
+                            <div class="fw-bold fs-3">{{ pending_pdi_requests }} units</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-tools fa-lg text-success me-2"></i>
+                            <div class="small text-muted mt-3">Repairs in Progress</div>
+                            <div class="fw-bold fs-3">{{ repairs_in_progress }} units</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-clipboard-check fa-lg text-purple me-2"></i>
+                            <div class="small text-muted mt-3">Completed Inspections this Month</div>
+                            <div class="fw-bold fs-3">{{ completed_inspections }} Units</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+    <br>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">List of Units</h5>
+
+    </div>
+
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control mb-3" placeholder="search" id="search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">
+                            Request ID</th>
+                        <th style="opacity: 0.3;">Request Type</th>
+                        <th style="opacity: 0.3;">Unit</th>
+                        <th style="opacity: 0.3;">Linked Invoice</th>
+                        <th style="opacity: 0.3;">Assigned By</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for request in sales_requests %}
+                    <tr>
+                        <td>{{ request.request_id }}</td>
+                        <td>{{ request.request_type }}</td>
+                        <td>{{ request.unit }}</td>
+                        <td>{{ request.invoice_number }}</td>
+                        <td>{{ request.requested_by_name }}</td>
+                        <td>
+                            <span class="status-badge {% if request.status == 'Pending' %}status-pending{% elif request.status == 'In Progress' %}status-progress{% elif request.status == 'Completed' %}status-completed{% endif %}">
+                                {{ request.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewMotorpoolModal{{ request.id }}"><i class="bi bi-chevron-right"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No requests found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# Render a modal for each request #}
+    {% for request in sales_requests %}
+        {% include 'admin_modals/operations_modal/motorpool_modals/view_motorpool_modal.html' with request=request %}
+    {% endfor %}
+
+
+
+
+
+
+
+
+</div>
+{% endblock %}

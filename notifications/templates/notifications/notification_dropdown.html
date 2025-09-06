@@ -1,0 +1,158 @@
+{% load static %}
+
+<div class="dropdown">
+    <a href="#" class="dropdown-toggle notification-bell" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-bell" style="color: #025ca8; font-size: 1.5rem;"></i>
+        <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+        <div class="dropdown-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Notifications</h6>
+            <a href="{% url 'notifications:notification_center' %}" class="text-muted">View All</a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div id="notificationList">
+            <!-- Notifications will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-bell {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+}
+
+.notification-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #e8f0fe;
+    position: relative;
+}
+
+.notification-item.unread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: #025ca8;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.notification-read {
+    opacity: 0.7;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function fetchNotifications() {
+        fetch('{% url "notifications:get_notifications" %}', { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(data => {
+                const notificationList = document.getElementById('notificationList');
+                const notificationCount = document.getElementById('notificationCount');
+                
+                // Update notification count
+                if (data.unread_count > 0) {
+                    notificationCount.textContent = data.unread_count;
+                    notificationCount.style.display = 'block';
+                } else {
+                    notificationCount.style.display = 'none';
+                }
+                
+                // Clear existing notifications
+                notificationList.innerHTML = '';
+                
+                // Add new notifications
+                data.notifications.forEach(notification => {
+                    const notifElement = document.createElement('div');
+                    notifElement.className = 'notification-item unread';
+                    notifElement.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <strong>${notification.title}</strong>
+                            <small class="notification-time">${notification.created_at}</small>
+                        </div>
+                        <div>${notification.message}</div>
+                    `;
+                    
+                    // Add click handler
+                    notifElement.addEventListener('click', () => {
+                        // Get CSRF token from the meta tag
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                        
+                        // Mark as read
+                        fetch(`{% url "notifications:mark_notification_read" notification_id=0 %}`.replace('0', notification.id), {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        }).then(response => {
+                            if (response.ok) {
+                                // Remove unread styling
+                                notifElement.classList.remove('unread');
+                                
+                                // Handle redirection based on notification type
+                                if (notification.notification_type === 'pdi_request') {
+                                    // For PDI requests, redirect to the specific request in received requests page
+                                    const requestId = notification.related_link.split('request_id=')[1];
+                                    window.location.href = `/motorpool/received_requests/?request_id=${requestId}`;
+                                } else if (notification.notification_type === 'delivery_request') {
+                                    // For delivery requests, redirect to the specific request in delivery requests page
+                                    const requestId = notification.related_link.split('request_id=')[1];
+                                    window.location.href = `/delivery/requests/?request_id=${requestId}`;
+                                } else if (notification.related_link) {
+                                    // For other notifications with related links
+                                    window.location.href = notification.related_link;
+                                } else {
+                                    // Default fallback
+                                    window.location.href = '{% url "delivery_requests" %}';
+                                }
+                            }
+                        }).catch(error => {
+                            console.error('Error marking notification as read:', error);
+                        });
+                    });
+                    
+                    notificationList.appendChild(notifElement);
+                });
+                
+                if (data.notifications.length === 0) {
+                    notificationList.innerHTML = '<div class="p-3 text-center text-muted">No new notifications</div>';
+                }
+            })
+            .catch(error => console.error('Error fetching notifications:', error));
+    }
+    
+    // Fetch notifications immediately and every 5 seconds
+    fetchNotifications();
+    setInterval(fetchNotifications, 5000);
+});
+</script> 

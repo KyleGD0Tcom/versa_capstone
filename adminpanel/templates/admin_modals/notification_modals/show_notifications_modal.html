@@ -1,0 +1,59 @@
+<style>
+    .unread:hover {
+        background-color: rgb(245, 235, 235);
+        border-radius: 10px;
+        padding: 8px;
+    }
+
+    /* Custom positioning for the modal */
+    #notificationsModal .modal-dialog {
+        position: absolute;
+        top: 70px; /* Adjust this value to position the modal below the icon */
+        right: 120px; /* Align the modal to the right of the screen */
+        margin: 0;
+    }
+
+    #notificationsModal .modal-content {
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
+    }
+</style>
+
+<!-- Notifications Modal -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content rounded-3 p-4 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold" id="notificationsModalLabel" style="color: #033b60;">Notifications
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Unread Notifications -->
+                <h6 class="text-secondary mb-3">Unread</h6>
+                <div class="mb-4 ms-3">
+                    <div class="d-flex justify-content-between mb-2 unread">
+                        <span>User "Hubert Eleazar Debalucos" has been deleted from Warehouse
+                            Department.</span>
+                        <span class="text-muted small ms-3">[14:01]</span>
+                    </div>
+                </div>
+
+                <!-- Read Notifications -->
+                <h6 class="text-secondary mb-3">Read</h6>
+                <div class="fs-6 ms-3">
+                    {% for i in "12345" %}
+                    <div class="d-flex justify-content-between mb-4">
+                        <span>User "Hubert Eleazar Debalucos" has been deleted from Warehouse Department.</span>
+                        <span class="text-muted small ms-3">[14:01]</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <a href="{% url 'notifications' %}" style="color: #033b60; text-decoration: none;">See All</a>
+            </div>
+        </div>
+    </div>
+</div>

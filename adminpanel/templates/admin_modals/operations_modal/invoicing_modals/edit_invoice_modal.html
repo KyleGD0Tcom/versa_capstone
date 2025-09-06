@@ -1,0 +1,240 @@
+<!-- Update/Edit Invoice Modal -->
+<div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content rounded-3 p-5"
+            style="font-family: 'Rubik', sans-serif; max-height: 90vh; overflow: hidden;">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start p-4 border-bottom">
+                <div>
+                    <h5 class="fw-bold mb-3" style="color: #033b60;">INV-00-0001</h5>
+                    <div class="d-flex align-items-center text-muted small">
+                        <div class="me-3">
+                            <strong>Date of Issue:</strong>
+                        </div>
+                        <input type="date" class="form-control form-control-sm" id="editDateOfIssue" value="2025-05-01">
+                    </div>
+                    <div class="d-flex align-items-center text-muted small mt-2">
+                        <div class="me-3">
+                            <strong>Due Date:</strong>
+                        </div>
+                        <input type="date" class="form-control form-control-sm ms-3" id="editDueDateHeader"
+                            value="2025-05-25">
+                    </div>
+                </div>
+                <div class="d-flex align-items-start">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="modal-body p-4 overflow-auto" style="max-height: calc(90vh - 130px);">
+
+                <!-- Client and Seller Information -->
+                <div class="row mb-5">
+                    <!-- Client Information -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold" style="color: #033b60;">CLIENT INFORMATION</h6>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Name:</strong></div>
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="editClientName"
+                                    value="John Doe Construction">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Address:</strong></div>
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="editClientAddress"
+                                    value="123 Building St, City, Country">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Contact:</strong></div>
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="editClientContact"
+                                    value="+63 9 677 845 78">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Email:</strong></div>
+                            <div class="col-8">
+                                <input type="email" class="form-control form-control-sm" id="editClientEmail"
+                                    value="johndoe@email.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seller Information -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold" style="color: #033b60;">SELLER INFORMATION</h6>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Company:</strong></div>
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="editSellerCompany"
+                                    value="JINYI">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Address:</strong></div>
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="editSellerAddress"
+                                    value="456 Industrial Ave, City, Country">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Contact:</strong></div>
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm" id="editSellerContact"
+                                    value="+63 9 677 845 78">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted"><strong>Email:</strong></div>
+                            <div class="col-8">
+                                <input type="email" class="form-control form-control-sm" id="editSellerEmail"
+                                    value="johndoe@email.com">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Breakdown -->
+                <div class="mb-3" style="color: #033b60;">PRODUCT BREAKDOWN</div>
+
+                <!-- Heavy Equipment Section -->
+                <div class="mb-3">
+                    <span class="badge bg-light text-dark border me-2">Sales</span>
+                    <strong class="fs-6" style="color: #033b60;">Heavy Equipment</strong>
+                </div>
+                <div class="border p-3 rounded-3 mb-5">
+                    <div class="table-responsive mb-4">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="opacity: 0.3;">Item Description</th>
+                                    <th style="opacity: 0.3;">Serial Number</th>
+                                    <th style="opacity: 0.3;">Quantity</th>
+                                    <th style="opacity: 0.3;">Unit Price</th>
+                                    <th style="opacity: 0.3;">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Excavator Model X300</td>
+                                    <td class="fw-bold">EX-12345</td>
+                                    <td>Sales</td>
+                                    <td>₱ 500,000</td>
+                                    <td>₱ 500,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Spare Parts Section -->
+                <div class="mb-3">
+                    <span class="badge bg-light text-dark border me-2">Warehouse</span>
+                    <strong class="fs-6" style="color: #033b60;">Spare Parts</strong>
+                </div>
+                <div class="border p-3 rounded-3 mb-5">
+                    <div class="table-responsive mb-5">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="opacity: 0.3;">Item Description</th>
+                                    <th style="opacity: 0.3;">Part Number</th>
+                                    <th style="opacity: 0.3;">Quantity</th>
+                                    <th style="opacity: 0.3;">Unit Price</th>
+                                    <th style="opacity: 0.3;">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Hydraulic Hose</td>
+                                    <td class="fw-bold">HP-9876</td>
+                                    <td>3</td>
+                                    <td>₱ 500</td>
+                                    <td>₱ 1,500</td>
+                                </tr>
+                                <tr>
+                                    <td>Engine Filter</td>
+                                    <td class="fw-bold">EF-1234</td>
+                                    <td>2</td>
+                                    <td>₱ 350</td>
+                                    <td>₱ 700</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Summary -->
+                <h6 class="fw-bold" style="color: #033b60;">SUMMARY</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table border-0">
+                        <tbody>
+                            <tr>
+                                <td>Subtotal (Equipment)</td>
+                                <td class="text-end">₱ 500,000</td>
+                            </tr>
+                            <tr>
+                                <td>Subtotal (Spare Parts)</td>
+                                <td class="text-end">₱ 2,200</td>
+                            </tr>
+                            <tr>
+                                <td>Delivery Fee</td>
+                                <td class="text-end">₱ 350</td>
+                            </tr>
+                            <tr>
+                                <td>Tax (12%)</td>
+                                <td class="text-end">₱ 264</td>
+                            </tr>
+                            <tr class="fw-bold">
+                                <td>Total</td>
+                                <td class="text-end">₱ 2,464</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Payment Details -->
+                <h6 class="fw-bold mb-3" style="color: #033b60;">PAYMENT DETAILS</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row mb-1">
+                            <div class="col-5 text-muted fw-semibold">Bank Account:</div>
+                            <div class="col-7">XYZ Bank</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-5 text-muted fw-semibold">Account Number:</div>
+                            <div class="col-7">123-456-789</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row mb-1">
+                            <div class="col-5 text-muted fw-semibold">Payment Status:</div>
+                            <div class="col-7">
+                                <select class="form-select form-select-sm" id="editPaymentStatus">
+                                    <option value="Pending" selected>Pending</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Overdue">Overdue</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-5 text-muted fw-semibold">Due Date:</div>
+                            <div class="col-7"><span class="text-dark">May 25, 2025</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- CLOSE .modal-body -->
+
+            <!-- ✅ Proper Placement -->
+            <div class="modal-footer border-top pt-3">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success px-4">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>

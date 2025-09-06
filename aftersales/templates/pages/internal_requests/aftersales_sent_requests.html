@@ -1,0 +1,137 @@
+{% extends 'aftersales/aftersales_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/sent_requests_modals/add_requests_modal.html' %}
+{% include 'shared/sent_requests_modals/view_requests_modal.html' %}
+{% include 'shared/sent_requests_modals/edit_requests_modal.html' %}
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Aftersales Department | Internal Requests > Sent Requests</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search1" placeholder="search"></div>
+
+
+    <div class="d-flex gap-5 mb-5">
+        <a href="{% url 'aftersales_received_requests' %}">
+            <button class="p-2 rounded text-secondary fw-bold fs-5 border-0"
+                style="width: 130%; background-color: #d6d6d6;">
+                Received Requests
+            </button>
+        </a>
+
+        <a href="">
+            <button class="p-2 rounded fw-bold text-white fs-5 border-0"
+                style="width: 155%; background-color: #033b60;">
+                Sent Requests
+            </button>
+        </a>
+    </div>
+
+
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div></div>
+        <a href="#" class="btn text-white d-flex align-items-center gap-2" data-bs-toggle="modal"
+            data-bs-target="#addRequestModal" style="background-color: #53893c; width: 12%;">
+            <i class="bi bi-plus-circle"></i> Create Request
+        </a>
+
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 600px; overflow-y: auto;">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Request ID</th>
+                        <th style="opacity: 0.3;">Type</th>
+                        <th style="opacity: 0.3;">Related Part</th>
+                        <th style="opacity: 0.3;">Date Sent</th>
+                        <th style="opacity: 0.3;">Department</th>
+                        <th style="opacity: 0.3;">Priority</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for i in "0123456789" %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>
+                            RQ-0001
+                        </td>
+                        <td>Repair</td>
+                        <td>SP-0001 | Hydraulic Filters</td>
+                        <td>May 25, 2024</td>
+                        <td>Warehouse</td>
+                        <td><span class="text-success">Low</span></td>
+                        <td><span style="background-color: rgb(202, 238, 204); border-radius: 5px;"
+                                class="p-1 text-success">Completed</span></td>
+                        <td>
+                            <a class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#editRequestModal">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewReqModal">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

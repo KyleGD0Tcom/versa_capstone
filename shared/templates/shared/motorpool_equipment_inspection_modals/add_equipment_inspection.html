@@ -1,0 +1,192 @@
+{% load static %}
+
+<div class="modal fade" id="addEquipmentInspectionModal" tabindex="-1"
+    aria-labelledby="addEquipmentInspectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <div class="w-100">
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;">INS-0001</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex align-items-center gap-3">
+                            <label class="text-secondary" style="min-width: 150px;">Technician:</label>
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <img src="https://i.pravatar.cc/32" class="rounded-circle" alt="Technician">
+                                <select class="form-select w-100">
+                                    <option selected>Hubert Eleazar</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center gap-3">
+                            <label class="text-secondary" style="min-width: 150px;">Inspection Date:</label>
+                            <input type="date" class="form-control w-100">
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex align-items-center gap-3">
+                            <label class="text-secondary" style="min-width: 150px;">Request Type:</label>
+                            <select class="form-select w-100">
+                                <option selected disabled>Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center gap-3">
+                            <label class="text-secondary" style="min-width: 150px;">Status:</label>
+                            <select class="form-select w-100">
+                                <option selected disabled>Select</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex align-items-center gap-3">
+                            <label class="text-secondary" style="min-width: 150px;">Department:</label>
+                            <select class="form-select w-100">
+                                <option selected disabled>Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">EQUIPMENT DETAILS</div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Unit Code:</label>
+                        <input type="text" class="form-control w-100">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Usage Hours:</label>
+                        <input type="text" class="form-control w-100">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Serial Number:</label>
+                        <span>EX-12345</span>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Last Inspection Date:</label>
+                        <input type="date" class="form-control w-100">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Unit Name:</label>
+                        <span>Excavator EC750</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Location during Inspection:</label>
+                        <select class="form-select w-100">
+                            <option selected disabled>Select</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-body mt-5">
+                <div class="mb-3" style="color: #033b60;">INSPECTION INFO</div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Inspection Type:</label>
+                        <select class="form-select w-100">
+                            <option selected disabled>Select</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Checklist Reference:</label>
+                        <div class="d-flex flex-column gap-2">
+                            <input type="file" class="form-control" name="checklist_reference" 
+                                   accept=".pdf,.doc,.docx">
+                            <small class="text-muted">Upload checklist document</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <label class="text-secondary" style="min-width: 150px;">Assisted by:</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://i.pravatar.cc/32" class="rounded-circle" width="37" height="37">
+                            Hubert Eleazar
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mt-4">
+                <div class="mb-3" style="color: #033b60;">RESULTS & FINDINGS</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label class="text-secondary" style="min-width: 150px;">Inspection Result:</label>
+                            <select class="form-select w-100">
+                                <option selected disabled>Select</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label text-secondary">Issues Found:</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" rows="3" placeholder="Enter notes here..."></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label text-secondary">Corrective Actions Taken:</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" rows="3" placeholder="Enter notes here..."></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label text-secondary">Spare Parts Used:</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" rows="3" placeholder="Enter notes here..."></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label text-secondary">Notes:</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" rows="3" placeholder="Enter notes here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mt-4 mb-5">
+                <div class="mb-3" style="color: #033b60;">ATTACHMENTS</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2 text-secondary">Inspection Photos:</div>
+                        <input type="file" class="form-control" name="inspection_photo1" accept="image/*">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2 text-secondary">Signed Form:</div>
+                        <a href="#"><i class="bi bi-file-earmark-text"></i> attachment-file</a>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <div class="modal-footer border-0 d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-success p-2 me-2">Cancel</button>
+                <button type="button" class="btn btn-success p-2">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>

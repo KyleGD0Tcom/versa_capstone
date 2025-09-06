@@ -1,0 +1,268 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+{% include 'admin_modals/settings_modals/contact_support_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .fields {
+        background-color: #dededf;
+    }
+
+    .save-btn {
+        background-color: #033b60;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .save-btn:hover {
+        background-color: #025ca8;
+    }
+
+    .settings-form {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Settings</div>
+    <div class="row mb-5">
+        <input class="p-2" type="search" id="search1" placeholder="search">
+    </div>
+
+    <div style="color: #033b60;" class="mb-4">GENERAL SETTINGS</div>
+
+    <!-- Settings Form -->
+    <form method="POST" class="settings-form">
+        {% csrf_token %}
+        
+        <!-- Time Zone -->
+        <div class="d-flex align-items-center text-secondary mb-3 gap-5" style="max-width: 500px;">
+            <label for="timezone" class="me-2 mb-0" style="white-space: nowrap;">Time Zone:</label>
+            <select class="form-select flex-grow-1 ms-3 fields" id="timezone" name="timezone">
+                <option value="">Select Time Zone</option>
+                <!-- Popular timezones first -->
+                <option value="UTC+08:00" {% if user_settings.timezone == 'UTC+08:00' %}selected{% endif %}>
+                    (UTC+08:00) Manila, Philippines (PHT)
+                </option>
+                <!-- Other timezone choices -->
+                {% for value, label in timezone_choices %}
+                    {% if value != 'UTC+08:00' %}
+                        <option value="{{ value }}" {% if user_settings.timezone == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Date Format -->
+        <div class="d-flex align-items-center text-secondary gap-4 mb-4" style="max-width: 500px;">
+            <label for="dateFormat" class="me-2 mb-0" style="white-space: nowrap;">Date Format:</label>
+            <select class="form-select flex-grow-1 ms-4 fields" id="dateFormat" name="dateFormat">
+                <option value="">Select Date Format</option>
+                {% for value, label in date_format_choices %}
+                    <option value="{{ value }}" {% if user_settings.date_format == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="mb-4 p-3 bg-light rounded">
+            <h6 class="text-muted mb-2">Live Preview:</h6>
+            <div class="d-flex gap-4">
+                <div>
+                    <strong>Current Time:</strong>
+                    <div id="liveTime" class="text-primary"></div>
+                </div>
+                <div>
+                    <strong>Current Date:</strong>
+                    <div id="liveDate" class="text-primary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="mb-3">
+            <button type="submit" name="save_settings" class="save-btn">
+                <i class="fas fa-save me-2"></i>Save Settings
+            </button>
+        </div>
+    </form>
+
+    <div>
+        <div style="color: #033b60;" class="mt-5 mb-4">SUPPORT & HELP CENTER?</div>
+        <div class="text-secondary mb-3">How to manage users?</div>
+        <div class="text-secondary mb-3">How to track orders?</div>
+        <div class="text-secondary mb-3">How risks & anomaly detection works?</div>
+        <div class="text-secondary mb-3">How to generate reports?</div>
+    </div>
+
+    <div>
+        <div style="color: #033b60;" class="mt-5 mb-4">FAQS</div>
+        <div class="text-secondary mb-3">Why can't I access my account?</div>
+        <div class="text-secondary mb-3">How do I reset my password?</div>
+        <div class="text-secondary mb-5">Where are my archived logs?</div>
+        <div class="mt-5 mb-4 fst-italic"><a href="" style="text-decoration: none; color: #033b60;" data-bs-toggle="modal"
+                data-bs-target="#contactSupportModal">Contact Support?</a></div>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+{% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<script>
+// Auto-hide alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+
+    // Initialize live preview
+    updateLivePreview();
+    // Update preview every second
+    setInterval(updateLivePreview, 1000);
+});
+
+// Function to update live preview
+function updateLivePreview() {
+    const timezoneSelect = document.getElementById('timezone');
+    const dateFormatSelect = document.getElementById('dateFormat');
+    const liveTimeDiv = document.getElementById('liveTime');
+    const liveDateDiv = document.getElementById('liveDate');
+    
+    if (timezoneSelect && dateFormatSelect && liveTimeDiv && liveDateDiv) {
+        const selectedTimezone = timezoneSelect.value || 'UTC+08:00';
+        const selectedDateFormat = dateFormatSelect.value || 'MM/DD/YYYY';
+        
+        // Get current time in UTC
+        const now = new Date();
+        const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+        
+        // Parse timezone offset
+        const timezoneOffset = parseTimezoneOffset(selectedTimezone);
+        
+        // Calculate time in selected timezone
+        const targetTime = new Date(utcTime + (timezoneOffset * 60000));
+        
+        // Format time
+        const timeString = formatTime(targetTime);
+        
+        // Format date
+        const dateString = formatDate(targetTime, selectedDateFormat);
+        
+        // Update preview
+        liveTimeDiv.textContent = timeString;
+        liveDateDiv.textContent = dateString;
+    }
+}
+
+// Function to parse timezone offset
+function parseTimezoneOffset(timezone) {
+    const match = timezone.match(/UTC([+-])(\d{1,2}):?(\d{2})?/);
+    if (match) {
+        const sign = match[1] === '+' ? 1 : -1;
+        const hours = parseInt(match[2]);
+        const minutes = match[3] ? parseInt(match[3]) : 0;
+        return sign * (hours * 60 + minutes);
+    }
+    return 0; // Default to UTC
+}
+
+// Function to format time
+function formatTime(date) {
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    // Convert to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+}
+
+// Function to format date based on user preference
+function formatDate(date, format) {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    switch(format) {
+        case 'MM/DD/YYYY':
+            return `${month}/${day}/${year}`;
+        case 'DD/MM/YYYY':
+            return `${day}/${month}/${year}`;
+        case 'YYYY-MM-DD':
+            return `${year}-${month}-${day}`;
+        case 'MMM DD, YYYY':
+            return `${monthNames[date.getMonth()]} ${day}, ${year}`;
+        default:
+            return `${month}/${day}/${year}`;
+    }
+}
+
+// Real-time preview of date format
+document.getElementById('dateFormat').addEventListener('change', function() {
+    updateLivePreview();
+});
+
+// Real-time preview of timezone
+document.getElementById('timezone').addEventListener('change', function() {
+    updateLivePreview();
+});
+
+function createPreviewDiv() {
+    const previewDiv = document.createElement('div');
+    previewDiv.id = 'dateFormatPreview';
+    previewDiv.className = 'text-muted mt-2';
+    previewDiv.style.fontSize = '0.9em';
+    
+    const dateFormatContainer = document.getElementById('dateFormat').closest('.d-flex');
+    dateFormatContainer.appendChild(previewDiv);
+    
+    return previewDiv;
+}
+</script>
+
+{% endblock %}

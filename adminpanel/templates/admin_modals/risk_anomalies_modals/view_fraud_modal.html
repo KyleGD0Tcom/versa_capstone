@@ -1,0 +1,164 @@
+<!-- view_fraud_modal.html -->
+<div class="modal fade" id="viewFraudModal" tabindex="-1" aria-labelledby="viewFraudModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content p-5 rounded-3">
+
+            <!-- Modal Header with Close Button -->
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="viewFraudModalLabel" style="color: #033b60;">ORD-00-0001</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Header Info -->
+                <div class="row g-1 mb-4">
+                    <!-- Serial Number -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Serial Number:</div>
+                            <div>ORD-00-0001</div>
+                        </div>
+                    </div>
+                    <!-- Flag Date -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Flag Date:</div>
+                            <div class="ms-5">May 4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-1 mb-4">
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Status:</div>
+                            <div><span style="background-color: rgb(238, 202, 202); border-radius: 5px;"
+                                class="p-1 text-danger">Blacklisted</span></div>
+                        </div>
+                    </div>
+                    <!-- Time Since Order -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Time Since Order:</div>
+                            <div class="ms-5">3 months ago</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <hr>
+
+                <!-- Client Information -->
+                <h6 class="mb-4 mt-5" style="color: #033b60;">CLIENT INFORMATION</h6>
+
+                <div class="row g-1 mb-4">
+                    <!-- Name -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Name:</div>
+                            <div>Balbin INC.</div>
+                        </div>
+                    </div>
+                    <!-- Down Payment -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Payment Status:</div>
+                            <div class="ms-5"><span class="">Down payment (30% partial)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-1 mb-4">
+                    <!-- Address -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Address:</div>
+                            <div>123 Building St, City, Country</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-1 mb-4">
+                    <!-- Contact -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Contact:</div>
+                            <div>+63 9 677 845 78</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-1 mb-4">
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="text-secondary" style="min-width: 140px;">Email:</div>
+                            <div><a href="mailto:johndoe@email.com">johndoe@email.com</a></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <br>
+
+
+
+                <!-- Triggered Rules -->
+                <h6 class="mb-4 mt-4" style="color: #033b60;">TRIGGERED RULES</h6>
+                <div class="alert alert-danger p-3">
+                    Client settled the down payment but has not returned or followed up since.
+                </div>
+
+                <!-- Add Remarks -->
+                <h6 class="mb-3 mt-5" style="color: #033b60;">ADD REMARKS</h6>
+                <div id="remarks-container">
+                    <div class="bg-light p-2 rounded mb-2">
+                        Transaction remains idle since down payment was made. Client has been unresponsive to initial
+                        follow-up attempts. Monitor for potential drop-off.
+                    </div>
+                </div>
+
+                <button class="btn-md mb-4 text-white rounded-2 p-1 mt-3" id="add-remark-btn" style="background-color: #033b60; width: 15%;">+ &nbsp;Add more</button>
+
+                <hr>
+
+                <!-- Action Buttons -->
+                <!-- <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Dismiss Flag</button>
+                    <button class="btn btn-danger">Add to Blacklist</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Event listener for the "Add more" button
+    document.getElementById("add-remark-btn").addEventListener("click", function() {
+        // Create a new remark container
+        var newRemark = document.createElement("div");
+
+        // Add a textarea for the new remark
+        var newTextArea = document.createElement("textarea");
+        newTextArea.classList.add("form-control", "mb-2", "bg-light");
+        newTextArea.setAttribute("placeholder", "Add additional remarks here...");
+
+        // Create a remove button
+        var removeButton = document.createElement("button");
+        removeButton.classList.add("btn", "btn-sm", "btn-danger", "float-end");
+        removeButton.innerHTML = "X";
+
+        // Event listener for removing the remark
+        removeButton.addEventListener("click", function() {
+            newRemark.remove();
+        });
+
+        // Append the textarea and remove button to the new remark container
+        newRemark.appendChild(newTextArea);
+        newRemark.appendChild(removeButton);
+
+        // Append the new remark container to the remarks container
+        document.getElementById("remarks-container").appendChild(newRemark);
+    });
+</script>

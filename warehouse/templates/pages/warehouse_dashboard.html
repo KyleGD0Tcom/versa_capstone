@@ -1,0 +1,295 @@
+{% extends 'warehouse/warehouse_base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Warehouse Department | Dashboard</div>
+    <div class="d-flex gap-5">
+        <div class="mt-2" style="color: #033b60;">
+            <h4>Good Afternoon!</h4>
+        </div>
+        <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+    </div>
+
+    <div class="row mb-5">
+        <!-- Left Column: 3 Cards -->
+        <div class="col-lg-4">
+            <div class="row g-3">
+                <!-- Card 1 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 163px;">
+                        <a class="btn btn-sm position-absolute top-0 end-0 m-2"></a>
+                        <div class="d-flex align-items-center h-100">
+                            <div class="d-flex justify-content-between w-100">
+                                <div class="ms-3 mt-3">
+                                    <i class="fas fa-box fa-lg me-3" style="color: #005ca8;"></i>
+                                    <div class="small text-muted mt-2 ms-2">Total Spare Parts in Stock</div>
+                                    <div class="fw-bold fs-4 ms-2">{{ total_spare_parts }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 163px;">
+                        <a class="btn btn-sm position-absolute top-0 end-0 m-2"></a>
+                        <div class="d-flex align-items-center h-100">
+                            <div class="d-flex justify-content-between w-100">
+                                <div class="ms-3 mt-3">
+                                    <i class="fas fa-clock fa-lg me-3" style="color: #005ca8;"></i>
+                                    <div class="small text-muted mt-2 ms-2">Pending Orders</div>
+                                    <div class="fw-bold fs-4 ms-2">{{ pending_orders }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 163px;">
+                        <a class="btn btn-sm position-absolute top-0 end-0 m-2"></a>
+                        <div class="d-flex align-items-center h-100">
+                            <div class="d-flex justify-content-between w-100">
+                                <div class="ms-3 mt-3">
+                                    <i class="fas fa-truck fa-lg me-3" style="color: #005ca8;"></i>
+                                    <div class="small text-muted mt-2 ms-2">Parts Delivered this Month</div>
+                                    <div class="fw-bold fs-4 ms-2">{{ parts_delivered }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Single Container (Moved Title Outside) -->
+        <div class="col-lg-8">
+            <!-- Title outside the container -->
+            <div class="mb-3">
+                <h5 class="fw-bold mb-0" style="color: #033b60;">Inventory Forecast</h5>
+            </div>
+
+            <!-- The actual content container -->
+            <div class="card p-4 shadow-sm w-100" style="border-radius: 10px; min-height: 480px;">
+                <!-- Scrollable inner content -->
+                <div id="forecast-content" style="max-height: 400px; overflow-y: auto;" class="mt-2">
+                    {% for i in "12345" %}
+                    <div class="forecast-item" data-category="warehouse">
+                        <div class="mb-3 d-flex justify-content-between align-items-start">
+                            <div style="flex: 1;">
+                                <div class="badge rounded-4 p-2 text-center mb-2"
+                                    style="background-color: #e6c99f; color: #ab5d1e; font-weight: normal;">
+                                    Preventive Maintenance Warning
+                                </div>
+                                <h6 class="fw-bold mb-1">Excavator EC750</h6>
+                                <div class="text-muted">Hydraulic Pump down to <span class="fw-bold">12% life.</span>
+                                </div>
+                            </div>
+                            <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                                <div>Department: <strong class="text-dark">Warehouse</strong></div><br>
+                                <div>Failure projected: <strong class="text-dark">May 8</strong></div>
+                                <div><strong class="text-dark">Schedule replacement</strong></div>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}
+                        <hr>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid px-9 my-5">
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <h5 class="fw-bold mb-0" style="color: #033b60;">Top Selling Parts</h5>
+            <a href="">
+                <i class="fas fa-lg fa-chevron-right text-muted"></i>
+            </a>
+        </div>
+        <div class="card p-4" style="border-radius: 10px;">
+            <div class="row">
+                <!-- Left: Chart Area -->
+                <div class="col-lg-8 border-end">
+                    <!-- Sale Forecast Heading (Now completely outside the container) -->
+                    <div class="d-flex justify-content-start align-items-center mb-3 w-100">
+                        <h5 class="fw-bold mb-0 me-3">April 2025</h5>
+                        <button class="btn btn-sm btn-light rounded p-2">Past 30 days</button>
+                    </div>
+
+                    <div style="height: 300px;" class="mt-5">
+                        <canvas id="warehouseForecastChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Top Products List -->
+                <div class="col-lg-4 ps-4">
+                    <h6 class="fw-bold fs-5">Top 5 Products</h6>
+                    <p class="text-muted small mb-3">By Forecast Demands</p>
+
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Product Items -->
+                        <div class="d-flex align-items-center p-2 rounded bg-light">
+                            <span class="fw-bold me-2">1</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <!-- 2-5 (repeating structure without background highlight) -->
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">2</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">3</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">4</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">5</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById("warehouseForecastChart").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["1", "5", "10", "15", "20"], // X-axis labels (Days)
+                datasets: [
+                    {
+                        label: "Top Selling Parts",
+                        data: [500, 400, 450, 600, 350], // Sales data for each day
+                        backgroundColor: "#2d8bba", // Single color for all bars
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.6,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false, // Hide the legend
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Day",
+                            color: "#999",
+                            font: { style: "italic" },
+                        },
+                        ticks: {
+                            color: "#333",
+                        },
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Item Code",
+                            color: "#999",
+                            font: { style: "italic" },
+                        },
+                        ticks: {
+                            callback: function () {
+                                return "EC750"; // Display "EC750" for all Y-axis ticks
+                            },
+                            stepSize: 100, // Ensure proper spacing between ticks
+                            color: "#333",
+                        },
+                        grid: {
+                            color: "#ddd",
+                            borderDash: [4, 4],
+                        },
+                        min: 0, // Start Y-axis at 0
+                        max: 500, // Set maximum value to fit the dataset
+                    },
+                },
+            },
+        });
+    });
+</script>
+
+
+
+
+
+{% endblock %}

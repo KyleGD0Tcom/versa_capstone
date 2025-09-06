@@ -1,0 +1,274 @@
+<script>
+    function initializeDeliverySchedule(requestId, invoiceNumber, createdAt, clientName, clientAddress, clientContact, clientEmail, unitName, serialNumber, unitPrice, totalPrice, deliveryDate, deliveryInstructions) {
+        // Update request ID
+        document.getElementById('delivery-request-id').textContent = requestId;
+
+        // Update order details
+        document.getElementById('invoice-number').textContent = invoiceNumber;
+        document.getElementById('date-ordered').textContent = createdAt;
+
+        // Update client information
+        document.getElementById('client-name').textContent = clientName;
+        document.getElementById('client-address').textContent = clientAddress;
+        document.getElementById('client-contact').textContent = clientContact;
+        document.getElementById('client-email').textContent = clientEmail;
+        document.getElementById('client-email-link').href = 'mailto:' + clientEmail;
+
+        // Update product details
+        document.getElementById('unit-name').textContent = unitName;
+        document.getElementById('serial-number').textContent = serialNumber;
+        
+        // Format and update financial information
+        const formattedUnitPrice = parseFloat(unitPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const formattedTotalPrice = parseFloat(totalPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        document.getElementById('unit-price').textContent = '₱ ' + formattedUnitPrice;
+        document.getElementById('total-price').textContent = '₱ ' + formattedTotalPrice;
+        document.getElementById('equipment-subtotal').textContent = '₱ ' + formattedTotalPrice;
+
+        // Update delivery information
+        document.getElementById('delivery-date').value = deliveryDate;
+        document.getElementById('delivery-instructions').value = deliveryInstructions || '';
+        
+        console.log('Initialized delivery schedule with:', {
+            requestId,
+            invoiceNumber,
+            createdAt,
+            clientName,
+            unitName,
+            serialNumber,
+            unitPrice: formattedUnitPrice,
+            totalPrice: formattedTotalPrice,
+            deliveryDate,
+            deliveryInstructions
+        });
+    }
+</script>
+
+{% for request in delivery_requests %}<div class="modal fade" id="createDeliveryModal{{ request.id }}" tabindex="-1"
+    aria-labelledby="createDeliveryModalLabel{{ request.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;"> <!-- Add CSRF Token --> {% csrf_token %} <div
+                class="modal-header border-0">
+                <div class="w-100"> <!-- Name -->
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;" id="delivery-request-id-{{ request.id }}">{% if request.request_id %}{{ request.request_id }}{% elif request.invoice and request.invoice.request_id %}{{ request.invoice.request_id }}{% else %}{% endif %}</h4> <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div> <!-- Row 1:  -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Invoice Number:</div>
+                            <div class="fw-bold ms-4" id="invoice-number-{{ request.id }}">{% if request.invoice_number %}{{ request.invoice_number }}{% elif request.invoice and request.invoice.invoice_number %}{{ request.invoice.invoice_number }}{% else %}{% endif %}</div>
+                        </div>
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Date Ordered:</div>
+                            <div id="date-ordered-{{ request.id }}">{% if request.created_at %}{{ request.created_at|date:"F j, Y" }}{% elif request.invoice and request.invoice.created_at %}{{ request.invoice.created_at|date:"F j, Y" }}{% else %}{% endif %}</div>
+                        </div>
+                    </div> <!-- Row 3: -->
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-secondary">Delivery Date:</div>
+                        <div class="col-md-10">
+                            <input type="date" class="form-control" name="delivery_date" id="delivery-date-{{ request.id }}" 
+                                value="{{ request.delivery_date_value }}" required>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-secondary">Delivery Instructions:</div>
+                        <div class="col-md-10">
+                            <textarea class="form-control" name="delivery_instructions" id="delivery-instructions-{{ request.id }}" 
+                                rows="4">{{ request.delivery_instructions_value }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Assigned Driver -->
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-secondary">Assigned Driver:</div>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="assigned_driver" id="assigned-driver-{{ request.id }}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">CLIENT INFORMATION</div>
+
+                <!-- Client Details -->
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Name:</div>
+                        <div class="fw-bold" id="client-name">{% if request.client_info.client_name %}{{ request.client_info.client_name }}{% elif request.invoice and request.invoice.order and request.invoice.order.client_name %}{{ request.invoice.order.client_name }}{% else %}{% endif %}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Address:</div>
+                        <div class="fw-bold" id="client-address">{% if request.client_info.client_address %}{{ request.client_info.client_address }}{% elif request.invoice and request.invoice.order and request.invoice.order.client_address %}{{ request.invoice.order.client_address }}{% else %}{% endif %}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Contact:</div>
+                        <div class="fw-bold" id="client-contact">{% if request.client_info.client_contact %}{{ request.client_info.client_contact }}{% elif request.invoice and request.invoice.order and request.invoice.order.client_contact %}{{ request.invoice.order.client_contact }}{% else %}{% endif %}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Email:</div>
+                        <div><a href="mailto:{% if request.client_info.client_email %}{{ request.client_info.client_email }}{% elif request.invoice and request.invoice.order and request.invoice.order.client_email %}{{ request.invoice.order.client_email }}{% else %}{% endif %}" id="client-email-link"><span
+                                    id="client-email">{% if request.client_info.client_email %}{{ request.client_info.client_email }}{% elif request.invoice and request.invoice.order and request.invoice.order.client_email %}{{ request.invoice.order.client_email }}{% else %}{% endif %}</span></a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Breakdown -->
+            <div class="mb-3 mt-4" style="color: #033b60;">PRODUCT BREAKDOWN</div>
+            <div class="mb-3">
+                <span class="badge bg-light text-dark border me-2">Sales</span>
+                <strong class="fs-6" style="color: #033b60;">Heavy Equipment</strong>
+            </div>
+            <div class="border p-3 rounded-3 mb-4">
+                <div class="table-responsive mb-4">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="opacity: 0.3;">Item Description</th>
+                                <th style="opacity: 0.3;">Serial Number</th>
+                                <th style="opacity: 0.3;">Quantity</th>
+                                <th style="opacity: 0.3;">Unit Price</th>
+                                <th style="opacity: 0.3;">Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="unit-name">{% if request.unit_info.unit_name %}{{ request.unit_info.unit_name }}{% elif request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.inventory_item.unit_item }}{% else %}{% endif %}</td>
+                                <td class="fw-bold" id="serial-number">{% if request.unit_info.serial_number %}{{ request.unit_info.serial_number }}{% elif request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.inventory_item.serial_number }}{% else %}{% endif %}</td>
+                                <td>{% if request.unit_info.quantity %}{{ request.unit_info.quantity }}{% elif request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.quantity }}{% else %}1{% endif %}</td>
+                                <td id="unit-price">₱ {% if request.unit_info.unit_price %}{{ request.unit_info.unit_price|floatformat:2 }}{% elif request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.unit_price|floatformat:2 }}{% else %}0.00{% endif %}</td>
+                                <td id="total-price">₱ {% if request.unit_info.total_price %}{{ request.unit_info.total_price|floatformat:2 }}{% elif request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.total_price|floatformat:2 }}{% else %}0.00{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <h6 class="" style="color: #033b60;">SUMMARY</h6>
+            <div class="table-responsive mb-4 mx-5">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Subtotal (Equipment)</td>
+                            <td id="equipment-subtotal">₱ {% if request.unit_info.total_price %}{{ request.unit_info.total_price|floatformat:2 }}{% elif request.invoice and request.invoice.order and request.invoice.order.items.first %}{{ request.invoice.order.items.first.total_price|floatformat:2 }}{% else %}0.00{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td>Amount Paid</td>
+                            <td id="amount-paid">₱ {% if request.unit_info.amount_paid %}{{ request.unit_info.amount_paid|floatformat:2 }}{% elif request.invoice and request.invoice.order %}{{ request.invoice.order.amount_paid|floatformat:2 }}{% else %}0.00{% endif %}</td>
+                        </tr>
+                        <tr class="fw-bold text-danger" style="border-top: solid rgb(197, 191, 191) 0.1px;">
+                            <td>Outstanding Balance</td>
+                            <td id="total-amount">₱ {% if request.unit_info.outstanding_balance %}{{ request.unit_info.outstanding_balance|floatformat:2 }}{% elif request.invoice and request.invoice.order %}{{ request.invoice.order.remaining_balance|floatformat:2 }}{% else %}0.00{% endif %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Debug Info (hidden in production) -->
+            {% if debug %}
+            <div class="alert alert-info">
+                <p>Debug Info:</p>
+                <ul>
+                    <li>Invoice Number: {{ request.invoice_number }}</li>
+                    <li>Has Invoice: {{ request.invoice|yesno:"Yes,No" }}</li>
+                    {% if request.invoice %}
+                        <li>Has Order: {{ request.invoice.order|yesno:"Yes,No" }}</li>
+                        {% if request.invoice.order %}
+                            <li>Order Items Count: {{ request.invoice.order.items.count }}</li>
+                            <li>First Item Total Price: {{ request.invoice.order.items.first.total_price|default:"N/A" }}</li>
+                            <li>Amount Paid: {{ request.invoice.order.amount_paid|default:"N/A" }}</li>
+                            <li>Remaining Balance: {{ request.invoice.order.remaining_balance|default:"N/A" }}</li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <hr>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="saveDeliverySchedule('{{ request.id }}')">Create</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+    function saveDeliverySchedule(requestId) {
+        const modal = document.getElementById('createDeliveryModal' + requestId);
+        const assignedDriver = modal.querySelector('#assigned-driver-' + requestId).value.trim();
+        const deliveryDate = modal.querySelector('#delivery-date-' + requestId).value;
+        const deliveryInstructions = modal.querySelector('#delivery-instructions-' + requestId).value.trim();
+        const requestIdText = modal.querySelector('#delivery-request-id-' + requestId).textContent;
+
+        // Validate required fields
+        if (!assignedDriver) {
+            alert('Please assign a driver.');
+            modal.querySelector('#assigned-driver-' + requestId).focus();
+            return;
+        }
+
+        if (!deliveryDate) {
+            alert('Please select a delivery date.');
+            modal.querySelector('#delivery-date-' + requestId).focus();
+            return;
+        }
+
+        // Prepare data for submission
+        const data = {
+            request_id: requestIdText,
+            assigned_driver: assignedDriver,
+            delivery_date: deliveryDate,
+            delivery_instructions: deliveryInstructions
+        };
+
+        console.log('Sending data:', data);
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Send request to create delivery schedule
+        fetch('/delivery/api/create-schedule/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response:', data);
+            if (data.status === 'success') {
+                alert('Delivery schedule created successfully!');
+                // Close the modal
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+                // Reload the page to show updated data
+                window.location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to create delivery schedule'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error creating delivery schedule. Please try again.');
+        });
+    }
+</script>

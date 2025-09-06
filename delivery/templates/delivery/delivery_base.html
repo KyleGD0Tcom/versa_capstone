@@ -1,0 +1,326 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DELIVERY DEPARTMENT</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<style>
+  .text-faded a {
+    opacity: 0.5;
+  }
+
+  .text-faded a:hover {
+    opacity: 1;
+  }
+
+  .settings-display {
+    /* Removed background, border, and shadow styling - now borderless */
+  }
+
+  .settings-display .time-display {
+    color: #025ca8;
+    font-weight: 500;
+  }
+
+  .settings-display .date-display {
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .refresh-settings-btn {
+    transition: all 0.3s ease;
+  }
+</style>
+
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="logo">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo-img" />
+        <div class="versa-title">VERSA</div>
+        <div class="powered-by">POWERED BY <strong>JINYI</strong></div>
+      </div>
+
+      <nav class="nav flex-column">
+        <a class="nav-link {% if request.resolver_match.url_name == 'delivery_dashboard' %}active{% endif %}" href="{% url 'delivery_dashboard' %}">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'delivery_requests' %}active{% endif %}" href="{% url 'delivery_requests' %}">
+          <i class="fa-solid fa-truck-ramp-box"></i> Delivery Requests
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'delivery_tracker' %}active{% endif %}" href="{% url 'delivery_tracker' %}">
+          <i class="fa-solid fa-truck"></i> Delivery Tracker
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'delivery_logs' %}active{% endif %}" href="{% url 'delivery_logs' %}">
+          <i class="fa-solid fa-file"></i> Logs
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'delivery_internal_requests' %}active{% endif %}" href="{% url 'delivery_internal_requests' %}">
+          <i class="fa-solid fa-list-check"></i> Internal Requests
+        </a>
+      </nav>
+
+      <div class="dropdown user-profile nav-link ms-auto me-0 px-3" style="position: absolute; bottom: 20px; right: 0;">
+        <a class="d-flex align-items-center text-decoration-none px-3 py-2 rounded" id="userDropdown" role="button"
+          data-bs-toggle="dropdown" aria-expanded="false" style="transition: background-color 0.2s;">
+          {% if request.user.userprofile.profile_picture %}
+            <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile" class="me-2"
+              style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+          {% else %}
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="me-2"
+              style="width: 40px; height: 40px; border-radius: 50%;" />
+          {% endif %}
+          <div class="text-start">
+            <div class="text-dark">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+            <small class="text-muted">Department Head</small>
+          </div>
+          <div class="ps-3">
+            <i class="fas fa-chevron-down text-muted"></i>
+          </div>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdown">
+          <li>
+            <button class="dropdown-item text-danger d-flex align-items-center" data-bs-toggle="modal"
+              data-bs-target="#logoutModal">
+              Logout
+            </button>
+          </li>
+        </ul>
+      </div>
+
+
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content w-100" id="mainContent">
+      <div class="top-navbar py-3 px-4">
+        <button class="btn btn-outline-primary d-md-none" id="toggleSidebar" type="button">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="d-flex align-items-center ms-auto">
+          <!-- Settings Display -->
+          <div class="me-3 d-none d-md-block">
+            <div class="settings-display d-flex align-items-center text-muted" style="font-size: 0.8rem;">
+              <div class="me-3 time-display">
+                <span id="currentTimezone" data-timezone="UTC+08:00">
+                  UTC+08:00
+                </span>
+              </div>
+              <div class="me-2 date-display">
+                <span id="currentDateFormat" data-format="MM/DD/YYYY">
+                  MM/DD/YYYY
+                </span>
+              </div>
+              <button class="btn btn-sm refresh-settings-btn" onclick="refreshSettings()" title="Refresh Settings">
+                <i class="fas fa-sync-alt" style="font-size: 1rem;"></i>
+              </button>
+            </div>
+          </div>
+          
+          {% include 'notifications/notification_dropdown.html' %}
+          <a href="{% url 'delivery_settings' %}"><i class="fas fa-cog" style="color: #025ca8; font-size: 1.5rem;"></i></a>
+          <a href="" data-bs-toggle="modal" data-bs-target="#contactSupportModal"><i class="fas fa-headset" style="color: #025ca8; font-size: 1.5rem;"></i></a>
+        </div>
+      </div>
+
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{% static 'js/js.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Function to update time and date display
+    function updateTimeAndDate() {
+      const timezoneSpan = document.getElementById('currentTimezone');
+      const dateFormatSpan = document.getElementById('currentDateFormat');
+      
+      if (timezoneSpan && dateFormatSpan) {
+        const now = new Date();
+        
+        // Get the actual timezone value from the span, not the displayed time
+        let timezone = timezoneSpan.getAttribute('data-timezone') || timezoneSpan.textContent || 'UTC+08:00';
+        let dateFormat = dateFormatSpan.getAttribute('data-format') || dateFormatSpan.textContent || 'MM/DD/YYYY';
+        
+        // Clean up timezone if it contains time display
+        if (timezone.includes(':')) {
+          timezone = timezoneSpan.getAttribute('data-timezone') || 'UTC+08:00';
+        }
+        
+        // Get current time in UTC
+        const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+        
+        // Parse timezone offset
+        const timezoneOffset = parseTimezoneOffset(timezone);
+        
+        // Calculate time in selected timezone
+        const targetTime = new Date(utcTime + (timezoneOffset * 60000));
+        
+        // Format time
+        const timeString = formatTime(targetTime);
+        
+        // Format date
+        const dateString = formatDate(targetTime, dateFormat);
+        
+        // Update display with icons
+        timezoneSpan.innerHTML = `<i class="fas fa-clock me-1"></i>${timeString}`;
+        dateFormatSpan.innerHTML = `<i class="fas fa-calendar me-1"></i>${dateString}`;
+        
+        // Store the original values as data attributes
+        timezoneSpan.setAttribute('data-timezone', timezone);
+        dateFormatSpan.setAttribute('data-format', dateFormat);
+      } else {
+        console.log('Elements not found, retrying in 100ms...');
+        setTimeout(updateTimeAndDate, 100);
+      }
+    }
+
+    // Function to parse timezone offset
+    function parseTimezoneOffset(timezone) {
+      const match = timezone.match(/UTC([+-])(\d{1,2}):?(\d{2})?/);
+      if (match) {
+        const sign = match[1] === '+' ? 1 : -1;
+        const hours = parseInt(match[2]);
+        const minutes = match[3] ? parseInt(match[3]) : 0;
+        return sign * (hours * 60 + minutes);
+      }
+      return 0; // Default to UTC
+    }
+
+    // Function to format time
+    function formatTime(date) {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    // Function to format date based on user preference
+    function formatDate(date, format) {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      switch(format) {
+        case 'MM/DD/YYYY':
+          return `${month}/${day}/${year}`;
+        case 'DD/MM/YYYY':
+          return `${day}/${month}/${year}`;
+        case 'YYYY-MM-DD':
+          return `${year}-${month}-${day}`;
+        case 'MMM DD, YYYY':
+          return `${monthNames[date.getMonth()]} ${day}, ${year}`;
+        default:
+          return `${month}/${day}/${year}`;
+      }
+    }
+
+    // Function to refresh settings from server
+    function refreshSettings() {
+      // Show loading state
+      const refreshBtn = document.querySelector('button[onclick="refreshSettings()"]');
+      const originalIcon = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 0.7rem;"></i>';
+      refreshBtn.disabled = true;
+      
+      // Fetch current settings
+      fetch('{% url "delivery_settings" %}')
+        .then(response => response.text())
+        .then(html => {
+          // Create a temporary div to parse the HTML
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = html;
+          
+          // Extract timezone and date format values from the form
+          const timezoneSelect = tempDiv.querySelector('select[name="timezone"]');
+          const dateFormatSelect = tempDiv.querySelector('select[name="dateFormat"]');
+          
+          if (timezoneSelect && dateFormatSelect) {
+            const selectedTimezone = timezoneSelect.value || 'UTC+08:00';
+            const selectedDateFormat = dateFormatSelect.value || 'MM/DD/YYYY';
+            
+            // Update the display elements
+            const timezoneSpan = document.getElementById('currentTimezone');
+            const dateFormatSpan = document.getElementById('currentDateFormat');
+            
+            if (timezoneSpan && dateFormatSpan) {
+              // Store the new values as data attributes
+              timezoneSpan.setAttribute('data-timezone', selectedTimezone);
+              dateFormatSpan.setAttribute('data-format', selectedDateFormat);
+              
+              // Update the time and date display immediately
+              updateTimeAndDate();
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing settings:', error);
+        })
+        .finally(() => {
+          // Restore button state
+          refreshBtn.innerHTML = originalIcon;
+          refreshBtn.disabled = false;
+        });
+    }
+
+    // Initialize time and date display when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize time and date display
+      updateTimeAndDate();
+      // Update time every second
+      setInterval(updateTimeAndDate, 1000);
+      
+      // Auto-refresh settings on page load to ensure latest values
+      setTimeout(refreshSettings, 1000);
+      
+      // Fallback: if elements still don't exist after 2 seconds, try again
+      setTimeout(function() {
+        const timezoneSpan = document.getElementById('currentTimezone');
+        const dateFormatSpan = document.getElementById('currentDateFormat');
+        if (!timezoneSpan || !dateFormatSpan) {
+          console.log('Elements still not found after 2 seconds, retrying...');
+          updateTimeAndDate();
+        }
+      }, 2000);
+    });
+  </script>
+</body>
+
+</html>
+
+<!-- Logout Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to logout?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>

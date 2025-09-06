@@ -1,0 +1,299 @@
+{% extends 'warehouse/warehouse_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/orders_modals/view_orders_modal.html' %}
+{% include 'shared/orders_modals/edit_orders_modal.html' %}
+{% include 'shared/orders_modals/request_orders_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9em;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-processing {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Warehouse Department | Orders</i>
+    <div class="row mb-5 mt-3 px-3">
+        <input class="p-3" type="search" id="search1" placeholder="Search orders..." onkeyup="filterOrders()">
+    </div>
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">List of Orders</h5>
+        <a href="#requestOrdersModal" class="btn text-white d-flex align-items-center gap-2" data-bs-toggle="modal"
+            data-bs-target="#requestOrdersModal" style="background-color: #53893c; width: 12%;">
+            <i class="bi bi-plus-circle ms-2"></i> Add new Order
+        </a>
+    </div>
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search" id="tableSearch" onkeyup="filterOrders()">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;" id="statusFilter" onchange="filterOrders()">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Order Number</th>
+                        <th style="opacity: 0.3;">Client Name</th>
+                        <th style="opacity: 0.3;">Item Description</th>
+                        <th style="opacity: 0.3;">Total Amount</th>
+                        <th style="opacity: 0.3;">Order Date</th>
+                        <th style="opacity: 0.3;">Delivery Date</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="ordersTableBody">
+                    {% for order in orders %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>{{ order.order_number }}</td>
+                        <td>{{ order.client_name }}</td>
+                        <td>
+                            {% with items=order.items.all %}
+                                {% if items %}
+                                    {{ items.0.quantity }}x {{ items.0.inventory_item.unit_item }}
+                                    {% if items|length > 1 %}
+                                        <span class="badge bg-secondary ms-2">+{{ items|length|add:"-1" }} more</span>
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>₱ {{ order.total_amount|floatformat:2 }}</td>
+                        <td>{{ order.order_date|date:"M d, Y" }}</td>
+                        <td>{{ order.delivery_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.status|lower }}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#editOrdersModal{{ order.id }}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal" 
+                               data-bs-target="#viewSalesOrderModal{{ order.id }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">No orders found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to generate a serial number based on item name
+    function generateSerialNumber(itemName) {
+        const timestamp = new Date().getTime().toString().slice(-6);
+        const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        const prefix = itemName.substring(0, 3).toUpperCase();
+        return `${prefix}-${timestamp}-${randomNum}`;
+    }
+
+    // Function to generate an item code based on item name
+    function generateItemCode(itemName) {
+        const timestamp = new Date().getTime().toString().slice(-4);
+        const prefix = itemName.substring(0, 3).toUpperCase();
+        return `${prefix}${timestamp}`;
+    }
+
+    // Function to handle item selection
+    function handleItemSelection(selectElement) {
+        const row = selectElement.closest('.product-row');
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const itemName = selectedOption.text;
+
+        if (itemName && itemName !== 'Select Item') {
+            // Generate and set item code
+            const itemCode = generateItemCode(itemName);
+            row.querySelector('.item-code').value = itemCode;
+
+            // Generate and set serial number
+            const serialNumber = generateSerialNumber(itemName);
+            row.querySelector('.serial-number').value = serialNumber;
+
+            // Fetch item details from server
+            fetch(`/warehouse/api/get-item-details/${selectElement.value}/`)
+                .then(response => response.json())
+                .then(data => {
+                    row.querySelector('.unit-price').value = data.unit_price;
+                    updateTotalPrice(row);
+                })
+                .catch(error => {
+                    console.error('Error fetching item details:', error);
+                });
+        } else {
+            // Clear fields if no item is selected
+            row.querySelector('.item-code').value = '';
+            row.querySelector('.serial-number').value = '';
+            row.querySelector('.unit-price').value = '';
+            row.querySelector('.total-price').value = '';
+        }
+    }
+
+    // Function to update total price
+    function updateTotalPrice(row) {
+        const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+        const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+        row.querySelector('.total-price').value = (quantity * unitPrice).toFixed(2);
+    }
+
+    // Function to add new product row
+    function addProduct() {
+        const productContainer = document.getElementById('product-container');
+        const newProductRow = document.querySelector('.product-row').cloneNode(true);
+
+        // Clear input fields in the cloned row
+        newProductRow.querySelectorAll('input').forEach(input => input.value = '');
+        newProductRow.querySelector('select').value = '';
+
+        // Add event listeners to the new row
+        setupProductRowEventListeners(newProductRow);
+
+        // Append the new row to the container
+        productContainer.appendChild(newProductRow);
+    }
+
+    // Function to setup event listeners for a product row
+    function setupProductRowEventListeners(row) {
+        const itemSelect = row.querySelector('.item-select');
+        const quantityInput = row.querySelector('.quantity');
+
+        // Remove previous event listeners if any
+        itemSelect.onchange = null;
+        quantityInput.oninput = null;
+
+        // Add change event listener for item selection
+        itemSelect.addEventListener('change', function() {
+            handleItemSelection(this);
+            updateTotalPrice(row); // Ensure total price updates after item selection
+        });
+
+        // Add input event listener for quantity
+        quantityInput.addEventListener('input', function() {
+            updateTotalPrice(row);
+        });
+    }
+
+    // Initialize the modal when it's shown
+    document.getElementById('requestOrdersModal').addEventListener('show.bs.modal', function () {
+        // Reset form
+        document.getElementById('salesOrderForm').reset();
+        
+        // Reset product rows to initial state
+        const productContainer = document.getElementById('product-container');
+        while (productContainer.children.length > 1) {
+            productContainer.removeChild(productContainer.lastChild);
+        }
+        
+        // Reset the first product row
+        const firstRow = productContainer.querySelector('.product-row');
+        firstRow.querySelectorAll('input').forEach(input => input.value = '');
+        firstRow.querySelector('select').value = '';
+        
+        // Initialize payment fields
+        togglePaymentFields();
+        
+        // Setup event listeners for all product rows
+        document.querySelectorAll('.product-row').forEach(row => {
+            setupProductRowEventListeners(row);
+        });
+    });
+
+    function filterOrders() {
+        const searchText = document.getElementById('tableSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const rows = document.getElementById('ordersTableBody').getElementsByTagName('tr');
+
+        for (let row of rows) {
+            const orderNumber = row.cells[0].textContent.toLowerCase();
+            const clientName = row.cells[1].textContent.toLowerCase();
+            const status = row.cells[6].textContent.trim();
+            
+            const matchesSearch = orderNumber.includes(searchText) || clientName.includes(searchText);
+            const matchesStatus = !statusFilter || status === statusFilter;
+
+            row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+        }
+    }
+
+    function editOrder(orderId) {
+        // Implement edit order functionality
+        console.log('Editing order:', orderId);
+    }
+
+    function deleteOrder(orderId) {
+        if (confirm('Are you sure you want to delete this order?')) {
+            // Implement delete order functionality
+            console.log('Deleting order:', orderId);
+        }
+    }
+
+    function viewOrder(orderId) {
+        // Implement view order functionality
+        console.log('Viewing order:', orderId);
+    }
+</script>
+
+{% endblock %}

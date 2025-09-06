@@ -1,0 +1,130 @@
+{% extends 'adminpanel/base.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'admin_modals/department_modals/view_department_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Department </div>
+    <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+    <!-- Top Info Section in One Container -->
+    <div class="row g-3 mb-4 border rounded shadow-sm">
+        <div class="col-12">
+            <div class="d-flex gap-3 justify-content-between bg-white p-3 rounded">
+                <!-- Total Users -->
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-people fs-4 text-primary"></i>
+                    <div>
+                        <div class="text-secondary small">Total Departments</div>
+                        <div class="fs-3 fw-bold">{{ total_departments }}</div>
+                    </div>
+                </div>
+                <!-- Sales Dept -->
+                 {% for dept in departments %} 
+                <div>
+                    <div class="text-secondary small">{{ dept.name }}</div>
+                    <div class="fs-3 fw-bold text-center">{{ dept.user_count }}</div>
+                </div>
+                {% endfor %}
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Header and Add User -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fs-4 fw-bold" style="color: #033b60;">List of Departments</h5>
+    </div>
+
+    <!-- Search and Filter -->
+    <!-- Search and Filter - Updated to align Filter right -->
+
+
+
+    <!-- User Table -->
+    <!-- User Table -->
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th>Department Name</th>
+                        <th>Total Users</th>
+                        <th>Department Manager</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in departments %}
+                    <tr>
+                        <td class="px-5">{{ dept.name }}</td>
+                        <td>{{ dept.user_count }}</td>
+                        <td>
+                           
+                            Hubert Eleazar
+                        </td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewDepartmentModal{{ dept.name }}"><i class="bi bi-chevron-right"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #search {
+        width: 20%;
+        border: none;
+        background-color: #eaedf7;
+        border-radius: 5px;
+        padding: 5px;
+    }
+</style>
+{% endblock %}
+

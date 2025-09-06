@@ -1,0 +1,495 @@
+{% extends 'sales/sales_base.html' %}
+{% load static %}
+{% block content %}
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Sales Department | Dashboard</div>
+    <div class="d-flex gap-5">
+        <div class="mt-2" style="color: #033b60;">
+            <h4>Good Afternoon!</h4>
+        </div>
+        <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+    </div>
+
+
+    <div class="container-fluid mb-5">
+        <div class="row g-3">
+            <!-- Card 1 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-truck fa-lg me-2 text-primary"></i>
+                            <div class="small text-muted mt-3">Total Units Sold this Month</div>
+                            <div class="fw-bold fs-3">{{ total_units_sold }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-clock fa-lg text-success me-2"></i>
+                            <div class="small text-muted mt-3">Pending Orders</div>
+                            <div class="fw-bold fs-3">{{ pending_orders_count }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-clipboard-check fa-lg text-purple me-2"></i>
+                            <div class="small text-muted mt-3">Scheduled Inspections (PDI)</div>
+                            <div class="fw-bold fs-3">{{ scheduled_pdi_count }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Forecast and Predicted Demand Spike -->
+    <div class="row mt-4">
+        <!-- Inventory Forecast -->
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center mb-3 gap-3">
+                <h5 class="fw-bold mb-0" style="color: #033b60;">Inventory Forecast</h5>
+
+            </div>
+            <div class="card p-5 shadow-sm" style="border-radius: 10px;">
+                <!-- Item 1 -->
+                <div class="d-flex justify-content-between align-items-start">
+                    <!-- LEFT side -->
+                    <div style="flex: 1;">
+                        <div class="badge rounded-4 p-2 text-center mb-2"
+                            style="background-color: #e79b97; color: #f71105;">
+                            Critical Low Stock Alert</div>
+                        <div class="fs-5 fw-semibold">Hydraulic Filters</div>
+                        <div class="text-muted">Projected to run out in <span class="fw-bold">13 days.</span></div>
+                    </div>
+
+                    <!-- RIGHT side -->
+                    <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                        <div>Department: <strong class="text-dark">Warehouse</strong></div><br>
+                        <div>Current Stock: <strong class="text-dark">12 units</strong></div>
+                        <div>Avg. Use: <strong class="text-dark">20/month</strong></div>
+                    </div>
+                </div>
+
+                <hr>
+                <!-- Item 2 -->
+                <div class="mb-3 d-flex justify-content-between align-items-start">
+                    <!-- LEFT side -->
+                    <div style="flex: 1;">
+                        <div class="badge rounded-4 p-2 text-center mb-2"
+                            style="background-color: #e6c99f; color: #ab5d1e;">
+                            Preventive Maintenance Warning
+                        </div>
+                        <h6 class="fw-bold mb-1">Excavator EC750</h6>
+                        <div class="text-muted">
+                            Hydraulic Pump down to <span class="fw-bold">12% life.</span>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT side -->
+                    <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                        <div>Department: <strong class="text-dark">Sales</strong></div><br>
+                        <div>Failure projected: <strong class="text-dark">May 8</strong></div>
+                        <div><strong class="text-dark">Schedule replacement</strong></div>
+                    </div>
+                </div>
+
+                <hr>
+                <!-- Item 3 -->
+                <div class="mb-3 d-flex justify-content-between align-items-start">
+                    <!-- LEFT side -->
+                    <div style="flex: 1;">
+                        <div class="badge rounded-4 p-2 text-center mb-2"
+                            style="background-color: #f7d1bd; color: #ef6f28;">
+                            Forecast Depletion
+                        </div>
+                        <h6 class="fw-bold mb-1">Track Rollers (CAT320)</h6>
+                        <div class="text-muted">
+                            Stock may hit by <span class="fw-bold">May 2.</span>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT side -->
+                    <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                        <div>Department: <strong class="text-dark">Sales</strong></div><br>
+                        <div>Lead time: <strong class="text-dark">18 days</strong></div>
+                        <div>Reorder now to avoid downtime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Predicted Demand Spike -->
+        <div class="col-lg-6 mb-4">
+            <div class="d-flex align-items-center mb-3 gap-3">
+                <h5 class="fw-bold mb-0" style="color: #033b60;">Predicted Demand Spike</h5>
+
+            </div>
+
+            <div class="card p-5 shadow-sm" style="border-radius: 10px; height: 95%;">
+                <!-- Alert 1 -->
+                <div class="mb-4">
+                    <div class="badge mb-2 rounded-4 p-2 text-center"
+                        style="background-color: #f7d1bd; color: #ef6f28;">
+                        Upcoming Demand Surge Alert
+                    </div>
+
+                    <!-- Flex row with title and peak window -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-1 mb-lg-0">Track Rollers (CAT320)</h6>
+                        <p class="small text-muted mb-0">Peak Window:<span class="text-dark"><strong><br>April 29 – May
+                                    5</strong></span></p>
+                    </div>
+
+                    <p class="small mb-3 text-muted">Usage projected to increase by <strong>+45% next week</strong>.</p>
+                    <p class="small text-muted mb-0"><strong>Recommendation:</strong><br> Adjust reorder volume & check
+                        stock
+                        buffer</p>
+                </div>
+
+                <hr>
+
+                <!-- Alert 2 (same style) -->
+                <div>
+                    <div class="badge mb-2 rounded-4 p-2 text-center"
+                        style="background-color: #f7d1bd; color: #ef6f28;">
+                        Upcoming Demand Surge Alert
+                    </div>
+
+                    <!-- Flex row again -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-1 mb-lg-0">Track Rollers (CAT320)</h6>
+                        <p class="small text-muted mb-0">Peak Window:<span class="text-dark"><strong><br>April 29 – May
+                                    5</strong></span></p>
+                    </div>
+
+                    <p class="small mb-3 text-muted">Usage projected to increase by <strong>+45% next week</strong>.</p>
+                    <p class="small text-muted mb-0"><strong>Recommendation:</strong><br> Adjust reorder volume & check
+                        stock
+                        buffer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Charts and Activity -->
+    <div class="container-fluid px-9 my-5">
+        <div class="d-flex align-items-center mb-3 gap-3">
+            <h5 class="fw-bold mb-0" style="color: #033b60;">Sales Forecast</h5>
+        </div>
+        <div class="card p-4" style="border-radius: 10px;">
+            <div class="row">
+                <!-- Left: Chart Area -->
+                <div class="col-lg-8 border-end">
+                    <!-- Sale Forecast Heading (Now completely outside the container) -->
+                    <div class="d-flex justify-content-start align-items-center mb-3 w-100">
+                        <h5 class="fw-bold mb-0 me-3">April 2025</h5>
+                        <button class="btn btn-sm btn-light">Next Year</button>
+                    </div>
+
+                    <div style="height: 300px;">
+                        <canvas id="saleForecastChartAdminDashboard"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Top Products List -->
+                <div class="col-lg-4 ps-4">
+                    <h6 class="fw-bold fs-5">Top 5 Products</h6>
+                    <p class="text-muted small mb-3">By Forecast Demands</p>
+
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Product Items -->
+                        <div class="d-flex align-items-center p-2 rounded bg-light">
+                            <span class="fw-bold me-2">1</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <!-- 2-5 (repeating structure without background highlight) -->
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">2</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">3</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">4</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center p-2">
+                            <span class="fw-bold me-2">5</span>
+                            <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded"
+                                alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <div class="fw-semibold">Crawler Excavator</div>
+                                <div class="text-muted small">Lorem Ipsum</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Invoice Monitoring -->
+            <div class="col-12 col-lg-5 mb-5">
+                <div class="d-flex align-items-center mb-3 gap-3">
+                    <h5 class="fw-bold mb-0" style="color: #033b60;">Invoice Monitoring</h5>
+                </div>
+                <div class="card shadow-sm p-4" style="border-radius: 16px;">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div class="chart-container d-flex justify-content-center align-items-center"
+                                style="position: relative; width: 100%; height: 320px;">
+                                <canvas id="doughnutChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-center mt-3">
+                            <ul class="list-unstyled mb-0 d-flex flex-wrap justify-content-center gap-4">
+                                <li><span class="badge me-2" style="background-color: #2d8bba;">&nbsp;</span> Pending
+                                </li>
+                                <li><span class="badge me-2" style="background-color: #6ce5e8;">&nbsp;</span> Completed
+                                </li>
+                                <li><span class="badge me-2" style="background-color: #1a5276;">&nbsp;</span> Errors
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Revenue Breakdown -->
+            <div class="col-12 col-lg-7">
+                <div class="d-flex align-items-center mb-3 gap-3">
+                    <h5 class="fw-bold mb-0" style="color: #033b60;">Monthly Revenue Breakdown</h5>
+                </div>
+                <div class="card shadow-sm p-4" style="border-radius: 16px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge fw-bold fs-6 px-3 py-2" style="background-color: #ecf4fa; color: #005ca8;">
+                            ₱41,781,000 PHP
+                        </span>
+                    </div>
+                    <div class="chart-container" style="width: 100%; height: 305px;">
+                        <canvas id="lineChart" style="width: 100% !important; height: 100% !important;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+</div>
+
+
+
+<script>
+
+    // saleForecastChartAdminDashboard
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById("saleForecastChartAdminDashboard").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["21", "22", "23", "24", "25", "26", "27", "28"],
+                datasets: [
+                    {
+                        label: "Forecast Sale",
+                        data: [25000, 40000, 22000, 52000, 38000, 27000, 30000, 24000],
+                        backgroundColor: "#6ce5e8",
+                        barPercentage: 1,
+                        categoryPercentage: 0.5,
+                    },
+                    {
+                        label: "Actual Sale",
+                        data: [40000, 35000, 33000, 42000, 36000, 44000, 41000, 35000],
+                        backgroundColor: "#2d8bba",
+                        barPercentage: 1,
+                        categoryPercentage: 0.5,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "top",
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            font: {
+                                size: 12,
+                            },
+                            color: "#333",
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Day",
+                            color: "#999",
+                            font: { style: "italic" },
+                        },
+                        ticks: {
+                            color: "#333",
+                        },
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Amount",
+                            color: "#999",
+                            font: { style: "italic" },
+                        },
+                        ticks: {
+                            callback: (value) => `${value / 1000}k`,
+                            color: "#333",
+                        },
+                        grid: {
+                            color: "#ddd",
+                            borderDash: [4, 4],
+                        },
+                    },
+                },
+            },
+        });
+    });
+
+
+
+    // KANI PUD SA DOUGHNUT CHART NI NGA JSs
+    const ctx = document.getElementById('doughnutChart').getContext('2d');
+    const doughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Pending ', 'Errors'],
+            datasets: [{
+                data: [100, 30, 20], // You will dynamically insert this later with Django
+                backgroundColor: ['#6ce5e8', '#41b8d5', '#2d8bba'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Line Chart: Monthly Revenue Breakdown
+    const ctxLine = document.getElementById('lineChart').getContext('2d');
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: ['1', '5', '10', '15', '20', '25', '30'],
+            datasets: [{
+                label: 'Revenue (Peso)',
+                data: [1, 1.5, 1.4, 4, 1.2, 3, 6],
+                fill: false,
+                borderColor: '#00d5ff',
+                tension: 0.4,
+                pointBackgroundColor: '#00d5ff',
+                pointBorderColor: '#00d5ff',
+                pointRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Month of April' }
+                },
+                y: {
+                    title: { display: true, text: 'Revenue (Peso)' },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+
+</script>
+
+
+{% endblock %}

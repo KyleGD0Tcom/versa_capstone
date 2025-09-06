@@ -1,0 +1,173 @@
+{% extends 'aftersales/aftersales_base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Aftersales Department | Dashboard</div>
+    <div class="d-flex gap-5">
+        <div class="mt-2" style="color: #033b60;">
+            <h4>Good Afternoon!</h4>
+        </div>
+        <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+    </div>
+
+    <div class="container-fluid mb-5">
+        <div class="row g-3">
+            <!-- Card 1 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-tools fa-lg me-2 text-primary"></i>
+                            <div class="small text-muted mt-3">Maintenance In Progress</div>
+                            <div class="fw-bold fs-3">{{ maintenance_in_progress|default:"0" }} active</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-check-circle fa-lg text-success me-2"></i>
+                            <div class="small text-muted mt-3">Resolved this Month</div>
+                            <div class="fw-bold fs-3">{{ resolved_this_month|default:"0" }} resolved</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100 p-3 d-flex flex-column justify-content-end position-relative"
+                    style="border-radius: 10px; min-height: 160px;">
+                    <div class="d-flex align-items-center">
+                        <div class="m-3">
+                            <i class="fas fa-shield-alt fa-lg text-purple me-2"></i>
+                            <div class="small text-muted mt-3">Warranty Active</div>
+                            <div class="fw-bold fs-3">{{ warranty_actives|default:"0" }} active</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <br>
+
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-3">
+        <h5 class="fs-4 fw-bold mb-0" style="color: #033b60;">Maintenance Scheduling</h5>
+        <a href="{% url 'aftersales_maintenance_schedule' %}" class="btn btn-link p-0 ms-2" title="Go to Maintenance Schedule">
+            <i class="bi bi-chevron-right fs-3 text-dark"></i>
+        </a>
+    </div>
+
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3 ms-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Role</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                </select>
+            </div>
+        </div>
+        <div style="max-height: 400px; overflow-y: auto;" class="mx-4">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Maintenance ID</th>
+                        <th style="opacity: 0.3;">Service ID</th>
+                        <th style="opacity: 0.3;">Unit Name</th>
+                        <th style="opacity: 0.3;">Serial Number</th>
+                        <th style="opacity: 0.3;">Client Name</th>
+                        <th style="opacity: 0.3;">Assigned Tech</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for maintenance in maintenance_records %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>{{ maintenance.maintenance_id }}</td>
+                        <td>{{ maintenance.service_id }}</td>
+                        <td>{{ maintenance.unit_name }}</td>
+                        <td>{{ maintenance.serial_number }}</td>
+                        <td>{{ maintenance.client_name }}</td>
+                        <td>
+                            {% with techs=maintenance.technicians.all %}
+                                {% if techs %}
+                                    {{ techs.0.name }}
+                                    {% if techs|length > 1 %}
+                                        <span class="badge ms-1" style="background-color: #a5acb3; opacity: 0.5; color: black; font-weight: bold;">+{{ techs|length|add:"-1" }} more</span>
+                                    {% endif %}
+                                {% else %}
+                                    Not Assigned
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            {% if maintenance.status == 'In Progress' %}
+                                <span style="background-color: #cfe2ff; color: #084298; border-radius: 5px;" class="p-1">{{ maintenance.status }}</span>
+                            {% elif maintenance.status == 'Pending' %}
+                                <span style="background-color: rgb(241, 238, 211); border-radius: 5px;" class="p-1 text-warning">{{ maintenance.status }}</span>
+                            {% elif maintenance.status == 'Completed' %}
+                            <span style="background-color: rgb(222, 243, 219); border-radius: 5px;" class="p-1 text-success">{{ maintenance.status }}</span>
+                            {% else %}
+                                <span style="background-color: #e2e3e5; border-radius: 5px;" class="p-1">{{ maintenance.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No maintenance records found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+
+
+
+{% endblock %}

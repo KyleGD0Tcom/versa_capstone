@@ -1,0 +1,292 @@
+{% extends 'sales/sales_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'shared/inventory_modals/add_inventory_modal.html' %}
+{% include 'shared/inventory_modals/view_inventory_modal.html' %}
+{% include 'shared/inventory_modals/sales_restock_inventory_modal.html' %}
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="successModalLabel">Success!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                <p class="mt-3" id="successMessage"></p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+    
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+</style>
+
+
+
+<div class="container-fluid px-5">
+    <!-- Greeting and Search -->
+    <i>Sales Department | Inventory Management > Inventory</i>
+    <div class="row mb-5 mt-3 px-3"><input class="p-3" type="search" id="search1" placeholder="search"></div>
+
+    <div class="d-flex gap-5 mb-5">
+        <a href="">
+            <button class="p-2 rounded text-white fw-bold fs-5 border-0"
+                style="width: 150%; background-color: #033b60;">
+                Inventory
+            </button>
+        </a>
+
+        <a href="{% url 'sales_forecasting' %}">
+            <button class="p-2 rounded fw-bold text-secondary fs-5 border-0"
+                style="width: 130%; background-color: #d8d8d8;">
+                Forecasting
+            </button>
+        </a>
+    </div>
+
+    <div class="row mb-5">
+        <!-- Left Column: 3 Cards -->
+        <div class="col-lg-4">
+            <div class="row g-3">
+                <!-- Card 1 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 162px;">
+                        <a href="{% url 'user_management' %}" class="btn btn-sm position-absolute top-0 end-0 m-2"></a>
+                        <div class="d-flex align-items-center h-100">
+                            <i class="fas fa-box fa-lg me-3" style="color: #005ca8;"></i>
+                            <div class="d-flex justify-content-between w-100">
+                                <div>
+                                    <div class="small text-muted mt-2">Total Items in Stock</div>
+                                    <div class="fw-bold fs-1">{{ total_items }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 162px;">
+                        <a href="{% url 'user_management' %}" class="btn btn-sm position-absolute top-0 end-0 m-2"></a>
+                        <div class="d-flex align-items-center h-100">
+                            <i class="fas fa-exclamation-triangle fa-lg me-3" style="color: #ef6f28;"></i>
+                            <div class="d-flex justify-content-between w-100">
+                                <div>
+                                    <div class="small text-muted mt-2">Low Stock Items</div>
+                                    <div class="fw-bold fs-1">{{ low_stock_items }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col-12">
+                    <div class="card p-3 shadow-sm position-relative" style="border-radius: 10px; min-height: 162px;">
+                        <a href="{% url 'user_management' %}" class="btn btn-sm position-absolute top-0 end-0 m-2"></a>
+                        <div class="d-flex align-items-center h-100">
+                            <i class="fas fa-plus-circle fa-lg me-3" style="color: #53893c;"></i>
+                            <div class="d-flex justify-content-between w-100">
+                                <div>
+                                    <div class="small text-muted mt-2">New Items Added this Week</div>
+                                    <div class="fw-bold fs-1">{{ new_items_this_week }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Single Container (Moved Title Outside) -->
+        <div class="col-lg-8">
+            <!-- Title outside the container -->
+            <div class="mb-3">
+                <h5 class="fw-bold mb-0" style="color: #033b60;">Inventory Forecast</h5>
+            </div>
+
+            <!-- The actual content container -->
+            <div class="card p-4 shadow-sm w-100" style="border-radius: 10px; min-height: 480px;">
+                <!-- Scrollable inner content -->
+                <div id="forecast-content" style="max-height: 400px; overflow-y: auto;" class="mt-2">
+                    {% for i in "12345" %}
+                    <div class="forecast-item" data-category="warehouse">
+                        <div class="mb-3 d-flex justify-content-between align-items-start">
+                            <div style="flex: 1;">
+                                <div class="badge rounded-4 p-2 text-center mb-2"
+                                    style="background-color: #e6c99f; color: #ab5d1e; font-weight: normal;">
+                                    Preventive Maintenance Warning
+                                </div>
+                                <h6 class="fw-bold mb-1">Excavator EC750</h6>
+                                <div class="text-muted">Hydraulic Pump down to <span class="fw-bold">12% life.</span>
+                                </div>
+                            </div>
+                            <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+                                <div>Department: <strong class="text-dark">Sales</strong></div><br>
+                                <div>Failure projected: <strong class="text-dark">May 8</strong></div>
+                                <div><strong class="text-dark">Schedule replacement</strong></div>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}
+                        <hr>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+        <!-- Header and Add User -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fs-4 fw-bold" style="color: #033b60;">Inventory</h5>
+            <a href="#" class="btn text-white d-flex align-items-center gap-2 ms-5" data-bs-toggle="modal"
+                data-bs-target="#addInventoryModal" style="background-color: #53893c; width: 15%;">
+                <i class="bi bi-plus-circle ms-3"></i> Add new Inventory
+            </a>
+        </div>
+        <div class="table-responsive border rounded-3 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <input type="text" class="form-control w-25 mb-3" placeholder="Search">
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <span class="text-secondary small">Filter by:</span>
+                    <select class="form-select form-select-sm" style="width: auto;">
+                        <option selected>Select</option>
+                        <option>Role</option>
+                        <option>Status</option>
+                        <option>Department</option>
+                    </select>
+                </div>
+            </div>
+    
+            <!-- Scrollable Table Container -->
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="table align-middle" style="border-spacing: 0 20px; border-collapse: separate;">
+                    <!-- Adjust vertical gap here -->
+                    <thead class="table">
+                        <tr>
+                            <th class="fw-normal text-secondary">Unit/Item Code</th>
+                            <th class="fw-normal text-secondary">Serial Number</th>
+                            <th class="fw-normal text-secondary">Unit/item<br>Name</th>
+                            <th class="fw-normal text-secondary">Category</th>
+                            <th class="fw-normal text-secondary">Quantity</th>
+                            <th class="fw-normal text-secondary">Last Restocked</th>
+                            <th class="fw-normal text-secondary">Status</th>
+                            <th class="fw-normal text-secondary">Supplier</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.item_code }}</td>
+                            <td>
+                                {{ item.serial_number }}
+                            </td>
+                            <td>{{ item.unit_item }}</td>
+                            <td>{{ item.category }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.date_received }}</td>
+                            <td>
+                                <!-- Status logic based on quantity -->
+                                {% if item.quantity < 20 %} <span style="background-color: #e6c5b0; color: #ef6f28;"
+                                    class="rounded p-1">Low Stock</span>
+                                    {% else %}
+                                    <span style="background-color: #92b0dd; color: #0d2f5a;" class="rounded p-1">In
+                                        Stock</span>
+                                    {% endif %}
+                            </td>
+                            <td>
+                                <span>{{ item.supplier }}</span>
+                            </td>
+    
+    
+                            <td>
+                                <a href="" data-bs-toggle="modal" data-bs-target="#RestockInventoryModal{{ item.id }}">
+                                    <button class="border-0 rounded bg-primary text-white p-1">Restock</button>
+                                </a>
+                               
+                                <a href="#" class="text-dark me-2 ms-2" data-bs-toggle="modal"
+                                    data-bs-target="#viewInventoryModal{{ item.id }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+
+
+
+
+
+</div>
+
+<!-- Hidden input to store Django messages -->
+<input type="hidden" id="django-messages" data-messages='{% if messages %}[{% for message in messages %}{"text": "{{ message|escapejs }}", "tags": "{{ message.tags|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]{% else %}[]{% endif %}'>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get messages from the hidden input
+        const messagesElement = document.getElementById('django-messages');
+        const djangoMessages = JSON.parse(messagesElement.dataset.messages);
+        
+        // Check for success messages
+        const successMessage = djangoMessages.find(msg => msg.tags === 'success');
+        if (successMessage) {
+            document.getElementById('successMessage').textContent = successMessage.text;
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

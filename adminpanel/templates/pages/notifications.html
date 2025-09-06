@@ -1,0 +1,74 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .unread:hover {
+        background-color: rgb(245, 235, 235);
+        border-radius: 10px;
+        padding: 8px;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Notifications</div>
+    <div class="row mb-5"><input class="p-2" type="search" id="search1" placeholder="search"></div>
+
+
+    <!-- Left-aligned, Modal-width Notifications Component -->
+    <div class="mt-4 ms-4 p-4 bg-white px-0" style="max-width: 600px;">
+        <h4 class="mb-4 fw-semibold" style="color: #033b60;">Notifications</h4>
+
+        <!-- Unread Notifications -->
+        <h6 class="text-secondary mb-3">Unread</h6>
+        <div class="fs-6 mb-4 ms-4">
+            {% for i in "1234" %}
+            <div class="d-flex justify-content-between mb-2 unread">
+                <span>User "<strong>Hubert Eleazar Debalucos</strong>" has been deleted from Warehouse
+                    Department.</span>
+                <span class="text-muted small ms-5">[14:01]</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Read Notifications -->
+        <h6 class="text-secondary mb-3">Read</h6>
+        <div class="fs-6 mb-4 ms-4">
+            {% for i in "12345678" %}
+            <div class="d-flex justify-content-between mb-4">
+                <span>User "<strong>Hubert Eleazar Debalucos</strong>" has been deleted from Warehouse
+                    Department.</span>
+                <span class="text-muted small ms-5">[14:01]</span>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+</div>
+
+
+{% endblock %}

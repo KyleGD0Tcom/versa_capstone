@@ -1,0 +1,184 @@
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="successModalLabel">Success!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                <p class="mt-3" id="successMessage"></p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addInventoryModal" tabindex="-1" aria-labelledby="addInventoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 p-3">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="addInventoryModalLabel">Add New Unit/Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data" id="addInventoryForm" onsubmit="handleFormSubmit(event)">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <!-- Photo Upload -->
+            <div class="col-md-4 text-center">
+              <div class="border rounded-3 p-2" style="height: 250px;">
+                <img src="https://via.placeholder.com/150x150.png?text=+" alt="Preview" class="img-fluid mb-2" id="photoPreview" style="height: 180px; object-fit: cover;">
+                <input type="file" name="photo" class="form-control form-control-sm" onchange="previewImageAdd(event)" required>
+              </div>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="col-md-8">
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label">Unit/Item Code</label>
+                  <input type="text" name="item_code" id="item_code" class="form-control" placeholder="Auto" readonly>
+                  <input type="hidden" name="generated_item_code" id="generated_item_code">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Category</label>
+                  <select name="category" class="form-select" id="category_select">
+                    <option selected disabled>Select Category</option>
+                    <option value="Heavy Equipment">Heavy Equipment</option>
+                    <option value="Spare Parts">Spare Parts</option>
+                  </select>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Unit/Item Name</label>
+                  <input type="text" name="unit_item" class="form-control">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Serial Number</label>
+                  <input type="text" name="serial_number" class="form-control">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Description</label>
+                  <textarea name="details" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Supplier</label>
+                  <input type="text" name="supplier" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Quantity</label>
+                  <input type="number" name="quantity" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Unit Price</label>
+                  <input type="number" name="unit_price" class="form-control" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Date Received</label>
+                  <input type="date" name="date_received" class="form-control">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Department</label>
+                  <select name="department" class="form-select">
+                    <option selected disabled>Select Department</option>
+                    <option value="Warehouse">Warehouse</option>
+                    <option value="Sales">Sales</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Confirm</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Script Section -->
+<script>
+  // Preview uploaded image
+  function previewImageAdd(event) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      const output = document.getElementById('photoPreview');
+      output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+  // Handle form submission
+  async function handleFormSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      });
+
+      if (response.ok) {
+        // Hide the add inventory modal
+        const addModal = bootstrap.Modal.getInstance(document.getElementById('addInventoryModal'));
+        addModal.hide();
+
+        // Show success message in modal
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        document.getElementById('successMessage').textContent = 'Inventory added successfully!';
+        successModal.show();
+
+        // Reload the page after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        throw new Error('Failed to add inventory');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to add inventory. Please try again.');
+    }
+  }
+
+  // Generate item code based on selected category
+  document.getElementById('category_select').addEventListener('change', function () {
+    const category = this.value;
+    let prefix = '';
+
+    if (category === 'Heavy Equipment') {
+      prefix = 'HVY-';
+    } else if (category === 'Spare Parts') {
+      prefix = 'SP-';
+    }
+
+    const randomCode = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+    const itemCode = prefix + randomCode;
+
+    // Set values in form
+    document.getElementById('generated_item_code').value = itemCode;
+    document.getElementById('item_code').value = itemCode;
+  });
+
+  // Reset form when modal is closed
+  document.getElementById('addInventoryModal').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('addInventoryForm').reset();
+    document.getElementById('photoPreview').src = 'https://via.placeholder.com/150x150.png?text=+';
+    document.getElementById('item_code').value = '';
+    document.getElementById('generated_item_code').value = '';
+  });
+</script>

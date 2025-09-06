@@ -1,0 +1,148 @@
+{% load static %}
+{% for item in items %}
+
+<!-- View Inventory Modal -->
+<div class="modal fade" id="RestockInventoryModal{{ item.id }}" tabindex="-1"
+    aria-labelledby="RestockInventoryModalLabel{{ item.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5 rounded-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <span class="badge bg-light border text-dark fw-bold px-2 py-1">{{ item.item_code }}</span>
+                    <h4 class="fw-bold d-inline ms-2" style="color: #033b60;">{{ item.unit_item }}</h4>
+                </div>
+                <div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Supplier and Date -->
+            <div class="mb-3">
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Serial Number:</div>
+                    <div class="col-sm-10 text-uppercase">{{ item.serial_number }}</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Supplier:</div>
+                    <div class="col-sm-10 text-uppercase fw-semibold">{{ item.supplier }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Date Received:</div>
+                    <div class="col-sm-10">{{ item.date_received }}</div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Image + Info Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 text-center">
+                    {% if item.photo %}
+                        <img src="{{ item.photo.url }}" alt="Item Photo" class="img-fluid rounded h-100" />
+                    {% else %}
+                        <div class="bg-light rounded h-100 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Department:</div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-light text-dark">{{ item.department }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-secondary">Category:</div>
+                        <div class="col-sm-8">{{ item.category }}</div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-secondary">Quantity:</div>
+                        <div class="col-sm-8">{{ item.quantity }}</div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-secondary">Unit Price:</div>
+                        <div class="col-sm-8">{% if item.unit_price %}₱{{ item.unit_price }}{% else %}Not set{% endif %}</div>
+                    </div>
+
+
+                    <!-- Description Below Label -->
+                    <div class="row mb-5 d-block">
+                        <div class="col-sm-3 mb-2 text-secondary">Description:</div>
+                        <div class="col-sm-12">
+                            <p class="small mb-0">
+                                {{ item.details }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Status and Last Restocked -->
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-secondary">Status:</div>
+                        <div class="col-sm-8">
+                            <span class="bg-warning text-dark">
+                                {% if item.quantity < 20 %} <span style="background-color: #e6c5b0; color: #ef6f28;"
+                                    class="rounded p-1">Low Stock</span>
+                            {% else %}
+                            <span style="background-color: #92b0dd; color: #0d2f5a;" class="rounded p-1">In Stock</span>
+                            {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-secondary">Last Restocked:</div>
+                        <div class="col-sm-8">{{ item.date_received }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <form method="POST" action="{% url 'sales_restock_inventory' item.id %}" id="restockForm{{ item.id }}">
+                {% csrf_token %}
+                <div class="mx-5 mb-5">
+                    <div class="fs-5 fw-semibold mt-3" style="color: #033b60;">Restock Item</div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Supplier</label>
+                        <input type="text" name="supplier" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity to Add</label>
+                            <input type="number" name="quantity_to_add" class="form-control" required min="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date Received</label>
+                            <input type="date" name="date_received" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="form-label">New Unit Price</label>
+                            <input type="number" name="new_unit_price" class="form-control" step="0.01" min="0" 
+                                placeholder="Current: {% if item.unit_price %}₱{{ item.unit_price }}{% else %}Not set{% endif %} (Leave blank to keep current price)">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Restock</button>
+                </div>
+            </form>
+
+            <script>
+                document.getElementById('restockForm{{ item.id }}').addEventListener('submit', function() {
+                    // Close the restock modal
+                    var restockModal = bootstrap.Modal.getInstance(document.getElementById('RestockInventoryModal{{ item.id }}'));
+                    restockModal.hide();
+                });
+            </script>
+        </div>
+    </div>
+</div>
+
+{% endfor %} 

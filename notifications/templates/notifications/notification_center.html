@@ -1,0 +1,112 @@
+{% extends base_template %}
+{% load static %}
+
+{% block content %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<div class="container-fluid px-4 notification-center">
+    <h2 class="mt-4 mb-4" style="font-family: 'Rubik', sans-serif;">Notification Center</h2>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" style="font-family: 'Rubik', sans-serif;">All Notifications</h5>
+                <div>
+                    <button class="btn btn-outline-primary btn-sm" id="markAllRead" style="font-family: 'Rubik', sans-serif;">Mark All as Read</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for notification in notifications %}
+                <div class="list-group-item list-group-item-action {% if request.user not in notification.read_by.all %}unread{% endif %}"
+                     data-notification-id="{{ notification.id }}" 
+                     data-notification-type="{{ notification.notification_type }}"
+                     data-related-link="{{ notification.related_link }}"
+                     style="font-family: 'Rubik', sans-serif;">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1" style="font-family: 'Rubik', sans-serif;">{{ notification.title }}</h6>
+                        <small class="text-muted" style="font-family: 'Rubik', sans-serif;">{{ notification.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1" style="font-family: 'Rubik', sans-serif;">{{ notification.message }}</p>
+                    <small class="text-muted" style="font-family: 'Rubik', sans-serif;">From: {{ notification.from_department|title }}</small>
+                </div>
+                {% empty %}
+                <div class="text-center p-4 text-muted" style="font-family: 'Rubik', sans-serif;">
+                    <i class="fas fa-bell fa-2x mb-3"></i>
+                    <p>No notifications to display</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.unread {
+    background-color: #e8f0fe;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle clicking on notifications
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const notificationId = this.dataset.notificationId;
+            const notificationType = this.dataset.notificationType;
+            const relatedLink = this.dataset.relatedLink;
+            
+            // Mark as read
+            fetch(`{% url 'notifications:mark_notification_read' notification_id=0 %}`.replace('0', notificationId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            }).then(response => {
+                if (response.ok) {
+                    // Remove unread styling
+                    this.classList.remove('unread');
+                    
+                    // Handle redirection based on notification type
+                    if (notificationType === 'new_sales_order') {
+                        // For new sales orders, redirect to the sales and orders page
+                        const orderNumber = new URLSearchParams(window.location.search).get('order_number');
+                        window.location.href = `/adminpanel/sales&Orders/${orderNumber ? `?order_number=${orderNumber}` : ''}`;
+                    } else if (relatedLink) {
+                        // For other notifications with related links
+                        window.location.href = relatedLink;
+                    }
+                }
+            }).catch(error => {
+                console.error('Error marking notification as read:', error);
+            });
+        });
+    });
+
+    // Handle mark all as read
+    document.getElementById('markAllRead').addEventListener('click', function() {
+        document.querySelectorAll('.list-group-item.unread').forEach(item => {
+            const notificationId = item.dataset.notificationId;
+            
+            fetch(`{% url 'notifications:mark_notification_read' notification_id=0 %}`.replace('0', notificationId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            }).then(() => {
+                item.classList.remove('unread');
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

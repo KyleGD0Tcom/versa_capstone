@@ -1,0 +1,143 @@
+{% load static %}
+
+<!-- View Inventory Modal -->
+<div class="modal fade" id="viewForecastModal" tabindex="-1" aria-labelledby="viewForecastModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5 rounded-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <span class="badge bg-light border text-dark fw-bold px-2 py-1">HVY-00001</span>
+                    <h4 class="fw-bold d-inline ms-2" style="color: #033b60;">Excavator EC750</h4>
+                </div>
+                <div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Supplier and Date -->
+            <div class="mb-3">
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Serial Number:</div>
+                    <div class="col-sm-10 text-uppercase">EX-12345</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Supplier:</div>
+                    <div class="col-sm-10 text-uppercase fw-semibold">XCMG</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-2 text-secondary">Date Received:</div>
+                    <div class="col-sm-10">June 3, 2020</div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Image + Info Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 text-center">
+                    <img src="{% static 'images/excavator2.png' %}" class="rounded-3" alt="Equipment Photo"
+                        style="width: 400px; height: auto;" />
+                </div>
+                <div class="col-md-8">
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Department:</div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-light text-dark">Sales</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Category:</div>
+                        <div class="col-sm-8">Heavy Equipment</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Current Stock:</div>
+                        <div class="col-sm-8">10</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Predicted Demand<br>(Next 30 Days):</div>
+                        <div class="col-sm-8 mt-4">5 units</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Suggested <br>
+                            Restock Qty:</div>
+                        <div class="col-sm-8 mt-4">130 units</div>
+                    </div>
+
+                    <!-- Status and Last Restocked -->
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-secondary">Trend:</div>
+                        <div class="col-sm-8">
+                            <span style="background-color: rgb(184, 199, 238); border-radius: 5px;"
+                                class="p-1 text-primary">Stable</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-secondary">Last Restocked:</div>
+                        <div class="col-sm-8">May 1, 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Forecast Section -->
+            <div class="mb-4">
+                <h5 class="mb-3" style="color: #033b60;">Notes</h5>
+
+                <div class="mb-3">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi assumenda amet vel totam ipsam,
+                    voluptatum reprehenderit ipsum commodi, voluptatibus numquam culpa. Dolor excepturi enim, deserunt
+                    earum quo itaque harum commodi.
+                </div>
+
+                <!-- Right aligned -->
+                <div class="text-end mx-3">
+                    <div class="text-end mx-5">
+                        <img src="https://i.pravatar.cc/32" class="rounded-circle me-2" width="36" height="36">
+                        <span class="me-2">Hubert Eleazar</span>
+                        <span class="me-2">|</span>
+                        <span class="me-4">April 30, 2025</span>
+                        <span>17:23:25</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-5 d-flex gap-3 flex-column" id="input-container">
+                <div class="d-flex gap-3">
+                    <input type="text" class="w-100 rounded border-0 bg-light">
+                    <button class="rounded border-0 text-white p-2" style="background-color: #033b60; width: 8%;"
+                        onclick="addField()">Add</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function addField() {
+        const newRow = document.createElement('div');
+        newRow.className = 'd-flex gap-3 mb-2 align-items-center';
+
+        const newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.className = 'w-100 rounded border-0 bg-light py-2 px-3';
+        newInput.style.outline = 'none';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = '✕';
+        removeBtn.className = 'btn btn-danger p-2';
+        removeBtn.style.width = '8%';
+        removeBtn.onclick = function () {
+            newRow.remove();
+        };
+
+        newRow.appendChild(newInput);
+        newRow.appendChild(removeBtn);
+
+        document.getElementById('input-container').appendChild(newRow);
+    }
+</script>

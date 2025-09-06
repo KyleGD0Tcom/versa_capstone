@@ -1,0 +1,176 @@
+{% extends 'delivery/delivery_base.html' %}
+{% load static %}
+{% block content %}
+{% include 'delivery_modals/delivery_requests_modals/view_delivery_req_modal.html' %}
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Rubik', sans-serif;
+    }
+
+    #search1 {
+        height: 40px;
+        border: none;
+        background-color: rgb(224, 224, 224);
+        border-radius: 10px;
+        padding: 20px;
+        width: 300px;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-processing {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+</style>
+
+<div class="container-fluid px-5">
+    <div class="row mb-3 fst-italic">Delivery Department | Delivery Requests</div>
+    <div class="d-flex gap-5">
+        <div class="row mb-5">
+            <input class="p-2" type="search" id="search1" placeholder="search"
+                style="height: 40px; border: none; background-color: rgb(224, 224, 224); border-radius: 10px; padding: 20px; width: 300px;">
+        </div>
+    </div>
+
+    <!-- Header-->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fs-4 fw-bold mb-4" style="color: #033b60;">Delivery Requests</h5>
+    </div>
+
+    <div class="table-responsive border rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <input type="text" class="form-control w-25 mb-3 ms-3" placeholder="Search">
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="text-secondary small">Filter by:</span>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>Select</option>
+                    <option>Status</option>
+                    <option>Department</option>
+                    <option>Date</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Table Container -->
+        <div style="max-height: 650px; overflow-y: auto;" class="mx-4">
+            <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                <thead class="table">
+                    <tr>
+                        <th style="opacity: 0.3;">Request ID</th>
+                        <th style="opacity: 0.3;">Invoice Number</th>
+                        <th style="opacity: 0.3;">Unit/Item Name</th>
+                        <th style="opacity: 0.3;">Serial Number</th>
+                        <th style="opacity: 0.3;">Client</th>
+                        <th style="opacity: 0.3;">Status</th>
+                        <th style="opacity: 0.3;">Request Date</th>
+                        <th style="opacity: 0.3;"></th>
+                    </tr>
+                </thead>
+
+                <tbody id="deliveryRequestsBody">
+                    {% for request in delivery_requests %}
+                    <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                        <td>{{ request.request_id }}</td>
+                        <td>{{ request.invoice_number }}</td>
+                        <td>{{ request.unit_info.unit_name }}</td>
+                        <td>{{ request.unit_info.serial_number }}</td>
+                        <td>{{ request.client_info.client_name }}</td>
+                        <td>
+                            <span class="status-badge {% if request.status == 'Pending' %}status-pending{% elif request.status == 'Processing' %}status-processing{% else %}status-completed{% endif %}">
+                                {{ request.status }}
+                            </span>
+                        </td>
+                        <td>{{ request.created_at|date:"F j, Y" }}</td>
+                        <td>
+                            <a href="#" class="text-dark me-2" data-bs-toggle="modal"
+                                data-bs-target="#viewDeliveryModal{{ request.id }}">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            No delivery requests found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.getElementById('deliveryRequestsBody');
+
+    function badgeClass(status) {
+        if (status === 'Pending') return 'status-pending';
+        if (status === 'Processing') return 'status-processing';
+        return 'status-completed';
+    }
+
+    function renderRows(items) {
+        if (!tbody) return;
+        let html = '';
+        items.forEach(function(item) {
+            html += '<tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">' +
+                '<td>' + item.request_id + '</td>' +
+                '<td>' + item.invoice_number + '</td>' +
+                '<td>' + (item.unit_name || '') + '</td>' +
+                '<td>' + (item.serial_number || '') + '</td>' +
+                '<td>' + (item.client_name || '') + '</td>' +
+                '<td><span class="status-badge ' + badgeClass(item.status) + '">' + item.status + '</span></td>' +
+                '<td>' + new Date(item.created_at).toLocaleDateString() + '</td>' +
+                '<td><a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewDeliveryModal' + item.id + '"><i class="bi bi-chevron-right fs-5"></i></a></td>' +
+            '</tr>';
+        });
+        if (html === '') {
+            html = '<tr><td colspan="9" class="text-center text-muted py-4">No delivery requests found</td></tr>';
+        }
+        tbody.innerHTML = html;
+    }
+
+    function fetchDeliveryFeed() {
+        fetch('{% url "delivery_requests_feed" %}', { credentials: 'same-origin' })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                const rows = data && Array.isArray(data.requests) ? data.requests : [];
+                renderRows(rows);
+                if (!rows.length) {
+                    console.debug('Delivery feed returned 0 items');
+                }
+                if (typeof fetchNotifications === 'function') {
+                    fetchNotifications();
+                }
+            })
+            .catch(function(err) { console.error('Delivery feed error:', err); });
+    }
+
+    fetchDeliveryFeed();
+    setInterval(fetchDeliveryFeed, 5000);
+});
+</script>
+
+{% endblock %}

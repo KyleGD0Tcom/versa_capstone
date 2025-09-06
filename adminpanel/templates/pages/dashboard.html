@@ -1,0 +1,617 @@
+{% extends 'adminpanel/base.html' %}
+{% block content %}
+{% load static %}
+
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+  body {
+    font-family: 'Rubik', sans-serif;
+  }
+
+  #wan {
+    color: #025ca8;
+  }
+
+  #viewButton {
+    background-color: #033b60;
+    color: white;
+    border-radius: 7px;
+    width: 18%;
+  }
+
+  #search {
+    height: 40px;
+    border: none;
+    background-color: rgb(224, 224, 224);
+    border-radius: 10px;
+    padding: 20px;
+    width: 500px;
+  }
+</style>
+
+<div class="container-fluid px-5">
+  <!-- Greeting and Search -->
+  <i>Dashboard</i>
+  <div class="d-flex align-items-center mt-5 mb-2 w-100 flex-wrap mb-5 gap-5">
+    <h4 class="fs-3 fw-bold me-3 mb-0" id="wan">Good afternoon!</h4>
+    <div class="d-flex align-items-center gap-2" style="flex-shrink: 0;">
+      <input type="search" placeholder="Search" id="search">
+      <button class="btn text-white btn-m ms-5" style="width: 30%; background-color: #53893c;">+ Add new user</button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-5">
+    <div class="col-lg-6">
+      <div class="row g-3" style="height: 48%;">
+        <!-- Card 1 -->
+        <div class="col-6">
+          <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+            <a href="{% url 'user_management' %}" class="btn btn-sm position-absolute top-0 end-0 m-2">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <div class="d-flex align-items-center h-10">
+              <div class="m-3">
+                <i class="fas fa-users fa-lg me-3" style="color: #005ca8;"></i>
+                <div class="small text-muted mt-3">Total Active Users</div>
+                <div class="fw-bold fs-4">64 out of 65</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col-6">
+          <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+            <a href="{% url 'department' %}" class="btn btn-sm position-absolute top-0 end-0 m-2">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <div class="d-flex align-items-center h-100">
+              <div class="m-3">
+                <i class="fas fa-building fa-lg text-success me-3"></i>
+                <div class="small text-muted mt-3">Departments Active</div>
+                <div class="fw-bold fs-4">6 of 6</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col-6">
+          <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+            <button class="btn btn-sm position-absolute top-0 end-0 m-2">
+              <a href="{% url 'operations_invoicing' %}">
+                <i class="fas fa-chevron-right text-muted"></i>
+              </a>
+            </button>
+            <div class="d-flex align-items-center h-100">
+              <div class="m-3">
+                <i class="fas fa-file-invoice fa-lg text-purple me-3"></i>
+                <div class="small text-muted mt-3">Invoices Generated Today</div>
+                <div class="fw-bold fs-4">8 invoices</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="col-6">
+          <div class="card p-3 shadow-sm h-100 position-relative" style="border-radius: 10px;">
+            <button class="btn btn-sm position-absolute top-0 end-0 m-2">
+              <a href="{% url 'riskAndAnomalies' %}">
+                <i class="fas fa-chevron-right text-muted"></i>
+              </a>
+            </button>
+            <div class="d-flex align-items-center h-100">
+              <div class="m-3">
+                <i class="fas fa-exclamation-triangle fa-lg text-warning me-3"></i>
+                <div class="small mt-3">Flagged Transactions</div>
+                <div class="fw-bold fs-4">3 flagged</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Audit Trail -->
+    <div class="col-lg-6">
+      <div class="mb-3 d-flex gap-3">
+        <h5 class="fw-bold mb-0" style="color: #033b60;">Audit Trail</i>
+        </h5>
+        <div> <a href="{% url 'auditTrail' %}">
+            <i class="fas fa-chevron-right text-muted"></i>
+          </a>
+          </i>
+        </div>
+      </div>
+      <div class="card p-4 shadow-sm h-90" style="height: 320px; border-radius: 10px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+        </div>
+        <div class="d-flex flex-column gap-2" style="max-height: 230px; overflow-y: auto;">
+          {% for _ in "1234" %}
+          <div class="d-flex justify-content-between align-items-start p-2 bg-light rounded">
+            <div class="d-flex align-items-start">
+              <i class="fas fa-trash-alt text-danger me-2 mt-1"></i>
+              <span>User "<strong>Hubert Eleazar Debalucos</strong>" has been deleted from Warehouse Department.</span>
+            </div>
+            <span class="text-muted small">[14:01]</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Inventory Forecast and Predicted Demand Spike -->
+  <div class="row mt-4">
+    <!-- Inventory Forecast -->
+    <div class="col-lg-6">
+      <div class="d-flex align-items-center mb-3 gap-3">
+        <h5 class="fw-bold mb-0" style="color: #033b60;">Inventory Forecast</h5>
+        <a href="{% url 'operations_inventory' %}">
+          <i class="fas fa-lg fa-chevron-right text-muted"></i>
+        </a>
+      </div>
+      <div class="card p-5 shadow-sm" style="border-radius: 10px;">
+        <!-- Item 1 -->
+        <div class="d-flex justify-content-between align-items-start">
+          <!-- LEFT side -->
+          <div style="flex: 1;">
+            <div class="badge rounded-4 p-2 text-center mb-2" style="background-color: #e79b97; color: #f71105;">
+              Critical Low Stock Alert</div>
+            <div class="fs-5 fw-semibold">Hydraulic Filters</div>
+            <div class="text-muted">Projected to run out in <span class="fw-bold">13 days.</span></div>
+          </div>
+
+          <!-- RIGHT side -->
+          <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+            <div>Department: <strong class="text-dark">Warehouse</strong></div><br>
+            <div>Current Stock: <strong class="text-dark">12 units</strong></div>
+            <div>Avg. Use: <strong class="text-dark">20/month</strong></div>
+          </div>
+        </div>
+
+        <hr>
+        <!-- Item 2 -->
+        <div class="mb-3 d-flex justify-content-between align-items-start">
+          <!-- LEFT side -->
+          <div style="flex: 1;">
+            <div class="badge rounded-4 p-2 text-center mb-2" style="background-color: #e6c99f; color: #ab5d1e;">
+              Preventive Maintenance Warning
+            </div>
+            <h6 class="fw-bold mb-1">Excavator EC750</h6>
+            <div class="text-muted">
+              Hydraulic Pump down to <span class="fw-bold">12% life.</span>
+            </div>
+          </div>
+
+          <!-- RIGHT side -->
+          <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+            <div>Department: <strong class="text-dark">Sales</strong></div><br>
+            <div>Failure projected: <strong class="text-dark">May 8</strong></div>
+            <div><strong class="text-dark">Schedule replacement</strong></div>
+          </div>
+        </div>
+
+        <hr>
+        <!-- Item 3 -->
+        <div class="mb-3 d-flex justify-content-between align-items-start">
+          <!-- LEFT side -->
+          <div style="flex: 1;">
+            <div class="badge rounded-4 p-2 text-center mb-2" style="background-color: #f7d1bd; color: #ef6f28;">
+              Forecast Depletion
+            </div>
+            <h6 class="fw-bold mb-1">Track Rollers (CAT320)</h6>
+            <div class="text-muted">
+              Stock may hit by <span class="fw-bold">May 2.</span>
+            </div>
+          </div>
+
+          <!-- RIGHT side -->
+          <div class="text-muted ms-3" style="flex: 1; max-width: 250px;">
+            <div>Department: <strong class="text-dark">Sales</strong></div><br>
+            <div>Lead time: <strong class="text-dark">18 days</strong></div>
+            <div>Reorder now to avoid downtime</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Predicted Demand Spike -->
+    <div class="col-lg-6 mb-4">
+      <div class="d-flex align-items-center mb-3 gap-3">
+        <h5 class="fw-bold mb-0" style="color: #033b60;">Predicted Demand Spike</h5>
+        <a href="{% url 'operations_forecast' %}">
+          <i class="fas fa-lg fa-chevron-right text-muted"></i>
+        </a>
+      </div>
+
+      <div class="card p-5 shadow-sm" style="border-radius: 10px; height: 95%;">
+        <!-- Alert 1 -->
+        <div class="mb-4">
+          <div class="badge mb-2 rounded-4 p-2 text-center" style="background-color: #f7d1bd; color: #ef6f28;">
+            Upcoming Demand Surge Alert
+          </div>
+
+          <!-- Flex row with title and peak window -->
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-1 mb-lg-0">Track Rollers (CAT320)</h6>
+            <p class="small text-muted mb-0">Peak Window:<span class="text-dark"><strong><br>April 29 – May
+                  5</strong></span></p>
+          </div>
+
+          <p class="small mb-3 text-muted">Usage projected to increase by <strong>+45% next week</strong>.</p>
+          <p class="small text-muted mb-0"><strong>Recommendation:</strong><br> Adjust reorder volume & check stock
+            buffer</p>
+        </div>
+
+        <hr>
+
+        <!-- Alert 2 (same style) -->
+        <div>
+          <div class="badge mb-2 rounded-4 p-2 text-center" style="background-color: #f7d1bd; color: #ef6f28;">
+            Upcoming Demand Surge Alert
+          </div>
+
+          <!-- Flex row again -->
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-1 mb-lg-0">Track Rollers (CAT320)</h6>
+            <p class="small text-muted mb-0">Peak Window:<span class="text-dark"><strong><br>April 29 – May
+                  5</strong></span></p>
+          </div>
+
+          <p class="small mb-3 text-muted">Usage projected to increase by <strong>+45% next week</strong>.</p>
+          <p class="small text-muted mb-0"><strong>Recommendation:</strong><br> Adjust reorder volume & check stock
+            buffer</p>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+  <!-- Charts and Activity -->
+  <div class="container-fluid px-9 my-5">
+    <div class="d-flex align-items-center mb-3 gap-3">
+      <h5 class="fw-bold mb-0" style="color: #033b60;">Sales Forecast</h5>
+      <a href="{% url 'operations_salesAndOrders' %}">
+        <i class="fas fa-lg fa-chevron-right text-muted"></i>
+      </a>
+    </div>
+    <div class="card p-4" style="border-radius: 10px;">
+      <div class="row">
+        <!-- Left: Chart Area -->
+        <div class="col-lg-8 border-end">
+          <!-- Sale Forecast Heading (Now completely outside the container) -->
+          <div class="d-flex justify-content-start align-items-center mb-3 w-100">
+            <h5 class="fw-bold mb-0 me-3">April 2025</h5>
+            <button class="btn btn-sm btn-light">Next 30 days</button>
+          </div>
+
+          <div style="height: 300px;">
+            <canvas id="saleForecastChartAdminDashboard"></canvas>
+          </div>
+        </div>
+
+        <!-- Right: Top Products List -->
+        <div class="col-lg-4 ps-4">
+          <h6 class="fw-bold fs-5">Top 5 Products</h6>
+          <p class="text-muted small mb-3">By Forecast Demands</p>
+
+          <div class="d-flex flex-column gap-2">
+            <!-- Product Items -->
+            <div class="d-flex align-items-center p-2 rounded bg-light">
+              <span class="fw-bold me-2">1</span>
+              <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded" alt="Product Image"
+                style="width: 50px; height: 50px; object-fit: cover;">
+              <div class="ms-3">
+                <div class="fw-semibold">Crawler Excavator</div>
+                <div class="text-muted small">Lorem Ipsum</div>
+              </div>
+            </div>
+
+            <!-- 2-5 (repeating structure without background highlight) -->
+            <div class="d-flex align-items-center p-2">
+              <span class="fw-bold me-2">2</span>
+              <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded" alt="Product Image"
+                style="width: 50px; height: 50px; object-fit: cover;">
+              <div class="ms-3">
+                <div class="fw-semibold">Crawler Excavator</div>
+                <div class="text-muted small">Lorem Ipsum</div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center p-2">
+              <span class="fw-bold me-2">3</span>
+              <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded" alt="Product Image"
+                style="width: 50px; height: 50px; object-fit: cover;">
+              <div class="ms-3">
+                <div class="fw-semibold">Crawler Excavator</div>
+                <div class="text-muted small">Lorem Ipsum</div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center p-2">
+              <span class="fw-bold me-2">4</span>
+                <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded" alt="Product Image"
+                  style="width: 50px; height: 50px; object-fit: cover;">
+              <div class="ms-3">
+                <div class="fw-semibold">Crawler Excavator</div>
+                <div class="text-muted small">Lorem Ipsum</div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center p-2">
+              <span class="fw-bold me-2">5</span>
+              <img src="{% static 'images/crawlerExcavator.png' %}" class="me-2 rounded" alt="Product Image"
+                style="width: 50px; height: 50px; object-fit: cover;">
+              <div class="ms-3">
+                  <div class="fw-semibold">Crawler Excavator</div>
+                <div class="text-muted small">Lorem Ipsum</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- LAST NAKO GI CODE GABIE BUT NOT THE LEAST-->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Invoice Monitoring -->
+      <div class="col-12 col-lg-5 mb-5">
+        <div class="d-flex align-items-center mb-3 gap-3">
+          <h5 class="fw-bold mb-0" style="color: #033b60;">Invoice Monitoring</h5>
+          <a href="{% url 'operations_invoicing' %}">
+            <i class="fas fa-lg fa-chevron-right text-muted"></i>
+          </a>
+        </div>
+        <div class="card shadow-sm p-4" style="border-radius: 16px;">
+          <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+              <div class="chart-container d-flex justify-content-center align-items-center"
+                style="position: relative; width: 100%; height: 320px;">
+                <canvas id="doughnutChart"></canvas>
+              </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-center mt-3">
+              <ul class="list-unstyled mb-0 d-flex flex-wrap justify-content-center gap-4">
+                <li><span class="badge me-2" style="background-color: #2d8bba;">&nbsp;</span> Pending</li>
+                <li><span class="badge me-2" style="background-color: #6ce5e8;">&nbsp;</span> Completed</li>
+                <li><span class="badge me-2" style="background-color: #1a5276;">&nbsp;</span> Errors</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Revenue Breakdown -->
+      <div class="col-12 col-lg-7">
+        <div class="d-flex align-items-center mb-3 gap-3">
+          <h5 class="fw-bold mb-0" style="color: #033b60;">Monthly Revenue Breakdown</h5>
+          <a href="{% url 'operations_salesAndOrders' %}">
+            <i class="fas fa-lg fa-chevron-right text-muted"></i>
+          </a>
+        </div>
+        <div class="card shadow-sm p-4" style="border-radius: 16px;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="badge fw-bold fs-6 px-3 py-2" style="background-color: #ecf4fa; color: #005ca8;">
+              ₱41,781,000 PHP
+            </span>
+          </div>
+          <div class="chart-container" style="width: 100%; height: 305px;">
+            <canvas id="lineChart" style="width: 100% !important; height: 100% !important;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Header and Add User -->
+  <div class="d-flex align-items-center mb-2 gap-3">
+    <h5 class="fs-4 fw-bold" style="color: #033b60;">Risk & Anomalies</h5>
+    <a href="{% url 'riskAndAnomalies' %}" class="mb-2">
+      <i class="fas fa-lg fa-chevron-right text-muted"></i>
+    </a>
+
+
+  </div>
+  <div class="table-responsive border rounded-3 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <input type="text" class="form-control w-25 mb-1" placeholder="Search">
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="text-secondary small">Filter by:</span>
+        <select class="form-select form-select-sm" style="width: auto;">
+          <option selected>Select</option>
+          <option>Role</option>
+          <option>Status</option>
+          <option>Department</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Scrollable Table Container -->
+    <div style="max-height: 400px; overflow-y: auto;">
+      <table class="table align-middle" style="border-collapse: separate; border-spacing: 0 10px;">
+        <thead class="table">
+          <tr>
+            <th style="opacity: 0.3;">Order ID</th>
+            <th style="opacity: 0.3;">Client Name</th>
+            <th style="opacity: 0.3;">Down <br>payment Status</th>
+            <th style="opacity: 0.3;">Time Since Order</th>
+            <th style="opacity: 0.3;">Risk Type</th>
+            <th style="opacity: 0.3;">Flag Date</th>
+            <th style="opacity: 0.3;">Status</th>
+            <th style="opacity: 0.3;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in "0123456" %}
+          <tr>
+            <td>ORD-00-0001</td>
+            <td>Balbin INC.</td>
+            <td>Paid</td>
+            <td>3 months ago</td>
+            <td>Suspicious</td>
+            <td><span class="text-success">May 4</span></td>
+            <td><span style="background-color: rgb(238, 202, 202); border-radius: 5px;"
+                class="p-1 text-danger">Blacklisted</span></td>
+            <td>
+              <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewFraudModal">
+                <i class="fas fa-lg text-muted fa-chevron-right"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- Chart JS -->
+<script>
+  // document.addEventListener("DOMContentLoaded", function () {
+  //   const ctx = document.getElementById("saleForecastChartAdminDashboard").getContext("2d");
+  //   new Chart(ctx, {
+  //     type: "bar",
+  //     data: {
+  //       labels: ["22", "22", "23", "24", "25", "26", "27", "28"],
+  //       datasets: [
+  //         {
+  //           label: "Forecast Sale",
+  //           data: [25000, 40000, 22000, 52000, 38000, 27000, 30000, 24000],
+  //           backgroundColor: "#6ce5e8",
+  //           barPercentage: 1,
+  //           categoryPercentage: 0.5,
+  //         },
+  //         {
+  //           label: "Actual Sale",
+  //           data: [40000, 35000, 33000, 42000, 36000, 44000, 41000, 35000],
+  //           backgroundColor: "#2d8bba",
+  //           barPercentage: 1,
+  //           categoryPercentage: 0.5,
+  //         },
+  //       ],
+  //     },
+  //     options: {
+  //       responsive: true,
+  //       maintainAspectRatio: false,
+  //       plugins: {
+  //         legend: {
+  //           position: "top",
+  //           labels: {
+  //             usePointStyle: true,
+  //             pointStyle: "circle",
+  //             font: {
+  //               size: 12,
+  //             },
+  //             color: "#333",
+  //           },
+  //         },
+  //       },
+  //       scales: {
+  //         x: {
+  //           title: {
+  //             display: true,
+  //             text: "Day",
+  //             color: "#999",
+  //             font: { style: "italic" },
+  //           },
+  //           ticks: {
+  //             color: "#333",
+  //           },
+  //           grid: {
+  //             display: false,
+  //           },
+  //         },
+  //         y: {
+  //           beginAtZero: true,
+  //           title: {
+  //             display: true,
+  //             text: "Amount",
+  //             color: "#999",
+  //             font: { style: "italic" },
+  //           },
+  //           ticks: {
+  //             callback: (value) => `${value / 1000}k`,
+  //             color: "#333",
+  //           },
+  //           grid: {
+  //             color: "#ddd",
+  //             borderDash: [4, 4],
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  // });
+
+
+  // KANI PUD SA DOUGHNUT CHART NI NGA JSs
+  const ctx = document.getElementById('doughnutChart').getContext('2d');
+  const doughnutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Completed', 'Pending ', 'Errors'],
+      datasets: [{
+        data: [100, 30, 20], // You will dynamically insert this later with Django
+        backgroundColor: ['#6ce5e8', '#41b8d5', '#2d8bba'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // Line Chart: Monthly Revenue Breakdown
+  const ctxLine = document.getElementById('lineChart').getContext('2d');
+  new Chart(ctxLine, {
+    type: 'line',
+    data: {
+      labels: ['1', '5', '10', '15', '20', '25', '30'],
+      datasets: [{
+        label: 'Revenue (Peso)',
+        data: [1, 1.5, 1.4, 4, 1.2, 3, 6],
+        fill: false,
+        borderColor: '#00d5ff',
+        tension: 0.4,
+        pointBackgroundColor: '#00d5ff',
+        pointBorderColor: '#00d5ff',
+        pointRadius: 5,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Month of April' }
+        },
+        y: {
+          title: { display: true, text: 'Revenue (Peso)' },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+{% endblock %}

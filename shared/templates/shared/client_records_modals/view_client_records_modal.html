@@ -1,0 +1,348 @@
+<!-- Add CSRF Token -->
+{% csrf_token %}
+
+<div class="modal fade" id="viewClientRecordsModal" tabindex="-1" aria-labelledby="viewClientRecordsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <div class="w-100">
+                    <!-- Name and Close Button -->
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h4 class="fw-bold mb-3" style="color: #033b60;" id="modal-client-name"></h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Row 1: Company & Address -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Company:</div>
+                            <div class="fw-bold" id="modal-company-name"></div>
+                        </div>
+                        <div class="col-md-6 d-flex mb-2">
+                            <div class="text-secondary" style="min-width: 150px;">Address:</div>
+                            <div class="fw-bold" id="modal-address"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Contact Details & Status -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary mb-2" style="min-width: 150px;">Contact Details:</div>
+                            <div class="fw-bold" id="modal-contact-info"></div>
+                        </div>
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary" style="min-width: 150px;">Status:</div>
+                            <div>
+                                <span id="modal-status-badge" class="p-1" style="border-radius: 5px;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Email -->
+                    <div class="row mb-2">
+                        <div class="col-md-6 d-flex">
+                            <div class="text-secondary" style="min-width: 150px;">Email:</div>
+                            <a href="#" id="modal-email-link" class="fw-bold text-primary"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">PAYMENT DETAILS</div>
+
+                <!-- Payment Details -->
+                <div class="row mb-4" id="modal-payment-mode-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Payment Mode:</div>
+                        <div class="fw-bold" id="modal-payment-mode"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-residence-location-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Residence Location:</div>
+                        <div class="fw-bold" id="modal-residence-location"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-due-date-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Due Date:</div>
+                        <div class="fw-bold" id="modal-due-date"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-amount-paid-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Amount Paid:</div>
+                        <div class="fw-bold" id="modal-amount-paid"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-bank-account-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Bank Account:</div>
+                        <div class="fw-bold" id="modal-bank-account"></div>
+                    </div>
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Account Number:</div>
+                        <div class="fw-bold" id="modal-account-number"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3" style="color: #033b60;">ATTACHMENTS</div>
+
+                <!-- Attachments -->
+                <div class="row mb-4" id="modal-id-attachment-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">ID:</div>
+                        <div id="modal-id-attachment"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-business-permit-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">Business Permit:</div>
+                        <div id="modal-business-permit"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-e-signature-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">E-signature:</div>
+                        <div id="modal-e-signature"></div>
+                    </div>
+                </div>
+                <div class="row mb-4" id="modal-bir-attachment-row">
+                    <div class="col-md-6 d-flex">
+                        <div class="text-secondary" style="min-width: 150px;">BIR:</div>
+                        <div id="modal-bir-attachment"></div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div style="color: #033b60;" class="fw-semibold fs-5 mb-3 mt-3">Order History</div>
+            <div class="table-responsive border rounded-3 p-4">
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                        <thead class="table">
+                            <tr>
+                                <th style="opacity: 0.3;">Order Number</th>
+                                <th style="opacity: 0.3;">Item Description</th>
+                                <th style="opacity: 0.3;">Total Amount</th>
+                                <th style="opacity: 0.3;">Order Date</th>
+                                <th style="opacity: 0.3;">Delivery Date</th>
+                                <th style="opacity: 0.3;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-order-history">
+                            <!-- Order history will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="color: #033b60;" class="fw-semibold fs-5 mb-3 mt-5">Invoice History</div>
+            <div class="table-responsive border rounded-3 p-4">
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="table align-middle" style="border-spacing: 0 10px; border-collapse: separate;">
+                        <thead class="table">
+                            <tr>
+                                <th style="opacity: 0.3;">Invoice Number</th>
+                                <th style="opacity: 0.3;">Total Amount</th>
+                                <th style="opacity: 0.3;">Invoice Date</th>
+                                <th style="opacity: 0.3;">Due Date</th>
+                                <th style="opacity: 0.3;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-invoice-history">
+                            <!-- Invoice history will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function initializeClientRecord(clientId, clientName, companyName, contactInfo, email, address, totalOrders, status, lastOrderDate, paymentMode, residenceLocation, dueDate, amountPaid, bankAccount, accountNumber, idAttachment, businessPermit, eSignature, birAttachment) {
+    // Decode any escaped values
+    clientName = decodeUnicode(clientName);
+    companyName = decodeUnicode(companyName);
+    contactInfo = decodeUnicode(contactInfo);
+    email = decodeUnicode(email);
+    address = decodeUnicode(address);
+    status = decodeUnicode(status);
+    bankAccount = decodeUnicode(bankAccount);
+    accountNumber = decodeUnicode(accountNumber);
+    idAttachment = decodeUnicode(idAttachment);
+    businessPermit = decodeUnicode(businessPermit);
+    eSignature = decodeUnicode(eSignature);
+    birAttachment = decodeUnicode(birAttachment);
+    paymentMode = decodeUnicode(paymentMode);
+    residenceLocation = decodeUnicode(residenceLocation);
+    dueDate = decodeUnicode(dueDate);
+    amountPaid = decodeUnicode(amountPaid);
+
+    // Helper to safely set textContent or innerHTML
+    function safeSet(id, value, isHTML) {
+        var el = document.getElementById(id);
+        if (el) {
+            if (isHTML) el.innerHTML = value;
+            else el.textContent = value;
+        }
+    }
+
+    safeSet('modal-client-name', clientName);
+    safeSet('modal-company-name', companyName || 'N/A');
+    safeSet('modal-address', address);
+    safeSet('modal-contact-info', contactInfo);
+    safeSet('modal-email-link', email || 'N/A');
+    var emailLink = document.getElementById('modal-email-link');
+    if (emailLink) emailLink.href = email ? `mailto:${email}` : '#';
+
+    safeSet('modal-payment-mode', paymentMode || '');
+    safeSet('modal-residence-location', residenceLocation || '');
+    safeSet('modal-due-date', dueDate || '');
+    safeSet('modal-amount-paid', amountPaid ? `₱ ${parseFloat(amountPaid).toLocaleString('en-PH', {minimumFractionDigits: 2})}` : '');
+    safeSet('modal-bank-account', bankAccount || '');
+    safeSet('modal-account-number', accountNumber || '');
+
+    safeSet('modal-id-attachment', idAttachment ? `<a href="${idAttachment}" target="_blank">View</a>` : '', true);
+    safeSet('modal-business-permit', businessPermit ? `<a href="${businessPermit}" target="_blank">View</a>` : '', true);
+    safeSet('modal-e-signature', eSignature ? `<a href="${eSignature}" target="_blank">View</a>` : '', true);
+    safeSet('modal-bir-attachment', birAttachment ? `<a href="${birAttachment}" target="_blank">View</a>` : '', true);
+
+    // Update status badge
+    var statusBadge = document.getElementById('modal-status-badge');
+    if (statusBadge) {
+        statusBadge.textContent = status;
+        statusBadge.className = 'p-1';
+        if (status === 'Active') {
+            statusBadge.style.backgroundColor = 'rgb(218, 241, 204)';
+            statusBadge.classList.add('text-success');
+        } else {
+            statusBadge.style.backgroundColor = 'rgb(238, 202, 202)';
+            statusBadge.classList.add('text-danger');
+        }
+    }
+
+    // Show/hide payment and attachment fields based on paymentMode
+    function safeDisplay(id, display) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = display;
+    }
+    if (paymentMode === 'cash') {
+        safeDisplay('modal-id-attachment-row', '');
+        safeDisplay('modal-business-permit-row', 'none');
+        safeDisplay('modal-e-signature-row', 'none');
+        safeDisplay('modal-bir-attachment-row', 'none');
+        safeDisplay('modal-residence-location-row', 'none');
+        safeDisplay('modal-bank-account-row', 'none');
+        safeDisplay('modal-account-number-row', 'none');
+    } else if (['inhouse', 'financing', 'loan'].includes(paymentMode.toLowerCase())) {
+        safeDisplay('modal-id-attachment-row', 'none');
+        safeDisplay('modal-business-permit-row', '');
+        safeDisplay('modal-bir-attachment-row', '');
+        safeDisplay('modal-e-signature-row', 'none');
+        safeDisplay('modal-residence-location-row', '');
+        safeDisplay('modal-bank-account-row', '');
+        safeDisplay('modal-account-number-row', '');
+    } else {
+        safeDisplay('modal-id-attachment-row', '');
+        safeDisplay('modal-business-permit-row', '');
+        safeDisplay('modal-bir-attachment-row', '');
+        safeDisplay('modal-e-signature-row', 'none');
+        safeDisplay('modal-residence-location-row', '');
+        safeDisplay('modal-bank-account-row', '');
+        safeDisplay('modal-account-number-row', '');
+    }
+
+    // Fetch and display order history
+    fetch(`/sales/api/client-orders/${clientId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const orderHistory = document.getElementById('modal-order-history');
+            if (orderHistory) {
+                if (data.orders.length === 0) {
+                    orderHistory.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No order history found</td></tr>';
+                } else {
+                    orderHistory.innerHTML = data.orders.map(order => `
+                        <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                            <td>${order.order_number}</td>
+                            <td>${order.item_description}</td>
+                            <td>₱ ${parseFloat(order.total_amount).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
+                            <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                            <td>${new Date(order.delivery_date).toLocaleDateString()}</td>
+                            <td><span style="background-color: ${getStatusColor(order.status)}; border-radius: 5px;"
+                                    class="p-1 ${getStatusTextColor(order.status)}">${order.status}</span></td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        });
+
+    // Fetch and display invoice history
+    fetch(`/sales/api/client-invoices/${clientId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const invoiceHistory = document.getElementById('modal-invoice-history');
+            if (invoiceHistory) {
+                if (data.invoices.length === 0) {
+                    invoiceHistory.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No invoice history found</td></tr>';
+                } else {
+                    invoiceHistory.innerHTML = data.invoices.map(invoice => `
+                        <tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">
+                            <td>${invoice.invoice_number}</td>
+                            <td>₱ ${parseFloat(invoice.amount).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
+                            <td>${new Date(invoice.invoice_date).toLocaleDateString()}</td>
+                            <td>${new Date(invoice.due_date).toLocaleDateString()}</td>
+                            <td><span style="background-color: ${getStatusColor(invoice.status)}; border-radius: 5px;"
+                                    class="p-1 ${getStatusTextColor(invoice.status)}">${invoice.status}</span></td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        });
+}
+
+function getStatusColor(status) {
+    switch (status.toLowerCase()) {
+        case 'active':
+        case 'paid':
+        case 'completed':
+            return 'rgb(218, 241, 204)';
+        case 'pending':
+            return 'rgb(255, 243, 205)';
+        case 'cancelled':
+            return 'rgb(238, 202, 202)';
+        case 'overdue':
+            return 'rgb(248, 215, 218)';
+        default:
+            return 'rgb(218, 241, 204)';
+    }
+}
+
+function getStatusTextColor(status) {
+    switch (status.toLowerCase()) {
+        case 'active':
+        case 'paid':
+        case 'completed':
+            return 'text-success';
+        case 'pending':
+            return 'text-warning';
+        case 'cancelled':
+        case 'overdue':
+            return 'text-danger';
+        default:
+            return 'text-success';
+    }
+}
+
+function decodeUnicode(str) {
+    try {
+        return JSON.parse('"' + str.replace(/"/g, '\\"') + '"');
+    } catch {
+        return str;
+    }
+}
+</script>

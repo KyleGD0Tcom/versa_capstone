@@ -1,0 +1,698 @@
+{% load static %}
+
+<div class="modal fade" id="editEquipmentInspectionModal{{ inspection.id }}" tabindex="-1"
+    aria-labelledby="editEquipmentInspectionModalLabel{{ inspection.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content p-5" style="border-radius: 12px;">
+            <form id="editInspectionForm{{ inspection.id }}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="inspection_id" value="{{ inspection.id }}">
+                <input type="hidden" id="removedPhotos{{ inspection.id }}" value="[]">
+                
+                <div class="modal-header border-0">
+                    <div class="w-100">
+                        <!-- Name and Close Button -->
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <h4 class="fw-bold mb-3" style="color: #033b60;">{{ inspection.inspection_id }}</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Row 1: Company & Address -->
+                        <div class="row mb-2">
+                            <div class="col-md-6 d-flex mb-0 gap-5">
+                                <div class="text-secondary" style="min-width: 150px;">Technician:</div>
+                                <div class="d-flex align-items-center">
+                                    <input type="text" class="form-control" name="assigned_technician" 
+                                           value="{{ inspection.assigned_technician }}" 
+                                           style="width: 250px;">
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex mb-2 gap-5">
+                                <div class="text-secondary" style="min-width: 150px;">Inspection Date:</div>
+                                <div>{{ inspection.date_received|date:"F j, Y" }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Request Type -->
+                        <div class="row mb-2">
+                            <div class="col-md-6 d-flex gap-5">
+                                <div class="text-secondary mb-2" style="min-width: 150px;">Request Type:</div>
+                                <div>
+                                    <input type="text" class="form-control" name="request_type" 
+                                           value="{{ inspection.request_type }}" 
+                                           style="width: 250px;" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Invoice ID -->
+                        <div class="row mb-2">
+                            <div class="col-md-6 d-flex gap-5">
+                                <div class="text-secondary" style="min-width: 150px;">Invoice ID:</div>
+                                <div>
+                                    <input type="text" class="form-control" name="invoice_number" 
+                                           value="{{ inspection.invoice_number }}" 
+                                           style="width: 250px;" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3 mt-4">
+                    <div style="color: #033b60;" class="mb-3">PRODUCT BREAKDOWN</div>
+                    {% if inspection.invoice and inspection.invoice.order %}
+                    <div class="table-responsive mb-4">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="opacity: 0.3;">Item Description</th>
+                                    <th style="opacity: 0.3;">Item Code</th>
+                                    <th style="opacity: 0.3;">Serial Number</th>
+                                    <th style="opacity: 0.3;">Quantity</th>
+                                    <th style="opacity: 0.3;">Unit Price</th>
+                                    <th style="opacity: 0.3;">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in inspection.invoice.order.items.all %}
+                                <tr>
+                                    <td>{{ item.inventory_item.unit_item }}</td>
+                                    <td>{{ item.inventory_item.item_code }}</td>
+                                    <td>{{ item.inventory_item.serial_number }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₱ {{ item.unit_price|floatformat:2 }}</td>
+                                    <td>₱ {{ item.total_price|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No invoice data available for this inspection.
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="modal-body mt-5">
+                    <div class="mb-3" style="color: #033b60;">INSPECTION INFO</div>
+
+                    <!-- Checklist Reference -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 d-flex gap-5">
+                            <div class="text-secondary" style="min-width: 150px;">Checklist Reference:</div>
+                            <div class="d-flex flex-column gap-2" style="width: 250px;">
+                                {% if inspection.checklist_reference %}
+                                <div class="current-file d-flex align-items-center gap-2">
+                                    <a href="{{ inspection.checklist_reference.url }}" class="text-decoration-none" target="_blank">
+                                        <i class="bi bi-file-earmark-text"></i> {{ inspection.checklist_reference.name|slice:"20:" }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                                <input type="file" class="form-control" name="checklist_reference" 
+                                       accept=".pdf,.doc,.docx">
+                                <small class="text-muted">Upload new file to replace existing</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <!-- Row 2: Payment Status & Due Date -->
+                        <div class="col-md-6 d-flex gap-5">
+                            <div class="text-secondary" style="min-width: 150px;">Assisted by:</div>
+                            <div class="assistants-container" style="width: 250px;">
+                                {% if inspection.assisted_by %}
+                                    {% for assistant in inspection.assisted_by %}
+                                    <div class="d-flex gap-2 mb-2">
+                                        <input type="text" class="form-control assistant-input" name="assisted_by[]" 
+                                               value="{{ assistant }}" placeholder="Enter name">
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-assistant" 
+                                                onclick="removeAssistant(this)" {% if forloop.first and forloop.last %}style="display: none;"{% endif %}>
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="d-flex gap-2 mb-2">
+                                        <input type="text" class="form-control assistant-input" name="assisted_by[]" 
+                                               placeholder="Enter name">
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-assistant" 
+                                                onclick="removeAssistant(this)" style="display: none;">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" 
+                                        onclick="addAssistant('{{ inspection.id }}')">
+                                    <i class="bi bi-plus"></i> Add Assistant
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results & Findings Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="mb-3" style="color: #033b60; font-weight: normal;">RESULTS & FINDINGS</h6>
+                    </div>
+                    
+                    <!-- Inspection Result -->
+                    <div class="col-md-6 d-flex gap-5 mb-3">
+                        <div class="text-secondary" style="min-width: 150px;">Inspection Result:</div>
+                        <div class="d-flex align-items-center">
+                            <select class="form-select" name="inspection_result" id="inspectionResult{{ inspection.id }}" 
+                                    style="width: 250px;" onchange="toggleResultFields(this)">
+                                <option value="">Select Result</option>
+                                <option value="Passed" {% if inspection.inspection_result == 'Passed' %}selected{% endif %}>Passed</option>
+                                <option value="Failed" {% if inspection.inspection_result == 'Failed' %}selected{% endif %}>Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Fields that should be disabled until result is selected -->
+                    <div id="resultFields{{ inspection.id }}" {% if not inspection.inspection_result %}class="disabled-fields"{% endif %}>
+                        <!-- Issues Found -->
+                        <div class="col-12 mb-3">
+                            <div class="text-secondary mb-2">Issues Found:</div>
+                            <textarea class="form-control" name="issues_found" rows="3" 
+                                      placeholder="List any issues found during inspection"
+                                      {% if not inspection.inspection_result %}disabled{% endif %}>{{ inspection.issues_found }}</textarea>
+                        </div>
+                        
+                        <!-- Corrective Actions -->
+                        <div class="col-12 mb-3">
+                            <div class="text-secondary mb-2">Corrective Actions:</div>
+                            <textarea class="form-control" name="corrective_actions" rows="3" 
+                                      placeholder="Describe corrective actions taken"
+                                      {% if not inspection.inspection_result %}disabled{% endif %}>{{ inspection.corrective_actions }}</textarea>
+                        </div>
+                        
+                        <!-- Spare Parts Used -->
+                        <div class="col-12 mb-3">
+                            <div class="text-secondary mb-2">Spare Parts Used:</div>
+                            <textarea class="form-control" name="spare_parts_used" rows="3" 
+                                      placeholder="List any spare parts used"
+                                      {% if not inspection.inspection_result %}disabled{% endif %}>{{ inspection.spare_parts_used }}</textarea>
+                        </div>
+                        
+                        <!-- Additional Notes -->
+                        <div class="col-12 mb-3">
+                            <div class="text-secondary mb-2">Additional Notes:</div>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Any additional notes or observations"
+                                      {% if not inspection.inspection_result %}disabled{% endif %}>{{ inspection.notes }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container mt-4 mb-5">
+                    <div class="mb-3" style="color: #033b60;">ATTACHMENTS</div>
+                    <div class="row">
+                        <!-- Left Column: Inspection Photos -->
+                        <div class="col-md-6">
+                            <div class="mb-2 text-secondary">Inspection photos: (Max. 3 images)</div>
+                            <div class="d-flex flex-column">
+                                <div class="image-preview-container" id="imagePreviewContainer{{ inspection.id }}"
+                                     {% if inspection.inspection_photos %}data-has-existing-photos="true"{% endif %}>
+                                    {% if inspection.inspection_photos %}
+                                        {% for photo in inspection.inspection_photos %}
+                                            <div class="preview-wrapper">
+                                                <img src="{{ MEDIA_URL }}{{ photo }}" class="image-preview" 
+                                                     alt="Inspection Photo {{ forloop.counter }}" 
+                                                     data-original-path="{{ photo }}"
+                                                     data-inspection-id="{{ inspection.id }}">
+                                                <button type="button" class="remove-image" 
+                                                        onclick="removeImage(this, '{{ inspection.id }}')" 
+                                                        {% if not inspection.inspection_result %}disabled{% endif %}>×</button>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="mb-2">
+                                    <input type="file" class="form-control" id="inspectionPhotos{{ inspection.id }}" 
+                                           name="inspection_photos" accept="image/*" multiple
+                                           onchange="handleImagePreview(this, '{{ inspection.id }}')"
+                                           {% if not inspection.inspection_result %}disabled{% endif %}
+                                           {% if inspection.inspection_photos|length >= 3 %}disabled{% endif %}>
+                                    <small class="text-muted">Upload new photos to add or replace existing ones</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Signed Form -->
+                        <div class="col-md-6">
+                            <div class="mb-3 text-secondary">Signed form:</div>
+                            {% if inspection.signed_form %}
+                                <div class="current-file mb-2 d-flex align-items-center gap-2">
+                                    <a href="{{ inspection.signed_form.url }}" class="text-decoration-none" target="_blank">
+                                        <i class="bi bi-file-earmark-text"></i> {{ inspection.signed_form.name|slice:"20:" }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                            <div class="mb-2">
+                                <input type="file" class="form-control" name="signed_form" 
+                                       accept=".pdf,.doc,.docx"
+                                       {% if not inspection.inspection_result %}disabled{% endif %}>
+                                <small class="text-muted">Upload new file to replace existing</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.image-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.preview-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.remove-image {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: white;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 1;
+}
+
+.remove-image:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.disabled-fields {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.disabled-fields textarea,
+.disabled-fields input,
+.disabled-fields button {
+    cursor: not-allowed;
+}
+</style>
+
+<script>
+function addAssistant(inspectionId) {
+    const modal = document.getElementById(`editEquipmentInspectionModal${inspectionId}`);
+    const container = modal.querySelector('.assistants-container');
+    const newField = document.createElement('div');
+    newField.className = 'd-flex gap-2 mb-2';
+    newField.innerHTML = `
+        <input type="text" class="form-control assistant-input" name="assisted_by[]" 
+               placeholder="Enter name">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-assistant" 
+                onclick="removeAssistant(this, '${inspectionId}')">
+            <i class="bi bi-dash"></i>
+        </button>
+    `;
+    
+    // Insert before the "Add Assistant" button
+    container.insertBefore(newField, container.lastElementChild);
+    
+    // Show remove button on first assistant if we now have multiple
+    const allAssistants = container.querySelectorAll('.d-flex');
+    if (allAssistants.length > 1) {
+        allAssistants[0].querySelector('.remove-assistant').style.display = 'block';
+    }
+}
+
+function removeAssistant(button, inspectionId) {
+    const modal = document.getElementById(`editEquipmentInspectionModal${inspectionId}`);
+    const container = modal.querySelector('.assistants-container');
+    button.parentElement.remove();
+    
+    // Hide remove button on first assistant if we now only have one
+    const allAssistants = container.querySelectorAll('.d-flex');
+    if (allAssistants.length === 1) {
+        allAssistants[0].querySelector('.remove-assistant').style.display = 'none';
+    }
+}
+
+function handleImagePreview(input, inspectionId) {
+    const container = document.getElementById(`imagePreviewContainer${inspectionId}`);
+    const maxImages = 3;
+    const currentImages = container.querySelectorAll('.preview-wrapper').length;
+    const remainingSlots = maxImages - currentImages;
+
+    if (input.files.length > remainingSlots) {
+        alert(`You can only add ${remainingSlots} more image(s). Maximum total is ${maxImages}.`);
+        input.value = '';
+        return;
+    }
+
+    if (input.files) {
+        Array.from(input.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'preview-wrapper';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'image-preview';
+                img.dataset.isNew = 'true';  // Mark as a new image
+                img.dataset.inspectionId = inspectionId;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-image';
+                removeBtn.innerHTML = '×';
+                removeBtn.type = 'button';
+                removeBtn.onclick = function() {
+                    removeImage(this, inspectionId);
+                };
+                
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                container.appendChild(wrapper);
+
+                // Disable input if max images reached
+                const photoInput = document.getElementById(`inspectionPhotos${inspectionId}`);
+                if (container.querySelectorAll('.preview-wrapper').length >= maxImages) {
+                    photoInput.disabled = true;
+                }
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+function removeImage(button, inspectionId) {
+    const wrapper = button.parentElement;
+    const container = wrapper.parentElement;
+    const photoInput = document.getElementById(`inspectionPhotos${inspectionId}`);
+    
+    // Store the path of removed image if it's an existing one
+    const img = wrapper.querySelector('.image-preview');
+    if (img && !img.dataset.isNew && img.dataset.originalPath) {
+        const removedPhotosInput = document.getElementById(`removedPhotos${inspectionId}`);
+        const removedPhotos = removedPhotosInput.value ? JSON.parse(removedPhotosInput.value) : [];
+        removedPhotos.push(img.dataset.originalPath);
+        removedPhotosInput.value = JSON.stringify(removedPhotos);
+    }
+    
+    wrapper.remove();
+    
+    // Enable input if below max images
+    if (container.querySelectorAll('.preview-wrapper').length < 3) {
+        photoInput.disabled = false;
+        photoInput.value = ''; // Clear the input to allow the same file to be selected again
+    }
+}
+
+function toggleResultFields(selectElement) {
+    const inspectionId = selectElement.id.replace('inspectionResult', '');
+    const resultFields = document.getElementById(`resultFields${inspectionId}`);
+    const modal = selectElement.closest('.modal');
+    const attachmentsSection = modal.querySelector('.container.mt-4.mb-5');
+    const allInputs = attachmentsSection.querySelectorAll('input, button');
+    
+    if (selectElement.value) {
+        // Enable all fields
+        resultFields.classList.remove('disabled-fields');
+        resultFields.querySelectorAll('textarea').forEach(textarea => {
+            textarea.disabled = false;
+        });
+        
+        // Enable attachments section
+        allInputs.forEach(input => {
+            if (!input.hasAttribute('data-disabled-by-limit')) {
+                input.disabled = false;
+            }
+        });
+    } else {
+        // Disable all fields
+        resultFields.classList.add('disabled-fields');
+        resultFields.querySelectorAll('textarea').forEach(textarea => {
+            textarea.disabled = true;
+        });
+        
+        // Disable attachments section
+        allInputs.forEach(input => {
+            input.disabled = true;
+        });
+    }
+}
+
+// Initialize the fields state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const resultSelect = document.getElementById('inspectionResult{{ inspection.id }}');
+    if (resultSelect) {
+        toggleResultFields(resultSelect);
+    }
+});
+
+// Ensure modal isolation when multiple modals are present
+function ensureModalIsolation(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        // Reset any disabled states that might have been affected by other modals
+        const attachmentsSection = modal.querySelector('.container.mt-4.mb-5');
+        if (attachmentsSection) {
+            const allInputs = attachmentsSection.querySelectorAll('input, button');
+            allInputs.forEach(input => {
+                // Only enable if it's not disabled by business logic
+                if (!input.hasAttribute('data-disabled-by-limit') && 
+                    !input.hasAttribute('data-disabled-by-result')) {
+                    input.disabled = false;
+                }
+            });
+        }
+    }
+}
+
+// Add modal event listeners for proper isolation
+document.addEventListener('DOMContentLoaded', function() {
+    const modalId = 'editEquipmentInspectionModal{{ inspection.id }}';
+    const modal = document.getElementById(modalId);
+    
+    if (modal) {
+        // When modal is shown, ensure proper isolation
+        modal.addEventListener('shown.bs.modal', function() {
+            ensureModalIsolation(modalId);
+        });
+        
+        // When modal is hidden, clean up any global states
+        modal.addEventListener('hidden.bs.modal', function() {
+            // Reset any global states that might affect other modals
+            const resultSelect = document.getElementById('inspectionResult{{ inspection.id }}');
+            if (resultSelect) {
+                toggleResultFields(resultSelect);
+            }
+        });
+    }
+});
+
+document.getElementById('editInspectionForm{{ inspection.id }}').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const inspectionId = formData.get('inspection_id');
+    
+    // Check if inspection result is "Passed" and all required fields are filled
+    const inspectionResult = formData.get('inspection_result');
+    if (inspectionResult === 'Passed') {
+        const issuesFound = formData.get('issues_found')?.trim();
+        const correctiveActions = formData.get('corrective_actions')?.trim();
+        const sparePartsUsed = formData.get('spare_parts_used')?.trim();
+        const notes = formData.get('notes')?.trim();
+        const signedForm = formData.get('signed_form');
+        const modal = document.getElementById(`editEquipmentInspectionModal${inspectionId}`);
+        const hasExistingSignedForm = modal.querySelector('.current-file a') !== null;
+        
+        // Count existing and new photos
+        const container = document.getElementById(`imagePreviewContainer${inspectionId}`);
+        const totalPhotos = container.querySelectorAll('.preview-wrapper').length;
+
+        // Check if all required fields are filled
+        const allFieldsFilled = issuesFound && correctiveActions && sparePartsUsed && notes;
+        const hasSignedForm = signedForm || hasExistingSignedForm;
+        const hasPhotos = totalPhotos > 0;
+
+        console.log('Validation check:', {
+            allFieldsFilled,
+            hasSignedForm,
+            hasPhotos,
+            totalPhotos,
+            issuesFound: !!issuesFound,
+            correctiveActions: !!correctiveActions,
+            sparePartsUsed: !!sparePartsUsed,
+            notes: !!notes
+        });
+
+        if (allFieldsFilled && hasSignedForm && hasPhotos) {
+            // Add status as Delivery when all conditions are met
+            formData.append('status', 'Delivery');
+            console.log('Setting status to Delivery');
+        } else {
+            // Show error message about missing requirements
+            const missing = [];
+            if (!allFieldsFilled) missing.push('All text fields must be filled');
+            if (!hasSignedForm) missing.push('Signed form is required');
+            if (!hasPhotos) missing.push('At least one photo is required');
+            
+            alert('Cannot set to Delivery status. Missing requirements:\n' + missing.join('\n'));
+            return;
+        }
+    }
+    
+    // Handle assistants - collect all assistant names
+    const assistants = [];
+    this.querySelectorAll('.assistant-input').forEach(input => {
+        const value = input.value.trim();
+        if (value) {
+            assistants.push(value);
+        }
+    });
+    formData.delete('assisted_by[]'); // Remove the original array entries
+    formData.append('assisted_by', JSON.stringify(assistants)); // Add as JSON string
+    
+    // Add the files from image preview container
+    const imageInput = document.getElementById(`inspectionPhotos${inspectionId}`);
+    if (imageInput.files.length > 0) {
+        Array.from(imageInput.files).forEach((file, index) => {
+            formData.append(`inspection_photo_${index}`, file);
+        });
+    }
+    
+    // Get existing photos that weren't removed
+    const existingPhotos = [];
+    const container = document.getElementById(`imagePreviewContainer${inspectionId}`);
+    
+    // Only process existing photos if this is not a new inspection
+    if (container && container.hasAttribute('data-has-existing-photos')) {
+        container.querySelectorAll('.image-preview').forEach(img => {
+            // Only add photos that are from the server (not newly added ones)
+            if (!img.dataset.isNew) {
+                // Use the original path stored in the data attribute
+                const originalPath = img.dataset.originalPath;
+                if (originalPath && !existingPhotos.includes(originalPath)) {
+                    existingPhotos.push(originalPath);
+                }
+            }
+        });
+    }
+    
+    // Add the list of removed photos
+    const removedPhotosInput = document.getElementById(`removedPhotos${inspectionId}`);
+    if (removedPhotosInput && removedPhotosInput.value) {
+        formData.append('removed_photos', removedPhotosInput.value);
+    }
+    
+    formData.append('existing_photos', JSON.stringify(existingPhotos));
+    
+    fetch('/motorpool/update-inspection/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Reset the removed photos tracking
+            document.getElementById(`removedPhotos${inspectionId}`).value = '[]';
+            
+            // Update the image container with the new photo paths
+            const container = document.getElementById(`imagePreviewContainer${inspectionId}`);
+            container.innerHTML = '';
+            container.setAttribute('data-has-existing-photos', 'true');
+            container.setAttribute('data-inspection-id', inspectionId);
+            
+            // Keep track of added photos to prevent duplicates
+            const addedPhotos = new Set();
+            
+            if (data.photos && data.photos.length > 0) {
+                data.photos.forEach((photoUrl, index) => {
+                    const relativePath = photoUrl.replace(/^\/media\//, '');
+                    
+                    // Skip if this photo has already been added
+                    if (addedPhotos.has(relativePath)) {
+                        return;
+                    }
+                    addedPhotos.add(relativePath);
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-wrapper';
+                    
+                    const img = document.createElement('img');
+                    img.src = photoUrl;  // Use the full URL from the response
+                    img.className = 'image-preview';
+                    img.alt = `Inspection Photo ${index + 1}`;
+                    img.dataset.originalPath = relativePath;
+                    img.dataset.inspectionId = inspectionId;
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-image';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.type = 'button';
+                    removeBtn.onclick = function() {
+                        removeImage(this, inspectionId);
+                    };
+                    
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    container.appendChild(wrapper);
+                });
+            }
+            
+            // Disable photo input if max photos reached
+            const photoInput = document.getElementById(`inspectionPhotos${inspectionId}`);
+            if (photoInput) {
+                photoInput.disabled = addedPhotos.size >= 3;
+                photoInput.value = ''; // Clear the file input
+            }
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById(`editEquipmentInspectionModal${inspectionId}`));
+            modal.hide();
+            
+            // Show success message and reload
+            alert('Inspection updated successfully');
+            window.location.reload();
+        } else {
+            alert('Error updating inspection: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the inspection');
+    });
+});
+</script>
