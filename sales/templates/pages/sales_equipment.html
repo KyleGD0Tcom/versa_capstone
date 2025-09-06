@@ -54,9 +54,9 @@
             </div>
         </div>
 
-        <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="row row-cols-1 row-cols-md-2 g-4" id="equipmentContainer">
             {% for item in items %}
-            <div class="col">
+            <div class="col" data-item-id="{{ item.id }}">
                 <div class="card p-3 shadow-sm h-100">
                     <div class="row g-3">
                         <!-- Image Column (4 out of 12 columns on medium+) -->
@@ -86,11 +86,11 @@
                             </div>
                             <div class="mb-1 d-flex ">
                                 <span style="width: 150px;" class="text-secondary">Quantity</span>
-                                <span>{{ item.quantity }}</span>
+                                <span class="quantity-display" data-item-id="{{ item.id }}">{{ item.quantity }}</span>
                             </div>
                             <div class="mb-0">
                                 <span class="text-secondary">Description:</span>
-                                <p style="margin-left: 33%; margin-top: -5%;">{{ item.details }}</p>
+                                <p style="margin-left: 45%; margin-top: -5%;">{{ item.details }}</p>
                                 
                             </div>
                             <div class="mb-0 d-flex">
@@ -105,5 +105,97 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const equipmentContainer = document.getElementById('equipmentContainer');
+    
+    // Store previous quantities for comparison
+    let previousQuantities = new Map();
+    
+    // Initialize previous quantities
+    document.querySelectorAll('.quantity-display').forEach(element => {
+        const itemId = element.getAttribute('data-item-id');
+        const quantity = parseInt(element.textContent);
+        previousQuantities.set(itemId, quantity);
+    });
+
+    function fetchEquipmentData() {
+        fetch('{% url "sales_equipment_feed" %}', { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.items && Array.isArray(data.items)) {
+                    updateEquipmentDisplay(data.items);
+                }
+            })
+            .catch(error => console.error('Equipment feed error:', error));
+    }
+
+    function updateEquipmentDisplay(items) {
+        items.forEach(item => {
+            const quantityElement = document.querySelector(`.quantity-display[data-item-id="${item.id}"]`);
+            if (quantityElement) {
+                const currentQuantity = parseInt(item.quantity);
+                const previousQuantity = previousQuantities.get(item.id.toString());
+                
+                // Update the quantity display
+                quantityElement.textContent = currentQuantity;
+                
+                // Show visual indicator if quantity decreased
+                if (previousQuantity !== undefined && currentQuantity < previousQuantity) {
+                    showQuantityUpdateIndicator(quantityElement, previousQuantity, currentQuantity);
+                }
+                
+                // Update previous quantity
+                previousQuantities.set(item.id.toString(), currentQuantity);
+            }
+        });
+    }
+
+    function showQuantityUpdateIndicator(element, oldQuantity, newQuantity) {
+        // Add visual feedback for quantity change
+        element.style.backgroundColor = '#ffeb3b';
+        element.style.padding = '2px 6px';
+        element.style.borderRadius = '4px';
+        element.style.transition = 'background-color 0.3s ease';
+        
+        // Show a temporary tooltip or notification
+        const change = oldQuantity - newQuantity;
+        const tooltip = document.createElement('div');
+        tooltip.style.cssText = `
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+        `;
+        tooltip.textContent = `-${change} units`;
+        
+        // Position tooltip near the element
+        const rect = element.getBoundingClientRect();
+        tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+        tooltip.style.top = (rect.top - 30) + 'px';
+        
+        document.body.appendChild(tooltip);
+        
+        // Remove tooltip and reset styling after 3 seconds
+        setTimeout(() => {
+            element.style.backgroundColor = '';
+            element.style.padding = '';
+            element.style.borderRadius = '';
+            if (tooltip.parentNode) {
+                tooltip.parentNode.removeChild(tooltip);
+            }
+        }, 3000);
+    }
+
+    // Fetch equipment data every 5 seconds for real-time updates
+    fetchEquipmentData();
+    setInterval(fetchEquipmentData, 5000);
+});
+</script>
 
 {% endblock %}

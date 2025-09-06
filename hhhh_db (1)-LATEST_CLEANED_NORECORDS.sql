@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 03, 2025 at 05:07 AM
+-- Generation Time: Sep 03, 2025 at 05:31 AM
 -- Server version: 11.7.2-MariaDB
 -- PHP Version: 8.0.30
 
@@ -143,14 +143,6 @@ CREATE TABLE `aftersales_maintenancerecord` (
   `service_record_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `aftersales_maintenancerecord`
---
-
-INSERT INTO `aftersales_maintenancerecord` (`maintenance_id`, `service_id`, `unit_name`, `serial_number`, `client_name`, `status`, `created_at`, `updated_at`, `diagnosis`, `findings_note`, `reported_problem`, `work_performed`, `service_record_id`) VALUES
-('MTN-25-0001', 'AS-25-0001', 'Excavator Long Arm', '0023341323', 'lowe', 'Completed', '2025-07-20 11:31:53.168450', '2025-07-20 11:32:11.986329', 'none', 'none', 'None', 'asdasdaasdasd', 35),
-('MTN-25-0002', 'AS-25-0002', 'Bulldozer', '0011244331', 'kyle', 'Completed', '2025-08-24 04:58:31.537434', '2025-08-24 04:58:49.435217', 'bhahaah', 'hahaah', 'jeje', 'hasfdhasdasd', 36);
-
 -- --------------------------------------------------------
 
 --
@@ -162,14 +154,6 @@ CREATE TABLE `aftersales_maintenancerecord_technicians` (
   `maintenancerecord_id` varchar(20) NOT NULL,
   `technician_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `aftersales_maintenancerecord_technicians`
---
-
-INSERT INTO `aftersales_maintenancerecord_technicians` (`id`, `maintenancerecord_id`, `technician_id`) VALUES
-(40, 'MTN-25-0001', 29),
-(41, 'MTN-25-0002', 30);
 
 -- --------------------------------------------------------
 
@@ -196,15 +180,6 @@ CREATE TABLE `aftersales_servicerecord` (
   `warranty_type` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `aftersales_servicerecord`
---
-
-INSERT INTO `aftersales_servicerecord` (`id`, `service_id`, `unit_name`, `serial_number`, `client_name`, `warranty_start`, `warranty_end`, `status`, `created_at`, `updated_at`, `delivery_schedule_id`, `invoice_id`, `sales_order_id`, `usage_unit`, `usage_value`, `warranty_type`) VALUES
-(35, 'AS-25-0001', 'Excavator Long Arm', '0023341323', 'lowe', '2025-07-26', '2026-07-26', 'Warranty Active', '2025-07-20 11:30:20.247079', '2025-07-20 11:30:20.247097', 80, 116, 129, 'hrs', 0.00, 'Heavy Equipment'),
-(36, 'AS-25-0002', 'Bulldozer', '0011244331', 'kyle', '2025-08-30', '2026-08-30', 'Warranty Active', '2025-08-24 04:57:52.730383', '2025-08-24 04:57:52.730394', 83, 118, 131, 'hrs', 0.00, 'Heavy Equipment'),
-(37, 'AS-25-0003', 'Excavator Long Arm', '0023341323', 'lowe', '2025-08-30', '2026-08-30', 'Warranty Active', '2025-08-24 04:57:55.800966', '2025-08-24 04:57:55.800977', 82, 117, 130, 'hrs', 0.00, 'Heavy Equipment');
-
 -- --------------------------------------------------------
 
 --
@@ -215,14 +190,6 @@ CREATE TABLE `aftersales_technician` (
   `id` bigint(20) NOT NULL,
   `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `aftersales_technician`
---
-
-INSERT INTO `aftersales_technician` (`id`, `name`) VALUES
-(29, 'hubertos'),
-(30, 'Hubert');
 
 -- --------------------------------------------------------
 
@@ -424,9 +391,9 @@ CREATE TABLE `auth_user` (
 --
 
 INSERT INTO `auth_user` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`) VALUES
-(1, 'pbkdf2_sha256$1000000$o9vV523rnEW2vprTHuEKBN$Cvsu+XXbUTYauRgNgeDu7n2mDDb/s7EcFHtNQAklEjM=', '2025-09-03 03:00:21.917630', 1, 'admin', 'Christian', 'Jude', 'admin@administrator.com', 1, 1, '2025-04-17 15:58:51.000000'),
-(2, 'pbkdf2_sha256$1000000$gVLuqX4sOPGcYNDYk8WteO$OTXTpv1IB47BdWVQP2KFi3KHblQDAfhr8/Q6NzdbGFk=', '2025-09-03 02:51:24.930950', 0, 'salesadmin@1', 'Christian', 'Jude', 'christianjude@gmail.com', 0, 1, '2025-09-03 02:48:40.300845'),
-(3, 'pbkdf2_sha256$1000000$nWTxNXSK77kwwNgcn8mtbY$LSBTny3uT+n/LMNFcpBVyFEM2zfV7IXEcUH717mxXmM=', '2025-09-03 02:53:09.409624', 0, 'warehouseadmin@1', 'Kyle james', 'ar', 'kyle123123@gmail.com', 0, 1, '2025-09-03 02:52:34.741329'),
+(1, 'pbkdf2_sha256$1000000$o9vV523rnEW2vprTHuEKBN$Cvsu+XXbUTYauRgNgeDu7n2mDDb/s7EcFHtNQAklEjM=', '2025-09-03 03:21:29.452793', 1, 'admin', 'Christian', 'Jude', 'admin@administrator.com', 1, 1, '2025-04-17 15:58:51.000000'),
+(2, 'pbkdf2_sha256$1000000$gVLuqX4sOPGcYNDYk8WteO$OTXTpv1IB47BdWVQP2KFi3KHblQDAfhr8/Q6NzdbGFk=', '2025-09-03 03:25:18.092198', 0, 'salesadmin@1', 'Christian', 'Jude', 'christianjude@gmail.com', 0, 1, '2025-09-03 02:48:40.300845'),
+(3, 'pbkdf2_sha256$1000000$nWTxNXSK77kwwNgcn8mtbY$LSBTny3uT+n/LMNFcpBVyFEM2zfV7IXEcUH717mxXmM=', '2025-09-03 03:22:14.000098', 0, 'warehouseadmin@1', 'Kyle james', 'ar', 'kyle123123@gmail.com', 0, 1, '2025-09-03 02:52:34.741329'),
 (4, 'pbkdf2_sha256$1000000$d8BWiXEk2ryJ8h0XJ7Kq4B$w7B8UQXYz13fmbZ6AqvZLVrKQXQf3EQ9Kviqtq1t51c=', '2025-09-03 02:56:09.854190', 0, 'motorpooladmin@1', 'jear', 'ar', 'jear@gmail.com', 0, 1, '2025-09-03 02:55:30.022609'),
 (5, 'pbkdf2_sha256$1000000$vRbUQ2u1n6aVilttN2Or8w$uk+3SIS++ILuwusmsWXXQteKZd8H2cdaAfRMae9bark=', '2025-09-03 03:00:10.724172', 0, 'deliveryadmin@1', 'Hubert', 'Debalucos', 'Hubert@gmail.com', 0, 1, '2025-09-03 02:58:36.011153'),
 (6, 'pbkdf2_sha256$1000000$n9lkQtoHLJONAIhiKgFbCC$kM8KqbySK5x6nTXfksT8TkQ6SBVtrAjfI/za6WLW5JU=', '2025-09-03 03:03:01.904328', 0, 'aftersalesadmin@1', 'benny', 'qt', 'benny1212@gmail.com', 0, 1, '2025-09-03 03:02:49.439973');
@@ -484,18 +451,6 @@ CREATE TABLE `delivery_deliveryrequest` (
   `created_at` datetime(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `delivery_deliveryrequest`
---
-
-INSERT INTO `delivery_deliveryrequest` (`id`, `request_id`, `pdi_request_id`, `invoice_number`, `unit_info`, `client_info`, `status`, `created_at`) VALUES
-(156, 'DVR-2025-0001', 'RQ-20250720-0001', 'INV-25-0001', '{\"unit_name\": \"Excavator Long Arm\", \"serial_number\": \"0023341323\"}', '{\"client_name\": \"lowe\", \"client_address\": \"lasang \", \"client_contact\": \"09368872989\", \"client_email\": \"lowe@gmail.com\", \"company_name\": \"jinyi\", \"company_address\": \"lasang\", \"company_contact\": \"09972474711\", \"company_email\": \"jinyi@gmail.com\"}', 'Completed', '2025-07-20 11:28:08.378636'),
-(157, 'DVR-2025-0002', '', 'INVWH-20250720-0001', '{\"unit_name\": \"Control valves\", \"serial_number\": \"012383421\", \"quantity\": 1, \"unit_price\": \"25000.00\", \"total_price\": \"25000.00\", \"amount_paid\": \"25000.00\", \"outstanding_balance\": \"0.00\", \"delivery_date\": \"2025-07-31\", \"delivery_instructions\": \"dasdasdsadasdsadasdasd\", \"item_code\": \"SP-544230\"}', '{\"client_name\": \"balbin\", \"client_address\": \"lasang\", \"client_contact\": \"09051069013\", \"client_email\": \"balbin@gmail.com\"}', 'Completed', '2025-07-20 11:37:04.797134'),
-(158, 'DVR-2025-0003', 'RQ-20250824-0002', 'INV-25-0002', '{\"unit_name\": \"Excavator Long Arm\", \"serial_number\": \"0023341323\"}', '{\"client_name\": \"lowe\", \"client_address\": \"lasang \", \"client_contact\": \"09368872989\", \"client_email\": \"lowe@gmail.com\", \"company_name\": \"jinyi\", \"company_address\": \"lasang\", \"company_contact\": \"09972474711\", \"company_email\": \"jinyi@gmail.com\"}', 'Completed', '2025-08-24 04:56:41.857497'),
-(159, 'DVR-2025-0004', 'RQ-20250824-0001', 'INV-25-0003', '{\"unit_name\": \"Bulldozer\", \"serial_number\": \"0011244331\"}', '{\"client_name\": \"kyle\", \"client_address\": \"kitolao\", \"client_contact\": \"09051069013\", \"client_email\": \"kyle@gmail.com\", \"company_name\": \"jinyi\", \"company_address\": \"lasang\", \"company_contact\": \"09972474711\", \"company_email\": \"jinyi@gmail.com\"}', 'Completed', '2025-08-24 04:56:45.135573'),
-(160, 'DVR-2025-0005', '', 'INVWH-20250824-0001', '{\"unit_name\": \"Oil Filters\", \"serial_number\": \"0093572323\", \"quantity\": 1, \"unit_price\": \"23000.00\", \"total_price\": \"23000.00\", \"amount_paid\": \"23000.00\", \"outstanding_balance\": \"0.00\", \"delivery_date\": \"2025-08-30\", \"delivery_instructions\": \"asdasdasdadasdas\", \"item_code\": \"SP-059645\"}', '{\"client_name\": \"lowe\", \"client_address\": \"lasang\", \"client_contact\": \"09368872989\", \"client_email\": \"lowe@gmail.com\"}', 'Completed', '2025-08-24 05:12:58.531910'),
-(161, 'DVR-2025-0006', '', 'INVWH-20250824-0002', '{\"unit_name\": \"Track Chains\", \"serial_number\": \"00553312341\", \"quantity\": 1, \"unit_price\": \"20000.00\", \"total_price\": \"20000.00\", \"amount_paid\": \"20000.00\", \"outstanding_balance\": \"0.00\", \"delivery_date\": \"2025-08-31\", \"delivery_instructions\": \"asdasdasdasdasdad\", \"item_code\": \"SP-674352\"}', '{\"client_name\": \"lowe\", \"client_address\": \"lasang\", \"client_contact\": \"09368872989\", \"client_email\": \"lowe@gmail.com\"}', 'Completed', '2025-08-24 05:15:12.063413');
-
 -- --------------------------------------------------------
 
 --
@@ -513,18 +468,6 @@ CREATE TABLE `delivery_deliveryschedule` (
   `updated_at` datetime(6) NOT NULL,
   `delivery_request_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `delivery_deliveryschedule`
---
-
-INSERT INTO `delivery_deliveryschedule` (`id`, `schedule_id`, `assigned_driver`, `delivery_date`, `delivery_instructions`, `status`, `created_at`, `updated_at`, `delivery_request_id`) VALUES
-(80, 'DVS-2025-0001', 'Hubertos', '2025-07-26', 'asdasdasdasd', 'Delivered', '2025-07-20 11:30:02.670389', '2025-07-20 11:30:20.238658', 156),
-(81, 'DVS-2025-0002', 'loweeee', '2025-07-31', 'dasdasdsadasdsadasdasd', 'Delivered', '2025-07-20 11:37:31.977676', '2025-07-20 11:37:45.329603', 157),
-(82, 'DVS-2025-0003', 'Hubert', '2025-08-30', 'asdasdasdasdadas', 'Delivered', '2025-08-24 04:57:31.690105', '2025-08-24 04:57:55.794009', 158),
-(83, 'DVS-2025-0004', 'Hubert', '2025-08-30', 'asdasdasdasdadasd', 'Delivered', '2025-08-24 04:57:38.481322', '2025-08-24 04:57:52.721875', 159),
-(84, 'DVS-2025-0005', 'Hubert', '2025-08-30', 'asdasdasdadasdas', 'Delivered', '2025-08-24 05:13:27.412419', '2025-08-24 05:13:34.771487', 160),
-(85, 'DVS-2025-0006', 'Hubert', '2025-08-31', 'asdasdasdasdasdad', 'Delivered', '2025-08-24 05:15:30.462491', '2025-08-24 05:15:36.662778', 161);
 
 -- --------------------------------------------------------
 
@@ -765,6 +708,7 @@ INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALU
 ('5qx96naerctxs8jel5lfofw4pxmf7gbm', '.eJxVjEEOwiAQRe_C2pAilCku3XsGMgMzUjU0Ke3KeHfbpAvd_vfef6uI61Li2niOY1YXZdXpdyNMT647yA-s90mnqS7zSHpX9EGbvk2ZX9fD_Tso2MpW95QtBccBEiUQAR8GQAMSemeyZMGEgaALfiOG2XmyxjrfDXSWhF59vgBCOFc:1uHFaK:RK6sRei0Pc8_9IpwSSF3QL6XFUzeLreztl8HU0iq63E', '2025-06-03 05:32:16.709721'),
 ('5rcmm84lia2baf4lefanqkuf9sss82sz', 'e30:1u5z8j:2UQ-VNDFJzzclke-3qem6Bwi1uCdiGtoFDIZdGqF57s', '2025-05-03 03:45:13.695159'),
 ('623mtgtguu6vdk618nq0nhv46ikj8hhk', 'e30:1u5yzh:oiyx_ntt64E_-ItNqkToaaNOfP74cxH2gQUiD5ycmdw', '2025-05-03 03:35:53.431759'),
+('87vol49och1v1l5aryxv8lud67ym40ph', '.eJxVjEEOwiAQRe_C2hA6TAO4dO8ZyMAMUjU0Ke3KeHdt0oVu_3vvv1Skba1x67LEidVZgTr9bonyQ9oO-E7tNus8t3WZkt4VfdCurzPL83K4fweVev3WzvpApnhnTUmuGCPkSOzIABBAyCL7Yjh4sn7MwyCIlBwWNBkQmdX7A9uwN8s:1ute7a:DeV_u8xkhMg0Fi0HuxwBr8N3ZEJJhvurbLV4FHnf_X8', '2025-09-17 03:25:18.093248'),
 ('87yudvnasuv201xge40cifqs7ujf3ug3', '.eJxVjMsOwiAQRf-FtSHAlMe4dO83EB6DVA0kpV0Z_12bdKHbe865L-bDtla_DVr8nNmZATv9bjGkB7Ud5Htot85Tb-syR74r_KCDX3um5-Vw_w5qGPVbR1dIo0MgQxlDTFbEEi2kYgoCKjsVXQAt4ARCQHZGC0NSOiWVNkGy9wfx_zcz:1uJ3Yk:sFEdNXlCJNxe92QoU0LRaNJEkPoE7s4il2LUucUVCA0', '2025-06-08 05:06:06.330070'),
 ('9s3rjytp5jzuvg7pw23n5ari8dw7s3h6', 'e30:1uF1fg:mdIMugEJ7kgIjvofKjInTalzawWyXcUHTEPZGfMeyco', '2025-05-28 02:16:36.208150'),
 ('am19mfw6mhyd0x8blm7zk6rnk9gr74qc', '.eJxVjDsOwjAQRO_iGln-ZR1T0ucM1tq7wgFkS3FSIe5OIqWAZop5b-YtIm5riVvnJc4krgLE5bdLmJ9cD0APrPcmc6vrMid5KPKkXU6N-HU73b-Dgr3sa6UYUCvt2QceUWUIXmtHo8FBOZsgWQTjMbFTxhHbsEfO4IIG0nkQny_I8Tdi:1uOZZe:qbeNZIZaTcdSAFvq7ozSbHHRQfj77ToW_Y3_OxiNDkE', '2025-06-23 10:17:50.522464'),
@@ -814,15 +758,6 @@ CREATE TABLE `motorpool_equipmentinspection` (
   `signed_form` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `motorpool_equipmentinspection`
---
-
-INSERT INTO `motorpool_equipmentinspection` (`id`, `inspection_id`, `request_type`, `unit`, `date_received`, `status`, `invoice_number`, `created_at`, `updated_at`, `assigned_technician`, `pdi_request_id`, `checklist_reference`, `assisted_by`, `corrective_actions`, `inspection_result`, `issues_found`, `notes`, `spare_parts_used`, `inspection_photos`, `signed_form`) VALUES
-(73, 'INS-20250720-0001', 'PDI', 'Excavator Long Arm', '2025-07-20 11:22:47.381384', 'Delivery', 'INV-25-0001', '2025-07-20 11:22:47.399723', '2025-07-20 11:28:08.382287', 'Hubert', NULL, 'inspections/73/checklist_DATA-MINING_VERSA.docx', '[\"Kyle\"]', 'None', 'Passed', 'None', 'None', 'None', '[\"inspections/73/photos/20250720_192757_adasdasd.png\", \"inspections/73/photos/20250720_192757_asdasdasd.jpg\", \"inspections/73/photos/20250720_192757_sdsdsdsdsd.jpg\"]', 'inspections/73/signed_form_DATA-MINING_VERSA.docx'),
-(74, 'INS-20250824-0001', 'PDI', 'Excavator Long Arm', '2025-08-24 04:55:45.400700', 'Delivery', 'INV-25-0002', '2025-08-24 04:55:45.401794', '2025-08-24 04:56:41.862939', 'Hubert', NULL, 'inspections/74/checklist_DATA-MINING_VERSA_EYQvEAE.docx', '[\"Kyle\"]', 'None', 'Passed', 'None', 'None', 'None', '[\"inspections/74/photos/20250824_125634_adasdasd.png\", \"inspections/74/photos/20250824_125634_asdasdasd.jpg\", \"inspections/74/photos/20250824_125634_sdsdsdsdsd.jpg\"]', 'inspections/74/signed_form_DATA-MINING_VERSA_3ASkCys.docx'),
-(75, 'INS-20250824-0002', 'PDI', 'Bulldozer', '2025-08-24 04:55:48.143837', 'Delivery', 'INV-25-0003', '2025-08-24 04:55:48.144191', '2025-08-24 04:56:45.138490', 'Hubert', NULL, 'inspections/75/checklist_DATA-MINING_VERSA.docx', '[\"Kyle\"]', 'None', 'Passed', 'None', 'None', 'None', '[\"inspections/75/photos/20250824_125608_adasdasd.png\", \"inspections/75/photos/20250824_125608_asdasdasd.jpg\", \"inspections/75/photos/20250824_125608_sdsdsdsdsd.jpg\"]', 'inspections/75/signed_form_DATA-MINING_VERSA_ag7fsiq.docx');
-
 -- --------------------------------------------------------
 
 --
@@ -841,59 +776,6 @@ CREATE TABLE `notifications_notification` (
   `related_link` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `notifications_notification`
---
-
-INSERT INTO `notifications_notification` (`id`, `title`, `message`, `notification_type`, `from_department`, `to_department`, `created_at`, `related_id`, `related_link`) VALUES
-(248, 'New Invoice Generated', 'New invoice INV-25-0001 has been generated for lowe', 'new_invoice', 'sales', 'admin', '2025-07-20 11:18:40.384471', 116, '/adminpanel/invoicing/?invoice_number=INV-25-0001'),
-(249, 'New Sales Order Created', 'New order ORD-20250720-0001 has been created for lowe', 'new_sales_order', 'sales', 'admin', '2025-07-20 11:18:40.385356', 129, '/adminpanel/sales&Orders/?order_number=ORD-20250720-0001'),
-(250, 'New PDI Request', 'New PDI request (RQ-20250720-0001) for unit Excavator Long Arm from Dane Tornado', 'pdi_request', 'sales', 'motorpool', '2025-07-20 11:18:57.621221', 110, '/motorpool/received_requests/?request_id=RQ-20250720-0001'),
-(251, 'New PDI Request', 'New PDI request (RQ-20250720-0001) for unit Excavator Long Arm from Dane Tornado', 'pdi_request_admin', 'sales', 'admin', '2025-07-20 11:18:57.621931', 110, '/adminpanel/motorpool/?request_id=RQ-20250720-0001'),
-(252, 'New Delivery Request', 'New delivery request (DVR-2025-0001) for unit Excavator Long Arm from Motorpool Department', 'delivery_request', 'motorpool', 'delivery', '2025-07-20 11:28:08.381033', 156, '/delivery/requests/?request_id=DVR-2025-0001'),
-(253, 'New Delivery Schedule Created', 'New delivery schedule DVS-2025-0001 has been created for lowe', 'new_delivery_schedule', 'delivery', 'admin', '2025-07-20 11:30:02.675329', 80, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0001'),
-(254, 'New Delivery Completed', 'Delivery DVS-2025-0001 has been completed for lowe', 'delivery_complete', 'delivery', 'aftersales', '2025-07-20 11:30:20.248710', 80, '/aftersales/logs/?schedule_id=DVS-2025-0001'),
-(255, 'Order Delivered', 'Order INV-25-0001 has been delivered to lowe', 'order_delivered', 'delivery', 'sales', '2025-07-20 11:30:20.249245', 80, '/sales/orders/?order_number=INV-25-0001'),
-(256, 'Sales Delivery Completed', 'Sales delivery DVS-2025-0001 has been completed for lowe', 'sales_delivery_complete', 'delivery', 'admin', '2025-07-20 11:30:20.249730', 80, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0001'),
-(257, 'New Maintenance Request', 'New maintenance request MTN-25-0001 has been created for lowe', 'new_maintenance_request', 'aftersales', 'admin', '2025-07-20 11:31:53.170616', NULL, '/adminpanel/aftersales/?maintenance_id=MTN-25-0001'),
-(258, 'New Warehouse Order Created', 'New warehouse order ORDWH-20250720-0001 has been created for balbin', 'new_warehouse_order', 'warehouse', 'admin', '2025-07-20 11:36:53.070992', 34, '/adminpanel/sales&Orders/?order_number=ORDWH-20250720-0001'),
-(259, 'New Warehouse Invoice Generated', 'New invoice INVWH-20250720-0001 has been generated for balbin', 'new_warehouse_invoice', 'warehouse', 'admin', '2025-07-20 11:36:53.071835', NULL, '/adminpanel/invoicing/?invoice_number=INVWH-20250720-0001'),
-(260, 'New Warehouse Delivery Request', 'New delivery request for balbin - Control valves', 'warehouse_delivery', 'warehouse', 'delivery', '2025-07-20 11:37:04.799693', 157, '/delivery/requests/?request_id=DVR-2025-0002'),
-(261, 'New Delivery Schedule Created', 'New delivery schedule DVS-2025-0002 has been created for balbin', 'new_delivery_schedule', 'delivery', 'admin', '2025-07-20 11:37:31.980155', 81, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0002'),
-(262, 'Order Delivered', 'Order INVWH-20250720-0001 has been delivered to balbin', 'warehouse_order_delivered', 'delivery', 'warehouse', '2025-07-20 11:37:45.334932', 34, '/warehouse/orders/?order_number=ORDWH-20250720-0001'),
-(263, 'Warehouse Delivery Completed', 'Warehouse delivery DVS-2025-0002 has been completed for balbin', 'warehouse_delivery_complete', 'delivery', 'admin', '2025-07-20 11:37:45.335418', 81, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0002'),
-(264, 'New Invoice Generated', 'New invoice INV-25-0002 has been generated for lowe', 'new_invoice', 'sales', 'admin', '2025-08-24 04:54:22.272075', 117, '/adminpanel/invoicing/?invoice_number=INV-25-0002'),
-(265, 'New Sales Order Created', 'New order ORD-20250824-0001 has been created for lowe', 'new_sales_order', 'sales', 'admin', '2025-08-24 04:54:22.272894', 130, '/adminpanel/sales&Orders/?order_number=ORD-20250824-0001'),
-(266, 'New Invoice Generated', 'New invoice INV-25-0003 has been generated for kyle', 'new_invoice', 'sales', 'admin', '2025-08-24 04:55:03.621414', 118, '/adminpanel/invoicing/?invoice_number=INV-25-0003'),
-(267, 'New Sales Order Created', 'New order ORD-20250824-0002 has been created for kyle', 'new_sales_order', 'sales', 'admin', '2025-08-24 04:55:03.622104', 131, '/adminpanel/sales&Orders/?order_number=ORD-20250824-0002'),
-(268, 'New PDI Request', 'New PDI request (RQ-20250824-0001) for unit Bulldozer from Dane Tornado', 'pdi_request', 'sales', 'motorpool', '2025-08-24 04:55:08.908886', 111, '/motorpool/received_requests/?request_id=RQ-20250824-0001'),
-(269, 'New PDI Request', 'New PDI request (RQ-20250824-0001) for unit Bulldozer from Dane Tornado', 'pdi_request_admin', 'sales', 'admin', '2025-08-24 04:55:08.909579', 111, '/adminpanel/motorpool/?request_id=RQ-20250824-0001'),
-(270, 'New PDI Request', 'New PDI request (RQ-20250824-0002) for unit Excavator Long Arm from Dane Tornado', 'pdi_request', 'sales', 'motorpool', '2025-08-24 04:55:22.404882', 112, '/motorpool/received_requests/?request_id=RQ-20250824-0002'),
-(271, 'New PDI Request', 'New PDI request (RQ-20250824-0002) for unit Excavator Long Arm from Dane Tornado', 'pdi_request_admin', 'sales', 'admin', '2025-08-24 04:55:22.405590', 112, '/adminpanel/motorpool/?request_id=RQ-20250824-0002'),
-(272, 'New Delivery Request', 'New delivery request (DVR-2025-0003) for unit Excavator Long Arm from Motorpool Department', 'delivery_request', 'motorpool', 'delivery', '2025-08-24 04:56:41.861112', 158, '/delivery/requests/?request_id=DVR-2025-0003'),
-(273, 'New Delivery Request', 'New delivery request (DVR-2025-0004) for unit Bulldozer from Motorpool Department', 'delivery_request', 'motorpool', 'delivery', '2025-08-24 04:56:45.137567', 159, '/delivery/requests/?request_id=DVR-2025-0004'),
-(274, 'New Delivery Schedule Created', 'New delivery schedule DVS-2025-0003 has been created for lowe', 'new_delivery_schedule', 'delivery', 'admin', '2025-08-24 04:57:31.691845', 82, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0003'),
-(275, 'New Delivery Schedule Created', 'New delivery schedule DVS-2025-0004 has been created for kyle', 'new_delivery_schedule', 'delivery', 'admin', '2025-08-24 04:57:38.483155', 83, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0004'),
-(276, 'New Delivery Completed', 'Delivery DVS-2025-0004 has been completed for kyle', 'delivery_complete', 'delivery', 'aftersales', '2025-08-24 04:57:52.732070', 83, '/aftersales/logs/?schedule_id=DVS-2025-0004'),
-(277, 'Order Delivered', 'Order INV-25-0003 has been delivered to kyle', 'order_delivered', 'delivery', 'sales', '2025-08-24 04:57:52.732599', 83, '/sales/orders/?order_number=INV-25-0003'),
-(278, 'Sales Delivery Completed', 'Sales delivery DVS-2025-0004 has been completed for kyle', 'sales_delivery_complete', 'delivery', 'admin', '2025-08-24 04:57:52.733068', 83, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0004'),
-(279, 'New Delivery Completed', 'Delivery DVS-2025-0003 has been completed for lowe', 'delivery_complete', 'delivery', 'aftersales', '2025-08-24 04:57:55.802390', 82, '/aftersales/logs/?schedule_id=DVS-2025-0003'),
-(280, 'Order Delivered', 'Order INV-25-0002 has been delivered to lowe', 'order_delivered', 'delivery', 'sales', '2025-08-24 04:57:55.802937', 82, '/sales/orders/?order_number=INV-25-0002'),
-(281, 'Sales Delivery Completed', 'Sales delivery DVS-2025-0003 has been completed for lowe', 'sales_delivery_complete', 'delivery', 'admin', '2025-08-24 04:57:55.803412', 82, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0003'),
-(282, 'New Maintenance Request', 'New maintenance request MTN-25-0002 has been created for kyle', 'new_maintenance_request', 'aftersales', 'admin', '2025-08-24 04:58:31.538485', NULL, '/adminpanel/aftersales/?maintenance_id=MTN-25-0002'),
-(283, 'New Warehouse Order Created', 'New warehouse order ORDWH-20250824-0001 has been created for lowe', 'new_warehouse_order', 'warehouse', 'admin', '2025-08-24 05:12:50.573864', 35, '/adminpanel/sales&Orders/?order_number=ORDWH-20250824-0001'),
-(284, 'New Warehouse Invoice Generated', 'New invoice INVWH-20250824-0001 has been generated for lowe', 'new_warehouse_invoice', 'warehouse', 'admin', '2025-08-24 05:12:50.574691', NULL, '/adminpanel/invoicing/?invoice_number=INVWH-20250824-0001'),
-(285, 'New Warehouse Delivery Request', 'New delivery request for lowe - Oil Filters', 'warehouse_delivery', 'warehouse', 'delivery', '2025-08-24 05:12:58.534451', 160, '/delivery/requests/?request_id=DVR-2025-0005'),
-(286, 'New Delivery Schedule Created', 'New delivery schedule DVS-2025-0005 has been created for lowe', 'new_delivery_schedule', 'delivery', 'admin', '2025-08-24 05:13:27.414014', 84, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0005'),
-(287, 'Order Delivered', 'Order INVWH-20250824-0001 has been delivered to lowe', 'warehouse_order_delivered', 'delivery', 'warehouse', '2025-08-24 05:13:34.776664', 35, '/warehouse/orders/?order_number=ORDWH-20250824-0001'),
-(288, 'Warehouse Delivery Completed', 'Warehouse delivery DVS-2025-0005 has been completed for lowe', 'warehouse_delivery_complete', 'delivery', 'admin', '2025-08-24 05:13:34.777156', 84, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0005'),
-(289, 'New Warehouse Order Created', 'New warehouse order ORDWH-20250824-0002 has been created for lowe', 'new_warehouse_order', 'warehouse', 'admin', '2025-08-24 05:14:57.717838', 36, '/adminpanel/sales&Orders/?order_number=ORDWH-20250824-0002'),
-(290, 'New Warehouse Invoice Generated', 'New invoice INVWH-20250824-0002 has been generated for lowe', 'new_warehouse_invoice', 'warehouse', 'admin', '2025-08-24 05:14:57.718519', NULL, '/adminpanel/invoicing/?invoice_number=INVWH-20250824-0002'),
-(291, 'New Warehouse Delivery Request', 'New delivery request for lowe - Track Chains', 'warehouse_delivery', 'warehouse', 'delivery', '2025-08-24 05:15:12.065842', 161, '/delivery/requests/?request_id=DVR-2025-0006'),
-(292, 'New Delivery Schedule Created', 'New delivery schedule DVS-2025-0006 has been created for lowe', 'new_delivery_schedule', 'delivery', 'admin', '2025-08-24 05:15:30.464703', 85, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0006'),
-(293, 'Order Delivered', 'Order INVWH-20250824-0002 has been delivered to lowe', 'warehouse_order_delivered', 'delivery', 'warehouse', '2025-08-24 05:15:36.668154', 36, '/warehouse/orders/?order_number=ORDWH-20250824-0002'),
-(294, 'Warehouse Delivery Completed', 'Warehouse delivery DVS-2025-0006 has been completed for lowe', 'warehouse_delivery_complete', 'delivery', 'admin', '2025-08-24 05:15:36.668781', 85, '/adminpanel/delivery&Tracking/?schedule_id=DVS-2025-0006');
-
 -- --------------------------------------------------------
 
 --
@@ -905,42 +787,6 @@ CREATE TABLE `notifications_notification_read_by` (
   `notification_id` bigint(20) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `notifications_notification_read_by`
---
-
-INSERT INTO `notifications_notification_read_by` (`id`, `notification_id`, `user_id`) VALUES
-(413, 248, 1),
-(411, 249, 1),
-(410, 251, 1),
-(412, 253, 1),
-(445, 255, 2),
-(408, 256, 1),
-(409, 257, 1),
-(407, 258, 1),
-(406, 259, 1),
-(405, 261, 1),
-(404, 263, 1),
-(444, 264, 1),
-(443, 265, 1),
-(440, 266, 1),
-(442, 267, 1),
-(441, 269, 1),
-(438, 271, 1),
-(439, 274, 1),
-(435, 275, 1),
-(437, 278, 1),
-(436, 281, 1),
-(434, 282, 1),
-(433, 283, 1),
-(432, 284, 1),
-(431, 286, 1),
-(428, 288, 1),
-(429, 289, 1),
-(430, 290, 1),
-(427, 292, 1),
-(426, 294, 1);
 
 -- --------------------------------------------------------
 
@@ -964,14 +810,6 @@ CREATE TABLE `sales_clientrecord` (
   `sales_order_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `sales_clientrecord`
---
-
-INSERT INTO `sales_clientrecord` (`id`, `client_name`, `company_name`, `contact_info`, `email`, `address`, `total_orders`, `status`, `last_order_date`, `created_at`, `updated_at`, `delivery_schedule_id`, `sales_order_id`) VALUES
-(33, 'lowe', 'jinyi', '09368872989', 'lowe@gmail.com', 'lasang ', 2, 'Active', '2025-08-30', '2025-07-20 11:30:20.240478', '2025-08-24 04:57:55.795953', 80, NULL),
-(34, 'kyle', 'jinyi', '09051069013', 'kyle@gmail.com', 'kitolao', 1, 'Active', '2025-08-24', '2025-08-24 04:57:52.724115', '2025-08-24 04:57:52.724128', 83, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -993,15 +831,6 @@ CREATE TABLE `sales_invoice` (
   `client_record_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `sales_invoice`
---
-
-INSERT INTO `sales_invoice` (`id`, `invoice_number`, `client_name`, `department`, `amount`, `invoice_date`, `due_date`, `status`, `created_at`, `updated_at`, `order_id`, `client_record_id`) VALUES
-(116, 'INV-25-0001', 'lowe', 'Sales', 3400000.00, '2025-07-20', '2025-07-26', 'Paid', '2025-07-20 11:18:40.383586', '2025-07-20 11:18:40.383599', 129, 33),
-(117, 'INV-25-0002', 'lowe', 'Sales', 3400000.00, '2025-08-24', '2025-08-30', 'Paid', '2025-08-24 04:54:22.271346', '2025-08-24 04:54:22.271357', 130, 33),
-(118, 'INV-25-0003', 'kyle', 'Sales', 4300000.00, '2025-08-24', '2025-08-27', 'Paid', '2025-08-24 04:55:03.620724', '2025-08-24 04:55:03.620734', 131, 34);
-
 -- --------------------------------------------------------
 
 --
@@ -1016,15 +845,6 @@ CREATE TABLE `sales_orderitem` (
   `inventory_item_id` bigint(20) NOT NULL,
   `order_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `sales_orderitem`
---
-
-INSERT INTO `sales_orderitem` (`id`, `quantity`, `unit_price`, `total_price`, `inventory_item_id`, `order_id`) VALUES
-(215, 1, 3400000.00, 3400000.00, 53, 129),
-(216, 1, 3400000.00, 3400000.00, 53, 130),
-(217, 1, 4300000.00, 4300000.00, 54, 131);
 
 -- --------------------------------------------------------
 
@@ -1098,15 +918,6 @@ CREATE TABLE `sales_salesorder` (
   `client_record_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `sales_salesorder`
---
-
-INSERT INTO `sales_salesorder` (`id`, `order_number`, `client_name`, `client_address`, `client_contact`, `client_email`, `order_date`, `delivery_date`, `delivery_instructions`, `payment_mode`, `due_date`, `amount_paid`, `residence_location`, `bank_account`, `account_number`, `id_attachment`, `business_permit`, `bir_attachment`, `status`, `total_amount`, `created_at`, `updated_at`, `company_address`, `company_contact`, `company_email`, `company_name`, `client_record_id`) VALUES
-(129, 'ORD-20250720-0001', 'lowe', 'lasang ', '09368872989', 'lowe@gmail.com', '2025-07-20', '2025-07-26', 'asdasdasdasd', 'cash', '2025-07-26', 3400000.00, NULL, NULL, NULL, 'sales_orders/ids/user.png', '', '', 'Completed', 3400000.00, '2025-07-20 11:18:40.374334', '2025-07-20 11:30:20.253791', 'lasang', '09972474711', 'jinyi@gmail.com', 'jinyi', 33),
-(130, 'ORD-20250824-0001', 'lowe', 'lasang ', '09368872989', 'lowe@gmail.com', '2025-08-24', '2025-08-30', 'asdasdasdasdadas', 'cash', '2025-08-30', 3400000.00, NULL, NULL, NULL, 'sales_orders/ids/asdasdasd.jpg', '', '', 'Completed', 3400000.00, '2025-08-24 04:54:22.263599', '2025-08-24 04:57:55.808061', 'lasang', '09972474711', 'jinyi@gmail.com', 'jinyi', 33),
-(131, 'ORD-20250824-0002', 'kyle', 'kitolao', '09051069013', 'kyle@gmail.com', '2025-08-24', '2025-08-30', 'asdasdasdasdadasd', 'cash', '2025-08-27', 4300000.00, NULL, NULL, NULL, 'sales_orders/ids/asdasdasd_wNE6arC.jpg', '', '', 'Completed', 4300000.00, '2025-08-24 04:55:03.613744', '2025-08-24 04:57:52.737341', 'lasang', '09972474711', 'jinyi@gmail.com', 'jinyi', 34);
-
 -- --------------------------------------------------------
 
 --
@@ -1129,14 +940,6 @@ CREATE TABLE `warehouse_warehouseclientrecord` (
   `warehouse_order_id` bigint(20) DEFAULT NULL
 ) ;
 
---
--- Dumping data for table `warehouse_warehouseclientrecord`
---
-
-INSERT INTO `warehouse_warehouseclientrecord` (`id`, `client_name`, `company_name`, `contact_info`, `email`, `address`, `total_orders`, `status`, `created_at`, `updated_at`, `delivery_schedule_id`, `last_order_date`, `warehouse_order_id`) VALUES
-(14, 'balbin', 'jinyi', '09051069013', 'balbin@gmail.com', 'lasang ', 1, 'Active', '2025-07-20 11:37:45.333630', '2025-07-20 11:37:45.333646', NULL, '2025-08-24', NULL),
-(15, 'lowe', 'jinyi', '09368872989', 'lowe@gmail.com', 'lasang ', 2, 'Active', '2025-08-24 05:13:34.775386', '2025-08-24 05:15:36.666168', 85, '2025-08-31', 36);
-
 -- --------------------------------------------------------
 
 --
@@ -1154,15 +957,6 @@ CREATE TABLE `warehouse_warehouseinvoice` (
   `updated_at` datetime(6) NOT NULL,
   `order_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `warehouse_warehouseinvoice`
---
-
-INSERT INTO `warehouse_warehouseinvoice` (`id`, `invoice_number`, `status`, `invoice_date`, `due_date`, `amount`, `created_at`, `updated_at`, `order_id`) VALUES
-(24, 'INVWH-20250720-0001', 'Paid', '2025-07-20', '2025-07-26', 25000.00, '2025-07-20 11:36:53.070236', '2025-07-20 11:36:53.070248', 34),
-(25, 'INVWH-20250824-0001', 'Paid', '2025-08-24', '2025-08-30', 23000.00, '2025-08-24 05:12:50.572858', '2025-08-24 05:12:50.572867', 35),
-(26, 'INVWH-20250824-0002', 'Paid', '2025-08-24', '2025-08-30', 20000.00, '2025-08-24 05:14:57.717115', '2025-08-24 05:14:57.717124', 36);
 
 -- --------------------------------------------------------
 
@@ -1200,15 +994,6 @@ CREATE TABLE `warehouse_warehouseorder` (
   `created_by_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `warehouse_warehouseorder`
---
-
-INSERT INTO `warehouse_warehouseorder` (`id`, `order_number`, `client_name`, `client_address`, `client_contact`, `client_email`, `company_name`, `company_address`, `company_contact`, `company_email`, `order_date`, `delivery_date`, `delivery_instructions`, `payment_mode`, `due_date`, `amount_paid`, `residence_location`, `bank_account`, `account_number`, `id_attachment`, `business_permit`, `bir_attachment`, `status`, `total_amount`, `created_at`, `updated_at`, `created_by_id`) VALUES
-(34, 'ORDWH-20250720-0001', 'balbin', 'lasang ', '09051069013', 'balbin@gmail.com', 'jinyi', 'lasang', '09972474711', 'jinyi@gmail.com', '2025-07-20', '2025-07-31', 'dasdasdsadasdsadasdasd', 'cash', '2025-07-26', 25000.00, NULL, NULL, NULL, 'warehouse_orders/ids/adasdasd.png', '', '', 'Completed', 25000.00, '2025-07-20 11:36:53.057066', '2025-07-20 11:37:45.334241', NULL),
-(35, 'ORDWH-20250824-0001', 'lowe', 'lasang ', '09368872989', 'lowe@gmail.com', 'jinyi', 'lasang', '09972474711', 'jinyi@gmail.com', '2025-08-24', '2025-08-30', 'asdasdasdadasdas', 'cash', '2025-08-30', 23000.00, NULL, NULL, NULL, 'warehouse_orders/ids/sdsdsdsdsd.jpg', '', '', 'Completed', 23000.00, '2025-08-24 05:12:50.562949', '2025-08-24 05:13:34.776000', NULL),
-(36, 'ORDWH-20250824-0002', 'lowe', 'lasang ', '09368872989', 'lowe@gmail.com', 'jinyi', 'lasang', '09972474711', 'jinyi@gmail.com', '2025-08-24', '2025-08-31', 'asdasdasdasdasdad', 'cash', '2025-08-30', 20000.00, NULL, NULL, NULL, 'warehouse_orders/ids/sdsdsdsdsd_UvusQ4T.jpg', '', '', 'Completed', 20000.00, '2025-08-24 05:14:57.709479', '2025-08-24 05:15:36.667251', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -1225,15 +1010,6 @@ CREATE TABLE `warehouse_warehouseorderitem` (
   `item_code` varchar(100) DEFAULT NULL,
   `serial_number` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `warehouse_warehouseorderitem`
---
-
-INSERT INTO `warehouse_warehouseorderitem` (`id`, `quantity`, `unit_price`, `total_price`, `inventory_item_id`, `order_id`, `item_code`, `serial_number`) VALUES
-(41, 1, 25000.00, 25000.00, 64, 34, 'CON1081', 'CON-401081-426'),
-(42, 1, 23000.00, 23000.00, 61, 35, 'OIL8914', 'OIL-358914-000'),
-(43, 1, 20000.00, 20000.00, 62, 36, 'TRA2997', 'TRA-482997-548');
 
 --
 -- Indexes for dumped tables

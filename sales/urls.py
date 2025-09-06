@@ -7,6 +7,7 @@ urlpatterns = [
     path('inventory/', views.sales_inventory, name='sales_inventory'),
     path('forecasting/', views.sales_forecasting, name='sales_forecasting'),
     path('equipment/', views.sales_equipment, name='sales_equipment'),
+    path('equipment/feed/', views.sales_equipment_feed, name='sales_equipment_feed'),
     path('orders/', views.sales_orders, name='sales_orders'),
     path('invoicing/', views.sales_invoicing, name='sales_invoicing'),
     path('client_records/', views.sales_client_records, name='sales_client_records'),

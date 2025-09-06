@@ -113,6 +113,26 @@ def sales_equipment(request):
 
     return render(request, 'pages/sales_equipment.html', {'items': items})
 
+@login_required
+@user_passes_test(is_sales)
+def sales_equipment_feed(request):
+    """Return latest equipment inventory for real-time updates as JSON for AJAX polling."""
+    items = InventoryItem.objects.filter(department='Sales')
+    results = []
+    for item in items:
+        results.append({
+            'id': item.id,
+            'item_code': item.item_code,
+            'unit_item': item.unit_item,
+            'serial_number': item.serial_number,
+            'category': item.category,
+            'quantity': item.quantity,
+            'unit_price': str(item.unit_price),
+            'details': item.details,
+            'photo_url': item.photo.url if item.photo else None,
+        })
+    return JsonResponse({'items': results})
+
 
 
 @login_required
