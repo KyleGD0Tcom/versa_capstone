@@ -640,7 +640,25 @@ def get_client_invoices(request, client_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-
-
+@login_required
+@user_passes_test(is_warehouse)
+def inventory_feed(request):
+    """Return latest inventory data as JSON for AJAX polling."""
+    # Get all warehouse items
+    items = InventoryItem.objects.filter(department='Warehouse').order_by('item_code')
+    results = []
+    
+    for item in items:
+        results.append({
+            'id': item.id,
+            'item_code': item.item_code,
+            'unit_item': item.unit_item,
+            'serial_number': item.serial_number,
+            'category': item.category,
+            'quantity': item.quantity,
+            'unit_price': str(item.unit_price),
+            'details': item.details,
+        })
+    return JsonResponse({'items': results})
 
 

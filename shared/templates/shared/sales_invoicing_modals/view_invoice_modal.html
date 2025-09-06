@@ -263,8 +263,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Invoice sent to delivery successfully!');
-                    location.reload();
+                    // Update button state
+                    button.disabled = true;
+                    button.textContent = 'Sent to Delivery';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-secondary');
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(button.closest('.modal'));
+                    if (modal) {
+                        modal.hide();
+                    }
                 } else {
                     alert('Error sending to delivery: ' + (data.message || 'Unknown error'));
                 }

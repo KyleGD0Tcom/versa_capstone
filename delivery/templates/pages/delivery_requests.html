@@ -55,18 +55,24 @@
     <!-- Header-->
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="fs-4 fw-bold mb-4" style="color: #033b60;">Delivery Requests</h5>
+        <div class="d-flex align-items-center">
+            <!-- <span class="text-muted small me-2">Real-time updates</span> -->
+            <!-- <div id="updateIndicator" class="spinner-border spinner-border-sm text-primary" role="status" style="display: none;">
+                <span class="visually-hidden">Updating...</span>
+            </div> -->
+        </div>
     </div>
 
     <div class="table-responsive border rounded-3 p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <input type="text" class="form-control w-25 mb-3 ms-3" placeholder="Search">
+            <input type="text" id="searchInput" class="form-control w-25 mb-3 ms-3" placeholder="Search by request ID, invoice, client, or unit...">
             <div class="d-flex align-items-center gap-2 ms-auto">
                 <span class="text-secondary small">Filter by:</span>
-                <select class="form-select form-select-sm" style="width: auto;">
-                    <option selected>Select</option>
-                    <option>Status</option>
-                    <option>Department</option>
-                    <option>Date</option>
+                <select id="statusFilter" class="form-select form-select-sm" style="width: auto;">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Completed">Completed</option>
                 </select>
             </div>
         </div>
@@ -124,6 +130,11 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tbody = document.getElementById('deliveryRequestsBody');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    let lastUpdateTime = null;
+    let allRequests = []; // Store all requests for filtering
+    let isInitialLoad = true; // Track if this is the first load
 
     function badgeClass(status) {
         if (status === 'Pending') return 'status-pending';
@@ -131,45 +142,132 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'status-completed';
     }
 
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    function filterRequests() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusFilterValue = statusFilter.value;
+        
+        let filteredRequests = allRequests.filter(function(item) {
+            const matchesSearch = !searchTerm || 
+                (item.request_id && item.request_id.toLowerCase().includes(searchTerm)) ||
+                (item.invoice_number && item.invoice_number.toLowerCase().includes(searchTerm)) ||
+                (item.unit_name && item.unit_name.toLowerCase().includes(searchTerm)) ||
+                (item.serial_number && item.serial_number.toLowerCase().includes(searchTerm)) ||
+                (item.client_name && item.client_name.toLowerCase().includes(searchTerm));
+            
+            const matchesStatus = !statusFilterValue || item.status === statusFilterValue;
+            
+            return matchesSearch && matchesStatus;
+        });
+        
+        renderRows(filteredRequests);
+    }
+
     function renderRows(items) {
         if (!tbody) return;
         let html = '';
         items.forEach(function(item) {
             html += '<tr style="background-color: #f9f9f9; border-radius: 10px; overflow: hidden;">' +
-                '<td>' + item.request_id + '</td>' +
-                '<td>' + item.invoice_number + '</td>' +
+                '<td>' + (item.request_id || '') + '</td>' +
+                '<td>' + (item.invoice_number || '') + '</td>' +
                 '<td>' + (item.unit_name || '') + '</td>' +
                 '<td>' + (item.serial_number || '') + '</td>' +
                 '<td>' + (item.client_name || '') + '</td>' +
                 '<td><span class="status-badge ' + badgeClass(item.status) + '">' + item.status + '</span></td>' +
-                '<td>' + new Date(item.created_at).toLocaleDateString() + '</td>' +
+                '<td>' + formatDate(item.created_at) + '</td>' +
                 '<td><a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewDeliveryModal' + item.id + '"><i class="bi bi-chevron-right fs-5"></i></a></td>' +
             '</tr>';
         });
         if (html === '') {
-            html = '<tr><td colspan="9" class="text-center text-muted py-4">No delivery requests found</td></tr>';
+            html = '<tr><td colspan="8" class="text-center text-muted py-4">No delivery requests found</td></tr>';
         }
         tbody.innerHTML = html;
     }
 
     function fetchDeliveryFeed() {
-        fetch('{% url "delivery_requests_feed" %}', { credentials: 'same-origin' })
-            .then(function(res) { return res.json(); })
+        const indicator = document.getElementById('updateIndicator');
+        if (indicator) {
+            indicator.style.display = 'inline-block';
+        }
+        
+        fetch('{% url "delivery_requests_feed" %}', { 
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(function(res) { 
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json(); 
+            })
             .then(function(data) {
                 const rows = data && Array.isArray(data.requests) ? data.requests : [];
-                renderRows(rows);
-                if (!rows.length) {
-                    console.debug('Delivery feed returned 0 items');
+                
+                // Store all requests for filtering
+                allRequests = rows;
+                
+                // Check if we have new data
+                const currentUpdateTime = rows.length > 0 ? rows[0].created_at : null;
+                if (currentUpdateTime && currentUpdateTime !== lastUpdateTime) {
+                    lastUpdateTime = currentUpdateTime;
+                    
+                    // No notification popup - just update the table silently
                 }
+                
+                // Mark initial load as complete after first fetch
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                }
+                
+                // Apply current filters
+                filterRequests();
+                
                 if (typeof fetchNotifications === 'function') {
                     fetchNotifications();
                 }
             })
-            .catch(function(err) { console.error('Delivery feed error:', err); });
+            .catch(function(err) { 
+                console.error('Delivery feed error:', err);
+                // Don't show error to user, just log it
+            })
+            .finally(function() {
+                if (indicator) {
+                    indicator.style.display = 'none';
+                }
+            });
     }
 
+
+    // Add event listeners for search and filter
+    if (searchInput) {
+        searchInput.addEventListener('input', filterRequests);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterRequests);
+    }
+
+    // Initial load
     fetchDeliveryFeed();
-    setInterval(fetchDeliveryFeed, 5000);
+    
+    // Set up polling every 3 seconds for more responsive updates
+    setInterval(fetchDeliveryFeed, 3000);
+    
+    // Also fetch when page becomes visible (user switches back to tab)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            fetchDeliveryFeed();
+        }
+    });
 });
 </script>
 

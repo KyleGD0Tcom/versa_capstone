@@ -281,6 +281,37 @@
         });
     }
 
+    // Global notification system for real-time updates
+    function showGlobalNotification(message, type = 'info', duration = 5000) {
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;';
+      
+      const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'danger' ? 'exclamation-circle' : 'info-circle';
+      
+      notification.innerHTML = `
+        <i class="bi bi-${icon} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after specified duration
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, duration);
+    }
+
+    // Enhanced notification fetching with better error handling
+    function fetchNotifications() {
+      if (typeof window.fetchNotifications === 'function') {
+        window.fetchNotifications();
+      }
+    }
+
     // Initialize time and date display when page loads
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize time and date display
@@ -290,6 +321,10 @@
       
       // Auto-refresh settings on page load to ensure latest values
       setTimeout(refreshSettings, 1000);
+      
+      // Set up global notification polling
+      fetchNotifications();
+      setInterval(fetchNotifications, 3000);
       
       // Fallback: if elements still don't exist after 2 seconds, try again
       setTimeout(function() {

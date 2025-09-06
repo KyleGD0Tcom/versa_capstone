@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/send-to-delivery/', views.send_to_delivery, name='send_to_delivery'),
     path('api/client-orders/<int:client_id>/', views.get_client_orders, name='get_client_orders'),
     path('api/client-invoices/<int:client_id>/', views.get_client_invoices, name='get_client_invoices'),
+    path('api/inventory-feed/', views.inventory_feed, name='inventory_feed'),
 ]

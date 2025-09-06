@@ -83,6 +83,12 @@ function initDeliveryTrackerFromElement(element) {
     <!-- Header-->
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="fs-4 fw-bold mb-4" style="color: #033b60;">Delivery Tracker</h5>
+        <div class="d-flex align-items-center">
+            <!-- <span class="text-muted small me-2">Real-time updates</span>
+            <div id="trackerUpdateIndicator" class="spinner-border spinner-border-sm text-primary" role="status" style="display: none;">
+                <span class="visually-hidden">Updating...</span>
+            </div> -->
+        </div>
     </div>
     
     <div class="table-responsive border rounded-3 p-4">
@@ -161,5 +167,99 @@ function initDeliveryTrackerFromElement(element) {
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let lastUpdateTime = null;
+    let isInitialLoad = true;
+    
+    function updateStatusInTable(scheduleId, newStatus) {
+        // Find the row with the matching schedule ID and update its status
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const scheduleIdCell = row.querySelector('td:first-child');
+            if (scheduleIdCell && scheduleIdCell.textContent.trim() === scheduleId) {
+                const statusCell = row.querySelector('td:nth-child(5)');
+                if (statusCell) {
+                    const statusBadge = statusCell.querySelector('.status-badge');
+                    if (statusBadge) {
+                        // Update status text
+                        statusBadge.textContent = newStatus;
+                        
+                        // Update status classes
+                        statusBadge.className = 'status-badge';
+                        if (newStatus === 'Scheduled') {
+                            statusBadge.classList.add('status-scheduled');
+                        } else if (newStatus === 'In-Transit') {
+                            statusBadge.classList.add('status-in-transit');
+                        } else if (newStatus === 'Delivered') {
+                            statusBadge.classList.add('status-delivered');
+                        } else if (newStatus === 'Cancelled') {
+                            statusBadge.classList.add('status-cancelled');
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function fetchDeliveryTrackerFeed() {
+        const indicator = document.getElementById('trackerUpdateIndicator');
+        if (indicator) {
+            indicator.style.display = 'inline-block';
+        }
+        
+        fetch('{% url "delivery_requests_feed" %}', { 
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(function(res) { 
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json(); 
+            })
+            .then(function(data) {
+                const rows = data && Array.isArray(data.requests) ? data.requests : [];
+                
+                // Check if we have new data
+                const currentUpdateTime = rows.length > 0 ? rows[0].created_at : null;
+                if (currentUpdateTime && currentUpdateTime !== lastUpdateTime) {
+                    lastUpdateTime = currentUpdateTime;
+                    
+                    // Only update if not initial load and there are actual changes
+                    if (!isInitialLoad) {
+                        // Instead of refreshing the page, just refresh the table data
+                        window.location.reload();
+                    }
+                }
+                
+                // Mark initial load as complete after first fetch
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                }
+            })
+            .catch(function(err) { 
+                console.error('Delivery tracker feed error:', err);
+            })
+            .finally(function() {
+                if (indicator) {
+                    indicator.style.display = 'none';
+                }
+            });
+    }
+
+    // Make updateStatusInTable globally available for the modal to use
+    window.updateStatusInTable = updateStatusInTable;
+
+    // Initial load
+    fetchDeliveryTrackerFeed();
+    
+    // Set up polling every 5 seconds for delivery tracker updates
+    setInterval(fetchDeliveryTrackerFeed, 5000);
+});
+</script>
 
 {% endblock %}

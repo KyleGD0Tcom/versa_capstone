@@ -378,19 +378,32 @@ function updateDeliveryStatus(scheduleId, newStatus, buttonElement, modalId) {
             // Update the progress indicators
             updateStatusProgress(decodedStatus, modalId);
             
+            // Update the status in the main table
+            if (typeof window.updateStatusInTable === 'function') {
+                window.updateStatusInTable(scheduleId, decodedStatus);
+            }
+            
             // Keep buttons disabled and update their appearance
             if (newStatus === 'In-Transit') {
                 inTransitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Marked as In-Transit';
                 inTransitBtn.classList.remove('btn-warning');
                 inTransitBtn.classList.add('btn-secondary');
+                
+                // Refresh the page to show the updated status in the table
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else if (newStatus === 'Delivered') {
                 deliveredBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Marked as Delivered';
                 deliveredBtn.classList.remove('btn-success');
                 deliveredBtn.classList.add('btn-secondary');
                 
-                // Refresh the current page after a short delay
+                // Close modal after a short delay
                 setTimeout(() => {
-                    window.location.reload();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('viewDeliveryTrackerModal' + modalId));
+                    if (modal) {
+                        modal.hide();
+                    }
                 }, 1500);
             }
         } else {
@@ -414,4 +427,5 @@ function updateDeliveryStatus(scheduleId, newStatus, buttonElement, modalId) {
         alert('Error updating delivery status. Please try again.');
     });
 }
+
 </script>

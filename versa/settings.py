@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'versa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'saging_db',
+        'NAME': 'mpl',
         'USER': 'root', 
         'PASSWORD': '',  # leave blank if no password
         'HOST': 'localhost',

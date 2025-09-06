@@ -35,6 +35,12 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold" style="color: #033b60;">Spare Parts Listings</h4>
             <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center">
+                    <!-- <span class="text-muted small me-2">Real-time updates</span>
+                    <div id="inventoryUpdateIndicator" class="spinner-border spinner-border-sm text-primary" role="status" style="display: none;">
+                        <span class="visually-hidden">Updating...</span>
+                    </div> -->
+                </div>
                 <!-- Filter by Dropdown -->
                 <div class="d-flex align-items-center">
                     <span class="text-secondary me-2">Filter by:</span>
@@ -91,7 +97,7 @@
 
                             <div class="mb-0">
                                 <span class="text-secondary">Description:</span>
-                                <p style="margin-left: 33%; margin-top: -5%;">{{ item.details }}</p>
+                                <p style="margin-left: 45%; margin-top: -5%;">{{ item.details }}</p>
                                 
                             </div>
                             <div class="mb-0 d-flex">
@@ -106,5 +112,117 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let lastInventoryData = null;
+    let isInitialLoad = true;
+    
+    function updateInventoryQuantities(items) {
+        // Update quantities for matching items using the feed data
+        const currentCards = document.querySelectorAll('.card');
+        
+        items.forEach(item => {
+            const itemCode = item.item_code;
+            const newQuantity = item.quantity;
+            
+            // Find matching card in current page
+            currentCards.forEach(currentCard => {
+                const currentItemCode = currentCard.querySelector('.sp-code')?.textContent.trim();
+                if (currentItemCode === itemCode) {
+                    // Find all divs with mb-1 d-flex class
+                    const allRows = currentCard.querySelectorAll('.mb-1.d-flex');
+                    
+                    // Find the quantity row (the one that contains "Quantity:")
+                    let quantityElement = null;
+                    allRows.forEach(row => {
+                        const firstSpan = row.querySelector('span:first-child');
+                        if (firstSpan && firstSpan.textContent.trim() === 'Quantity:') {
+                            quantityElement = row.querySelector('span:last-child');
+                        }
+                    });
+                    
+                    if (quantityElement) {
+                        const currentQuantity = parseInt(quantityElement.textContent.trim());
+                        const updatedQuantity = parseInt(newQuantity);
+                        
+                        // Only update if quantity has changed
+                        if (currentQuantity !== updatedQuantity) {
+                            quantityElement.textContent = newQuantity;
+                            
+                            // Add visual indicator for quantity change
+                            quantityElement.style.backgroundColor = '#fff3cd';
+                            quantityElement.style.padding = '2px 6px';
+                            quantityElement.style.borderRadius = '4px';
+                            quantityElement.style.transition = 'background-color 0.3s ease';
+                            
+                            // Remove highlight after 3 seconds
+                            setTimeout(() => {
+                                quantityElement.style.backgroundColor = '';
+                                quantityElement.style.padding = '';
+                                quantityElement.style.borderRadius = '';
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        });
+    }
+    
+    function fetchInventoryFeed() {
+        const indicator = document.getElementById('inventoryUpdateIndicator');
+        if (indicator) {
+            indicator.style.display = 'inline-block';
+        }
+        
+        // Check for inventory updates every 3 seconds
+        fetch('/warehouse/api/inventory-feed/', { 
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(function(res) { 
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json(); 
+            })
+            .then(function(data) {
+                const items = data && Array.isArray(data.items) ? data.items : [];
+                
+                // Compare current data with previous data to detect changes
+                const currentDataString = JSON.stringify(items);
+                if (currentDataString !== lastInventoryData) {
+                    lastInventoryData = currentDataString;
+                    
+                    // Only update if not initial load and there are actual changes
+                    if (!isInitialLoad) {
+                        updateInventoryQuantities(items);
+                    }
+                }
+                
+                // Mark initial load as complete after first fetch
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                }
+            })
+            .catch(function(err) { 
+                console.error('Inventory feed error:', err);
+            })
+            .finally(function() {
+                if (indicator) {
+                    indicator.style.display = 'none';
+                }
+            });
+    }
+
+    // Initial load
+    fetchInventoryFeed();
+    
+    // Set up polling every 3 seconds for inventory updates
+    setInterval(fetchInventoryFeed, 3000);
+});
+</script>
 
 {% endblock %}
