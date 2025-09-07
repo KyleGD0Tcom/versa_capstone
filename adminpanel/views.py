@@ -198,6 +198,49 @@ def SalesAndOrders_view(request):
     return render(request, 'pages/Operations/sales_and_orders.html', context)
 
 
+@login_required
+@user_passes_test(is_admin)
+def orders_feed(request):
+    """Return latest orders data as JSON for AJAX polling."""
+    from django.utils import timezone
+    
+    # Get all orders from both departments
+    sales_orders = SalesOrder.objects.all().order_by('-order_date')
+    warehouse_orders = WarehouseOrder.objects.all().order_by('-order_date')
+    
+    # Combine and sort all orders
+    all_orders = list(sales_orders) + list(warehouse_orders)
+    all_orders.sort(key=lambda x: x.order_date, reverse=True)
+    
+    results = []
+    for order in all_orders:
+        # Determine order type and get appropriate data
+        if hasattr(order, 'item_description'):  # SalesOrder
+            item_description = order.item_description
+            order_type = 'SalesOrder'
+        else:  # WarehouseOrder
+            if order.items.all():
+                item_description = ', '.join([f"{item.quantity}x {item.inventory_item.unit_item}" for item in order.items.all()])
+            else:
+                item_description = '-'
+            order_type = 'WarehouseOrder'
+        
+        results.append({
+            'id': order.id,
+            'order_number': order.order_number,
+            'client_name': order.client_name,
+            'item_description': item_description,
+            'total_amount': str(order.total_amount),
+            'order_date': order.order_date.isoformat(),
+            'delivery_date': order.delivery_date.isoformat(),
+            'status': order.status,
+            'order_type': order_type,
+            'created_at': order.order_date.isoformat(),
+        })
+    
+    return JsonResponse({'orders': results})
+
+
 
 @login_required
 @user_passes_test(is_admin)

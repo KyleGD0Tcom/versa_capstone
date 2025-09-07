@@ -254,14 +254,17 @@
         .then(data => {
             console.log('Response:', data);
             if (data.status === 'success') {
-                alert('Delivery schedule created successfully!');
                 // Close the modal
                 const modalInstance = bootstrap.Modal.getInstance(modal);
                 if (modalInstance) {
                     modalInstance.hide();
                 }
-                // Reload the page to show updated data
-                window.location.reload();
+                
+                // Update the request status in the table without page reload
+                updateRequestStatus(requestId, 'Processing');
+                
+                // Show success notification
+                showScheduleCreatedNotification();
             } else {
                 alert('Error: ' + (data.message || 'Failed to create delivery schedule'));
             }
@@ -270,5 +273,54 @@
             console.error('Error:', error);
             alert('Error creating delivery schedule. Please try again.');
         });
+    }
+    
+    function updateRequestStatus(requestId, newStatus) {
+        // Find the row with the matching request ID and update its status
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const requestIdCell = row.querySelector('td:first-child');
+            if (requestIdCell && requestIdCell.textContent.trim() === requestId) {
+                const statusCell = row.querySelector('td:nth-child(4)');
+                if (statusCell) {
+                    const statusBadge = statusCell.querySelector('.status-badge');
+                    if (statusBadge) {
+                        // Update status text
+                        statusBadge.textContent = newStatus;
+                        
+                        // Update status classes
+                        statusBadge.className = 'status-badge';
+                        if (newStatus === 'Pending') {
+                            statusBadge.classList.add('status-pending');
+                        } else if (newStatus === 'Processing') {
+                            statusBadge.classList.add('status-processing');
+                        } else if (newStatus === 'Completed') {
+                            statusBadge.classList.add('status-completed');
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function showScheduleCreatedNotification() {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>Success!</strong> Delivery schedule created successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 3000);
     }
 </script>

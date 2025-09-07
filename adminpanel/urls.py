@@ -19,4 +19,5 @@ urlpatterns = [
     path('settings/', views.Settings_view, name='settings'),
     path('notifications/', views.Notifications_view, name='notifications'),
     path('update-request-notes/', views.admin_update_request_notes, name='admin_update_request_notes'),
+    path('api/orders-feed/', views.orders_feed, name='admin_orders_feed'),
 ]

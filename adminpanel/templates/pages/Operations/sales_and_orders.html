@@ -305,4 +305,129 @@
 
 
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let lastOrdersData = null;
+    let isInitialLoad = true;
+    
+    function renderOrdersTable(orders) {
+        const tbody = document.querySelector('tbody');
+        if (!tbody) return;
+        
+        // Clear existing rows
+        tbody.innerHTML = '';
+        
+        if (orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No orders found</td></tr>';
+            return;
+        }
+        
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+            row.className = 'bg-white';
+            
+            // Format dates
+            const orderDate = new Date(order.order_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const deliveryDate = new Date(order.delivery_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            // Status badge HTML
+            let statusBadge = '';
+            if (order.status === 'Pending') {
+                statusBadge = '<span style="background-color: #fff3cd; border-radius: 5px;" class="p-1 text-warning">Pending</span>';
+            } else if (order.status === 'Processing') {
+                statusBadge = '<span style="background-color: #cfe2ff; border-radius: 5px;" class="p-1 text-primary">Processing</span>';
+            } else if (order.status === 'Completed') {
+                statusBadge = '<span style="background-color: #d1e7dd; border-radius: 5px;" class="p-1 text-success">Completed</span>';
+            } else if (order.status === 'Cancelled') {
+                statusBadge = '<span style="background-color: #f8d7da; border-radius: 5px;" class="p-1 text-danger">Cancelled</span>';
+            }
+            
+            row.innerHTML = `
+                <td class="d-flex align-items-center gap-2">
+                    ${order.order_number}
+                </td>
+                <td>${order.client_name}</td>
+                <td>${order.item_description}</td>
+                <td>₱ ${parseFloat(order.total_amount).toFixed(2)}</td>
+                <td>${orderDate}</td>
+                <td><span>${deliveryDate}</span></td>
+                <td>${statusBadge}</td>
+                <td>
+                    <a href="#" class="text-dark me-2" data-bs-toggle="modal" data-bs-target="#viewSalesOrderModal${order.id}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+    
+    function showNewOrderNotification() {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            <i class="bi bi-bell-fill me-2"></i>
+            <strong>New Order!</strong> A new order has been created.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+    
+    function fetchOrdersFeed() {
+        fetch('{% url "admin_orders_feed" %}', { 
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(function(res) { 
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json(); 
+            })
+            .then(function(data) {
+                const orders = data && Array.isArray(data.orders) ? data.orders : [];
+                
+                // Compare current data with previous data to detect changes
+                const currentDataString = JSON.stringify(orders);
+                if (currentDataString !== lastOrdersData) {
+                    lastOrdersData = currentDataString;
+                    
+                    // Only update if not initial load and there are actual changes
+                    if (!isInitialLoad) {
+                        renderOrdersTable(orders);
+                        showNewOrderNotification();
+                    }
+                }
+                
+                // Mark initial load as complete after first fetch
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                }
+            })
+            .catch(function(err) { 
+                console.error('Orders feed error:', err);
+            });
+    }
+
+    // Initial load
+    fetchOrdersFeed();
+    
+    // Set up polling every 5 seconds for orders updates
+    setInterval(fetchOrdersFeed, 5000);
+});
+</script>
+
 {% endblock %}
